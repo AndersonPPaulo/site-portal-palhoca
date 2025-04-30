@@ -25,7 +25,7 @@ export default function Header() {
   };
 
   return (
-    <header className="py-3 px-2 lg:px-8 xl:px-0 flex flex-col">
+    <header className="py-3 xl:px-0 flex flex-col">
       <div className="flex justify-between items-center p-4 bg-white">
         {/* Mobile menu button - visible only on mobile (<lg) */}
         <button 
