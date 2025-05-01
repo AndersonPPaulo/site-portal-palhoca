@@ -7,7 +7,7 @@ export function Footer() {
   return (
     <footer className="w-full pt-12 pb-4 border-t border-[#e6e6e6] mt-10">
       <div className="flex flex-col justify-between px-4">
-        <div className="flex mx-auto justify-between w-full p-4 gap-8">
+        <div className="flex flex-col md:flex-row mx-auto justify-between w-full p-4 gap-8">
           {/* Logo and description */}
           <div className="max-w-[380px]">
             <Image src={logo} alt="Portal Palhoça" width={200} height={50} />
@@ -30,8 +30,20 @@ export function Footer() {
             </div>
           </div>
 
+              {/* Receba nossas notícias mobile*/}
+        <div className="mt-8 px-4 flex flex-col max-w-[340px] lg:hidden">
+          <h3 className="font-semibold text-lg mb-4">Receba nossas notícias</h3>
+          <Link
+            href="#"
+            className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-4 py-2  rounded-3xl hover:bg-green-200"
+          >
+            <i className="fab fa-whatsapp"></i>
+            Entrar em nosso grupo de WhatsApp
+          </Link>
+        </div>
+
           {/* Sobre o Portal */}
-          <div>
+          <div className="mt-6 md:mt-0">
             <h3 className="font-semibold text-lg mb-4">Sobre o Portal</h3>
             <ul className="space-y-2">
               <li>
@@ -68,7 +80,7 @@ export function Footer() {
           </div>
 
           {/* Categorias */}
-          <div>
+          <div className="mt-6 md:mt-0">
             <h3 className="font-semibold text-lg mb-4">Categorias</h3>
             <div className="grid grid-cols-2 gap-2">
               <div>
@@ -171,7 +183,7 @@ export function Footer() {
           </div>
 
           {/* Nossos parceiros */}
-          <div >
+          <div className="mt-6 md:mt-0">
             <h3 className="font-semibold text-lg mb-4">Nossos parceiros</h3>
             <ul className="space-y-2">
               <li>
@@ -187,11 +199,11 @@ export function Footer() {
         </div>
 
         {/* Receba nossas notícias */}
-        <div className="mt-8">
+        <div className="mt-8 px-4 hidden lg:flex lg:flex-col max-w-[340px]">
           <h3 className="font-semibold text-lg mb-4">Receba nossas notícias</h3>
           <Link
             href="#"
-            className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-4 py-2 rounded-md hover:bg-green-200"
+            className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-4 py-2  rounded-3xl hover:bg-green-200"
           >
             <i className="fab fa-whatsapp"></i>
             Entrar em nosso grupo de WhatsApp

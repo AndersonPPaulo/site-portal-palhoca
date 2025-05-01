@@ -26,7 +26,7 @@ export default function PostTopGridSection() {
 
   return (
     <section className="flex flex-col gap-6 max-w-[1272px] mx-auto py-4 justify-between">
-      <div className="w-[106px] h-2 bg-primary rounded-full " />
+      <div className="w-[106px] h-2 bg-primary rounded-full" />
 
       {/* Header */}
       <div className="flex items-center justify-between ">
@@ -35,11 +35,11 @@ export default function PostTopGridSection() {
         </h2>
       </div>
 
-      <div className="grid grid-cols-3 justify-between gap-7">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 justify-between gap-7">
         {sortedPosts.slice(0, 9).map((post, idx) => (
           <Link key={idx} href="#">
             <div className="flex flex-col  rounded-xl transition">
-              <div className="relative w-[405px] h-[310px] rounded-md overflow-hidden">
+              <div className="relative min-w-[300px] md:w-[405px] h-[310px] rounded-md overflow-hidden">
                 <Image
                   src={post.image}
                   alt={post.title}

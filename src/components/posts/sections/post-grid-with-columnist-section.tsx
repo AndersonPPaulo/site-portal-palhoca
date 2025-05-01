@@ -19,8 +19,8 @@ export default function PostGridWwithColumnistSection() {
   const slicedPosts = sortedPosts.slice(7, 10); // índice 7, 8 e 9
   
   return (
-    <section className="flex gap-6 mx-auto max-w-[1272px] justify-between">
-      <div className="flex flex-row max-w-[840px] gap-2 rounded-2xl">
+    <section className="flex flex-col lg:flex-row gap-6 mx-auto max-w-[1272px] justify-between">
+      <div className="flex flex-col lg:flex-row max-w-[840px] gap-2 rounded-2xl">
         {slicedPosts.map((post, idx) => (
           <Link key={idx} href="#">
             <div className="flex flex-col gap-3 rounded-xl p-2 transition">

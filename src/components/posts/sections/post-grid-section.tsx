@@ -28,11 +28,11 @@ export default function PostGridSection() {
 
   return (
     <section className="flex gap-6 max-w-[1272px] mx-auto py-4 justify-between">
-      <div className="flex justify-between gap-7">
+      <div className="flex flex-col lg:flex-row justify-between gap-7">
         {slicedPosts.map((post, idx) => (
           <Link key={idx} href="#">
             <div className="flex flex-col  rounded-xl transition">
-              <div className="relative w-[405px] h-[310px] rounded-md overflow-hidden">
+              <div className="relative min-w-[300px] md:w-[405px] h-[310px] rounded-md overflow-hidden">
                 <Image
                   src={post.image}
                   alt={post.title}

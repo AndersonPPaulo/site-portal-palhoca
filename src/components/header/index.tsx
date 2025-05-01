@@ -10,10 +10,7 @@ import CustomInput from "../custom-input/custom-input";
 import CompanyCategorysMenu from "../menus/company-categorys-menu";
 import NewsCategoryMenu from "../menus/news-categorys-menu";
 import { Menu, Search, X } from "lucide-react";
-import HeroSection from "../posts/sections/hero-section";
-import { mockPosts } from "@/utils/mock-data";
 import TopBanner from "../banner/top";
-import PostGridSection from "../posts/sections/post-grid-section";
 
 export default function Header() {
   const pathname = usePathname();
@@ -29,7 +26,7 @@ export default function Header() {
   };
 
   return (
-    <header className="py-3 xl:px-0 flex flex-col max-w-[1272px] mx-auto">
+    <header className="py-3 p-0 xl:px-0 flex flex-col max-w-[1272px] mx-auto">
       <div className="flex justify-between items-center p-4 bg-white">
         {/* Mobile menu button - visible only on mobile (<lg) */}
         <button

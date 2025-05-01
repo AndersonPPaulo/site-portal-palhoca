@@ -7,10 +7,10 @@ export default function HeroSection() {
   const sidePosts = mockPosts.slice(1, 4);
 
   return (
-    <section className="flex gap-6 py-4 max-w-[1272px] mx-auto border-t border-[#e6e6e6] ">
+    <section className="flex flex-col lg:flex-row w-full max-w-[360px] gap-6 py-4 lg:max-w-[1272px] mx-auto border-t border-[#e6e6e6]">
       {/* Main Post */}
-      <div className="flex gap-6 bg-white rounded-xl p-4 pl-0">
-        <div className="relative min-w-[490px] max-w-[490px] min-h-[406px] max-h-[406px] rounded-xl overflow-hidden">
+      <div className="flex flex-col lg:flex-row gap-6 rounded-xl ">
+        <div className="relative md:min-w-[490px] max-w-[490px] min-h-[406px] max-h-[406px] rounded-xl overflow-hidden">
           <Image
             src={mainPost.image}
             alt={mainPost.title}
@@ -36,7 +36,7 @@ export default function HeroSection() {
       </div>
 
       {/* Side Posts */}
-      <div className="flex flex-col gap-4 shadow-md p-4 rounded-2xl min-w-[415px] max-w-[415px]">
+      <div className="flex flex-col gap-4 shadow-md p-4 rounded-2xl min-w-[300px] md:min-w-[415px] max-w-[415px]">
         {sidePosts.map((post, idx) => (
           <Link key={idx} href="#">
             <div className="flex gap-3 rounded-xl p-2 transition">

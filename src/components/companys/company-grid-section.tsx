@@ -24,7 +24,7 @@ export function CompanyGridSection() {
         </div>
 
         {/* Grid */}
-        <div className="flex justify-between">
+        <div className="flex flex-col lg:flex-row justify-between">
           {mockCompanys.slice(0, 4).map((company) => (
             <CardCompany
               key={company.name}
