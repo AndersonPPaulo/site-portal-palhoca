@@ -15,7 +15,7 @@ interface Props {
 
 export function CardCompany({ company }: Props) {
   return (
-    <div className="overflow-hidden w-[300px] rounded-3xl shadow-lg">
+    <div className="overflow-hidden w-[360px] md:w-[300px] rounded-3xl shadow-lg">
       <div className="relative h-[156px]">
         <Image
           src={company.image}

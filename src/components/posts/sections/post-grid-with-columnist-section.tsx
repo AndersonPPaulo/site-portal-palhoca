@@ -24,7 +24,7 @@ export default function PostGridWwithColumnistSection() {
         {slicedPosts.map((post, idx) => (
           <Link key={idx} href="#">
             <div className="flex flex-col gap-3 rounded-xl p-2 transition">
-              <div className="relative w-[264px] h-[200px] rounded-md overflow-hidden">
+              <div className="relative min-w-[300px]  h-[310px] md:w-[264px] md:min-w-[260px] md:h-[200px] rounded-md overflow-hidden">
                 <Image
                   src={post.image}
                   alt={post.title}

@@ -1,7 +1,6 @@
 import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 import { mockPosts } from "@/utils/mock-data";
-import { ArrowRight } from "lucide-react";
 
 export type NewsProps = {
   id: number;
