@@ -2,7 +2,7 @@ import { ChevronDown, Search } from "lucide-react";
 import { Input } from "../ui/input";
 
 export default function CustomInput({ pathname }: { pathname: string | null }) {
-  const isComercio = pathname === "/comercio";
+  const isComercio = pathname === "/comercios";
 
   return (
     <div className="w-full max-w-[628px] mx-auto -mb-4 md:mb-2 lg:mt-2">

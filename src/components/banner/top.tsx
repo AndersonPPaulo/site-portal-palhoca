@@ -15,8 +15,7 @@ export const TopBanner = () => {
   }
 
   return (
-    <div className="w-full border-b border-[#e6e6e6] pb-4 px-20">
-      <div className="flex flex-col md:flex-row max-w-[670px] mx-auto px-4 items-center relative">
+      <div className="flex flex-col md:flex-row max-w-[670px] mx-auto px-4 py-3  items-center relative">
         <span className="block w-full min-w-[360px] md:w-18 md:min-w-0 text-[12px] text-gray-400 md:absolute md:left-[-30px] md:top-1/2 md:-translate-y-1/2 mb-1 md:mb-0 md:transform md:-rotate-90">
           PUBLICIDADE
         </span>
@@ -35,7 +34,6 @@ export const TopBanner = () => {
             />
           </Link>
         </div>
-      </div>
     </div>
   );
 };
