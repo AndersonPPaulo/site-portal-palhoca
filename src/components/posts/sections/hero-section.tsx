@@ -1,6 +1,17 @@
+"use client"
+
 import Image from "next/image";
 import Link from "next/link";
 import { mockPosts } from "@/utils/mock-data";
+
+function normalizeText(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // Remove accents
+    .replace(/[^\w\s]/g, "") // Remove special characters
+    .replace(/\s+/g, ""); // Remove spaces
+}
 
 export default function HeroSection() {
   const mainPost = mockPosts[0];
@@ -38,8 +49,10 @@ export default function HeroSection() {
       {/* Side Posts */}
       <div className="flex flex-col gap-4 shadow-md p-4 rounded-2xl min-w-[300px] md:min-w-[415px] max-w-[415px]">
         {sidePosts.map((post, idx) => (
-          <Link key={idx} href="#">
-            <div className="flex gap-3 rounded-xl p-2 transition">
+          <Link key={idx} href={`/noticia/${normalizeText(post.category)}/${post.id}`}>
+            <div
+              className="flex gap-3 rounded-xl p-2 transition"
+            >
               <div className="relative min-w-[151px] h-[110px] rounded-sm overflow-hidden">
                 <Image
                   src={post.image}

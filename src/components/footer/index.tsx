@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import logo from "@/assets/Group.png";
 import { Facebook, Instagram } from "lucide-react";
+import ButtonCTAWhatsAppButton from "../custom-button/cta-whatsapp-group-button";
 
 export function Footer() {
   return (
@@ -199,15 +200,9 @@ export function Footer() {
         </div>
 
         {/* Receba nossas notícias */}
-        <div className="mt-8 px-4 hidden lg:flex lg:flex-col max-w-[340px]">
+        <div className="mt-8 px-4 hidden lg:flex lg:flex-col">
           <h3 className="font-semibold text-lg mb-4">Receba nossas notícias</h3>
-          <Link
-            href="#"
-            className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-4 py-2  rounded-3xl hover:bg-green-200"
-          >
-            <i className="fab fa-whatsapp"></i>
-            Entrar em nosso grupo de WhatsApp
-          </Link>
+          <ButtonCTAWhatsAppButton/>
         </div>
 
         {/* Copyright */}
