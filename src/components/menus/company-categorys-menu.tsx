@@ -61,122 +61,122 @@ export default function CompanyCategoryMenu({
   const [showRightArrow, setShowRightArrow] = useState(true);
 
   const categories = [
-    { name: "Todos", icon: todosIcon, path: "/comercio" },
-    { name: "Academia", icon: academiaIcon, path: "/comercio/academia" },
-    { name: "Advogados", icon: advogadosIcon, path: "/comercio/advogados" },
+    { name: "Todos", icon: todosIcon, path: "/comercios" },
+    { name: "Academia", icon: academiaIcon, path: "/comercios/academia" },
+    { name: "Advogados", icon: advogadosIcon, path: "/comercios/advogados" },
     {
       name: "Agência de viagem",
       icon: agenciaViagemIcon,
-      path: "/comercio/agencia-de-viagem",
+      path: "/comercios/agencia-de-viagem",
     },
     {
       name: "Alimentação",
       icon: alimentacaoIcon,
-      path: "/comercio/alimentacao",
+      path: "/comercios/alimentacao",
     },
-    { name: "Barbearia", icon: barbeariaIcon, path: "/comercio/barbearia" },
-    { name: "Bares", icon: baresIcon, path: "/comercio/bares" },
+    { name: "Barbearia", icon: barbeariaIcon, path: "/comercios/barbearia" },
+    { name: "Bares", icon: baresIcon, path: "/comercios/bares" },
     {
       name: "Casa e construção",
       icon: casaConstrucaoIcon,
-      path: "/comercio/casa-construcao",
+      path: "/comercios/casa-construcao",
     },
     {
       name: "Compras várias",
       icon: comprasVariasIcon,
-      path: "/comercio/compras-varias",
+      path: "/comercios/compras-varias",
     },
-    { name: "Eletrônico", icon: eletronico, path: "/comercio/eletronico" },
+    { name: "Eletrônico", icon: eletronico, path: "/comercios/eletronico" },
     {
       name: "Empresa médica",
       icon: empresa_medical,
-      path: "/comercio/empresa-medica",
+      path: "/comercios/empresa-medica",
     },
     {
       name: "Escolas e faculdades",
       icon: escola_faculdade,
-      path: "/comercio/escolas-faculdades",
+      path: "/comercios/escolas-faculdades",
     },
-    { name: "Farmácia", icon: farmacia, path: "/comercio/farmacia" },
+    { name: "Farmácia", icon: farmacia, path: "/comercios/farmacia" },
     {
       name: "Festas e eventos",
       icon: festa_eventos,
-      path: "/comercio/festas-eventos",
+      path: "/comercios/festas-eventos",
     },
     {
       name: "Floricultura",
       icon: floricultura,
-      path: "/comercio/floricultura",
+      path: "/comercios/floricultura",
     },
-    { name: "Imobiliárias", icon: imobiliaria, path: "/comercio/imobiliarias" },
+    { name: "Imobiliárias", icon: imobiliaria, path: "/comercios/imobiliarias" },
     {
       name: "Internet e informática",
       icon: internet_informatica,
-      path: "/comercio/internet-informatica",
+      path: "/comercios/internet-informatica",
     },
     {
       name: "Limpeza e organização",
       icon: limpeza_organizacao,
-      path: "/comercio/limpeza-organizacao",
+      path: "/comercios/limpeza-organizacao",
     },
     {
       name: "Marketing e publicidade",
       icon: marketing_publicidade,
-      path: "/comercio/marketing-publicidade",
+      path: "/comercios/marketing-publicidade",
     },
     {
       name: "Oficina mecânica",
       icon: oficina_mecanica,
-      path: "/comercio/oficina-mecanica",
+      path: "/comercios/oficina-mecanica",
     },
-    { name: "Outra", icon: outras, path: "/comercio/outra" },
-    { name: "Pet shop", icon: pet_shop, path: "/comercio/pet-shop" },
+    { name: "Outra", icon: outras, path: "/comercios/outra" },
+    { name: "Pet shop", icon: pet_shop, path: "/comercios/pet-shop" },
     {
       name: "Posto de combustível",
       icon: posto_combustivel,
-      path: "/comercio/posto-combustivel",
+      path: "/comercios/posto-combustivel",
     },
     {
       name: "Produto e serviço",
       icon: produto_servico,
-      path: "/comercio/produto-servico",
+      path: "/comercios/produto-servico",
     },
     {
       name: "Restaurante japonês",
       icon: rest_japones,
-      path: "/comercio/restaurante-japones",
+      path: "/comercios/restaurante-japones",
     },
     {
       name: "Revenda de carros",
       icon: revenda_carros,
-      path: "/comercio/revenda-carros",
+      path: "/comercios/revenda-carros",
     },
     {
       name: "Saúde e beleza",
       icon: saude_beleza,
-      path: "/comercio/saude-beleza",
+      path: "/comercios/saude-beleza",
     },
     {
       name: "Serviço público",
       icon: servico_publico,
-      path: "/comercio/servico-publico",
+      path: "/comercios/servico-publico",
     },
     {
       name: "Supermercado",
       icon: supermercado,
-      path: "/comercio/supermercado",
+      path: "/comercios/supermercado",
     },
     {
       name: "Viagem e transporte",
       icon: viagem_transportes,
-      path: "/comercio/viagem-transporte",
+      path: "/comercios/viagem-transporte",
     },
   ];
 
   useEffect(() => {
     // Only process if we're on a commerce route
-    if (pathname === "/comercio" || pathname?.startsWith("/comercio/")) {
-      if (pathname === "/comercio") {
+    if (pathname === "/comercios" || pathname?.startsWith("/comercios/")) {
+      if (pathname === "/comercios") {
         setActiveCategory("Todos");
       } else {
         const pathSegments = pathname.split("/");
@@ -239,13 +239,13 @@ export default function CompanyCategoryMenu({
   };
 
   // Only render this menu on commerce routes
-  if (!pathname?.startsWith("/comercio")) {
+  if (!pathname?.startsWith("/comercios")) {
     return null;
   }
 
   return (
     <nav className="flex justify-center w-full bg-white mx-auto mt-6 lg:overflow-x-hidden">
-      <div className="max-w-[1350px] w-full flex justify-between border-b border-[#E6E6E6] items-center relative">
+      <div className="max-w-[1211px] w-full flex justify-between border-b border-[#E6E6E6] items-center relative">
         {/* Left scroll button */}
         {showLeftArrow && (
           <div className="absolute left-0 h-full hidden lg:flex items-center justify-center z-30">

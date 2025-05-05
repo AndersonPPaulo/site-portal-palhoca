@@ -10,6 +10,7 @@ import CustomInput from "../custom-input/custom-input";
 import CompanyCategorysMenu from "../menus/company-categorys-menu";
 import NewsCategoryMenu from "../menus/news-categorys-menu";
 import { Menu, Search, X } from "lucide-react";
+import TopBanner from "../banner/top";
 
 export default function Header() {
   const pathname = usePathname();
@@ -17,7 +18,7 @@ export default function Header() {
 
   // Check if we're on commerce related pages
   const isComercioPath =
-    pathname === "/comercio" || pathname?.startsWith("/comercio/");
+    pathname === "/comercios" || pathname?.startsWith("/comercios/");
 
   // Toggle mobile menu
   const toggleMenu = () => {
@@ -25,11 +26,11 @@ export default function Header() {
   };
 
   return (
-    <header className="py-3 px-2 lg:px-8 xl:px-0 flex flex-col">
+    <header className="py-3 p-0 xl:px-0 flex flex-col max-w-[1272px] mx-auto">
       <div className="flex justify-between items-center p-4 bg-white">
         {/* Mobile menu button - visible only on mobile (<lg) */}
-        <button 
-          onClick={toggleMenu} 
+        <button
+          onClick={toggleMenu}
           className="lg:hidden flex items-center"
           aria-label="Toggle menu"
         >
@@ -54,7 +55,7 @@ export default function Header() {
             Portal
           </Link>
           <Link
-            href="/comercio"
+            href="/comercios"
             className={`hover:text-red px-4 py-3 ${
               isComercioPath
                 ? "text-red font-[700] border-b-2 border-red"
@@ -82,20 +83,16 @@ export default function Header() {
           <Link
             href="/"
             className={`block py-2 ${
-              !isComercioPath
-                ? "text-primary font-[700]"
-                : "text-[#363636]"
+              !isComercioPath ? "text-primary font-[700]" : "text-[#363636]"
             }`}
             onClick={() => setIsMenuOpen(false)}
           >
             Portal
           </Link>
           <Link
-            href="/comercio"
+            href="/comercios"
             className={`block py-2 ${
-              isComercioPath
-                ? "text-red font-[700]"
-                : "text-[#363636]"
+              isComercioPath ? "text-red font-[700]" : "text-[#363636]"
             }`}
             onClick={() => setIsMenuOpen(false)}
           >
@@ -120,7 +117,7 @@ export default function Header() {
           Portal
         </Link>
         <Link
-          href="/comercio"
+          href="/comercios"
           className={`hover:text-red px-4 py-3 ${
             isComercioPath
               ? "text-red font-[700] border-b-2 border-red"
@@ -137,15 +134,20 @@ export default function Header() {
       {/* Category menus - Only visible when menu is closed */}
       {!isMenuOpen && (
         <>
-          {!pathname?.startsWith("/comercio") || pathname?.startsWith("/noticia") ? (
+          {!pathname?.startsWith("/comercios") ||
+          pathname?.startsWith("/noticia") ? (
             <NewsCategoryMenu pathname={pathname} />
           ) : (
-            pathname.startsWith("/comercio") && (
+            pathname.startsWith("/comercios") && (
               <CompanyCategorysMenu pathname={pathname} />
             )
           )}
         </>
       )}
+
+      <TopBanner />
+
+     
     </header>
   );
 }
