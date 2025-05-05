@@ -10,7 +10,7 @@ export function CompanyGridSection() {
       <div className="w-[106px] h-2 bg-red rounded-full mb-6"/>
 
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col md:flex-row items-start gap-3 md:items-center justify-between mb-4 md:mb-8">
           <h2 className="text-2xl font-semibold text-red-500">
             Comércios que são destaques em Palhoça!
           </h2>
@@ -24,7 +24,7 @@ export function CompanyGridSection() {
         </div>
 
         {/* Grid */}
-        <div className="flex justify-between">
+        <div className="flex flex-col items-center gap-3 lg:flex-row justify-between">
           {mockCompanys.slice(0, 4).map((company) => (
             <CardCompany
               key={company.name}

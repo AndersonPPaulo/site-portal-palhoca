@@ -4,9 +4,9 @@ import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 
-import bannerTop from "@/assets/banner-top.png";
+import bannerPost from "@/assets/banner-post.png";
 
-export const TopBanner = () => {
+const PostBanner = () => {
   const pathname = usePathname();
 
   // Hide banner if route starts with /comercios
@@ -15,11 +15,11 @@ export const TopBanner = () => {
   }
 
   return (
-      <div className="flex flex-col md:flex-row max-w-[670px] mx-auto px-0 md:px-4 py-3  items-center relative">
+      <div className="flex flex-col md:flex-row mx-auto px-0 md:px-8 py-3 items-center relative">
         <span className="block w-full min-w-[360px] md:w-18 md:min-w-0 text-[12px] text-gray-400 md:absolute md:left-[-30px] md:top-1/2 md:-translate-y-1/2 mb-1 md:mb-0 md:transform md:-rotate-90">
           PUBLICIDADE
         </span>
-        <div className="rounded-2xl flex justify-center w-full min-w-[360px] md:max-w-[650px]  bg-white shadow-md">
+        <div className="rounded-2xl flex justify-center bg-white shadow-md">
           <Link
             href="https://www.hospitalveterinariasantavida.com.br"
             target="_blank"
@@ -27,10 +27,10 @@ export const TopBanner = () => {
             className="relative block"
           >
             <Image
-              src={bannerTop}
+              src={bannerPost}
               alt="Hospital Veterinário Santa Vida"
               priority
-              className="rounded-lg"
+              className="bg-cover rounded-lg min-h-[110px] lg:min-h-[240px]"
             />
           </Link>
         </div>
@@ -38,4 +38,4 @@ export const TopBanner = () => {
   );
 };
 
-export default TopBanner;
+export default PostBanner;
