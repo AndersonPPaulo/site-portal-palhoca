@@ -22,7 +22,7 @@ export default function ProfileColumnist() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const params = useParams();
-  
+
   const currentPage = Number(searchParams.get("page")) || 1;
   const postsPerPage = 9;
 
@@ -112,7 +112,7 @@ export default function ProfileColumnist() {
           >
             <ArrowLeft className="w-4 h-4" />
           </button>
-          
+
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
             <button
               key={page}
@@ -126,7 +126,7 @@ export default function ProfileColumnist() {
               {page}
             </button>
           ))}
-          
+
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
@@ -140,6 +140,7 @@ export default function ProfileColumnist() {
       </div>
 
       {/* Side Posts */}
+      {/* adicionar postagens do colunista aqui quando for consumir API */}
       <div className="flex flex-col max-w-[356px]">
         <div className="shadow-md rounded-lg p-1">
           <h2 className="ms-2 text-primary text-2xl font-semibold my-2">
