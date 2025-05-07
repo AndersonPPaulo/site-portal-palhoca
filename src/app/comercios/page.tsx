@@ -1,65 +1,120 @@
 "use client";
-import { CardCompany } from "@/components/companys/card-company";
+import FilteredCommerceList from "@/components/companys/filterCompany";
 import DefaultPage from "@/components/default-page";
 import Header from "@/components/header";
 import CompanyCategoryMenu from "@/components/menus/company-categorys-menu";
-import { mockCompanys } from "@/utils/mock-data";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
+
+// Helper function para normalizar texto
+function normalizeText(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\w\s]/g, "")
+    .replace(/\s+/g, "-");
+}
+
+declare global {
+  interface Window {
+    showMap?: boolean;
+    activeCategory?: string;
+    toggleMap?: () => void;
+  }
+}
 
 export default function Comercio() {
   const pathname = usePathname();
   const [showMap, setShowMap] = useState(false);
+  const [activeCategory, setActiveCategory] = useState("Todos");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      if (!('showMap' in window)) {
+        window.showMap = false;
+      }
+      
+      if (!('activeCategory' in window)) {
+        window.activeCategory = "Todos";
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const updateMapState = () => {
-      if (typeof window !== "undefined" && "showMap" in window) {
-        setShowMap(window.showMap);
+      if (typeof window !== "undefined" && 'showMap' in window) {
+        setShowMap(window.showMap === true);
       }
     };
 
     updateMapState();
-
     window.addEventListener("mapToggled", updateMapState);
+    return () => window.removeEventListener("mapToggled", updateMapState);
+  }, []);
 
-    return () => {
-      window.removeEventListener("mapToggled", updateMapState);
+  useEffect(() => {
+    if (pathname === "/comercios") {
+      setActiveCategory("Todos");
+      if (typeof window !== "undefined") {
+        window.activeCategory = "Todos";
+      }
+    } else if (pathname?.startsWith("/comercios/")) {
+      const pathSegments = pathname.split("/");
+      const categorySlug = pathSegments[2] || "";
+      
+      if (categorySlug) {
+        const categories = [
+          "Academia", "Advogados", "Agência de viagem", "Alimentação", 
+          "Barbearia", "Bares", "Casa e construção", "Compras várias",
+          "Eletrônico", "Empresa médica", "Escolas e faculdades", "Farmácia",
+          "Festas e eventos", "Floricultura", "Imobiliárias", 
+          "Internet e informática", "Limpeza e organização", 
+          "Marketing e publicidade", "Oficina mecânica", "Outra", 
+          "Pet shop", "Posto de combustível", "Produto e serviço",
+          "Restaurante japonês", "Revenda de carros", "Saúde e beleza",
+          "Serviço público", "Supermercado", "Viagem e transporte"
+        ];
+        
+        const matchedCategory = categories.find(
+          cat => normalizeText(cat) === categorySlug
+        );
+        
+        if (matchedCategory) {
+          setActiveCategory(matchedCategory);
+          if (typeof window !== "undefined") {
+            window.activeCategory = matchedCategory;
+          }
+        }
+      }
+    }
+  }, [pathname]);
+
+  useEffect(() => {
+    const handleCategoryChange = () => {
+      if (typeof window !== "undefined" && 'activeCategory' in window) {
+        setActiveCategory(window.activeCategory || "Todos");
+      }
     };
+  
+    window.addEventListener("categoryChanged", handleCategoryChange);
+    return () => window.removeEventListener("categoryChanged", handleCategoryChange);
   }, []);
 
   return (
     <DefaultPage>
       <Header />
-      <div className="max-w-[1272px] mx-auto px-7 py-2">
-        <h1 className="text-[24px] font-[600] text-red-600 mb-3">
-          Comércios de Palhoça
+      <div className="max-w-[1272px] mx-auto px-7 py-5">
+        <h1 className="max-w-[756px] text-[29px] font-[600] text-red-600 mb-3">
+          {activeCategory === "Todos" 
+            ? "Comércios de Palhoça" 
+            : `Comércios de Palhoça - ${activeCategory}`}
         </h1>
 
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* Área de cards - redimensiona quando o mapa está visível */}
-          <div
-            className={`${
-              showMap ? "lg:w-2/3" : "w-full"
-            } transition-all duration-300`}
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {mockCompanys.map((company, index) => (
-                <div className="w-full" key={index}>
-                  <CardCompany company={company} />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Área do mapa - visível apenas quando showMap é true */}
-          {showMap && (
-            <div className="lg:w-1/3 min-h-full bg-red-600 rounded-lg sticky top-[120px] transition-all duration-300">
-              <div className="h-full flex items-center justify-center text-white">
-                <p className="text-xl font-bold">Componente de Mapa</p>
-              </div>
-            </div>
-          )}
-        </div>
+        <FilteredCommerceList
+          activeCategory={activeCategory}
+          showMap={showMap}
+        />
       </div>
     </DefaultPage>
   );

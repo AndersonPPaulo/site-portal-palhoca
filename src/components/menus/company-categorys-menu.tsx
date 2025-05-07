@@ -53,9 +53,12 @@ function normalizeText(text: string): string {
 // Declare a global interface for window to include showMap property
 declare global {
   interface Window {
-    showMap: boolean;
+    showMap?: boolean;
+    activeCategory?: string;
+    toggleMap?: () => void;
   }
 }
+
 
 export default function CompanyCategoryMenu({
   pathname,
@@ -249,8 +252,12 @@ export default function CompanyCategoryMenu({
 
   const handleCategoryClick = (categoryName: string) => {
     setActiveCategory(categoryName);
+    
+    if (typeof window !== "undefined") {
+      window.activeCategory = categoryName;
+      window.dispatchEvent(new Event("categoryChanged"));
+    }
   };
-
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollBy({ left: -200, behavior: "smooth" });
