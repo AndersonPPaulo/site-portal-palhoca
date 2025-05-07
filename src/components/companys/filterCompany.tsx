@@ -73,16 +73,14 @@ export default function FilteredCommerceList({
             company => normalizeText(company.category) === categoryNormalized
           );
           
-          // Mostra apenas os resultados filtrados
           setFilteredCompanies(filtered);
         }
       } else {
-        // Se a categoria não existir, a lista fica vazia
         setFilteredCompanies([]);
       }
       
       setIsLoading(false);
-    }, 10); // Um pequeno delay para garantir que a UI mostre o loading state
+    }, 500); 
     
     return () => clearTimeout(timer);
   }, [activeCategory]);
