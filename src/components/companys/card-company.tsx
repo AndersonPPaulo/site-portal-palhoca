@@ -2,22 +2,22 @@ import Image, { StaticImageData } from "next/image";
 import { Button } from "@/components/ui/button";
 import { MapPin, Phone } from "lucide-react";
 
-interface CompanyType {
+interface CardCompanyProps {
   name: string;
   address: string;
   category: string;
   image: StaticImageData | string;
 }
 
-interface CardCompanyProps {
-  company: CompanyType;
+interface Props {
+  company: CardCompanyProps;
   className?: string;
 }
 
-export function CardCompany({ company, className = "" }: CardCompanyProps) {
+export function CardCompany({ company, className = "" }: Props) {
   return (
     <div
-      className={`overflow-hidden rounded-3xl shadow-lg h-full ${className}`}
+      className={`overflow-hidden rounded-3xl shadow-lg h-full w-full ${className}`}
     >
       <div className="relative h-[156px] w-full">
         <Image
@@ -32,17 +32,19 @@ export function CardCompany({ company, className = "" }: CardCompanyProps) {
         </span>
       </div>
 
-      <div className="p-6">
+      <div className="p-4 lg:p-6">
         <span className="bg-red-100 text-red-500 px-3 py-1 rounded-full -ms-1">
           {company.category}
         </span>
-        <h3 className="text-xl font-semibold mb-2 mt-4">{company.name}</h3>
+        <h3 className="text-base lg:text-xl font-semibold mb-2 mt-4 truncate">
+          {company.name}
+        </h3>
         <div className="flex items-center gap-2 text-muted-foreground mb-4">
-          <MapPin size={16} className="text-red-500" />
-          <span className="text-sm">{company.address}</span>
+          <MapPin size={16} className="text-red-500 flex-shrink-0" />
+          <span className="text-sm truncate">{company.address}</span>
         </div>
         <Button className="w-full rounded-full" variant="outline">
-          <Phone className="mr-2" /> Conferir número
+          <Phone className="mr-2 flex-shrink-0" /> Conferir número
         </Button>
       </div>
     </div>

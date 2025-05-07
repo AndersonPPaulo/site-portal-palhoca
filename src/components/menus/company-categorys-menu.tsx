@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 
-// Import icons (you'll need to create or source these icons)
+// Import icons
 import todosIcon from "@/assets/icons/company/todos.png";
 import academiaIcon from "@/assets/icons/company/academia.png";
 import advogadosIcon from "@/assets/icons/company/advogados.png";
@@ -50,15 +50,36 @@ function normalizeText(text: string): string {
     .replace(/\s+/g, "-"); // Replace spaces with hyphens for URL format
 }
 
+// Declare a global interface for window to include showMap property
+declare global {
+  interface Window {
+    showMap: boolean;
+  }
+}
+
 export default function CompanyCategoryMenu({
   pathname,
 }: {
-  pathname: string | null
+  pathname: string | null;
 }) {
   const [activeCategory, setActiveCategory] = useState("Todos");
   const scrollContainerRef = useRef<HTMLUListElement>(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
+  const [showMap, setShowMap] = useState(false);
+
+  const toggleMap = () => {
+    const newMapState = !showMap;
+    setShowMap(newMapState);
+
+    // Update the global state to share with other components
+    if (typeof window !== "undefined") {
+      window.showMap = newMapState;
+
+      // Dispatch an event for other components to listen for
+      window.dispatchEvent(new Event("mapToggled"));
+    }
+  };
 
   const categories = [
     { name: "Todos", icon: todosIcon, path: "/comercios" },
@@ -108,7 +129,11 @@ export default function CompanyCategoryMenu({
       icon: floricultura,
       path: "/comercios/floricultura",
     },
-    { name: "Imobiliárias", icon: imobiliaria, path: "/comercios/imobiliarias" },
+    {
+      name: "Imobiliárias",
+      icon: imobiliaria,
+      path: "/comercios/imobiliarias",
+    },
     {
       name: "Internet e informática",
       icon: internet_informatica,
@@ -296,6 +321,7 @@ export default function CompanyCategoryMenu({
           ))}
         </ul>
 
+        {/* Right scroll button */}
         {showRightArrow && (
           <div className="absolute right-33 h-full hidden lg:flex items-center justify-center z-30">
             <div
@@ -315,7 +341,8 @@ export default function CompanyCategoryMenu({
           </div>
         )}
 
-          <ButtonMap />
+        {/* Botão do mapa */}
+        <ButtonMap onClick={toggleMap} isMapOpen={showMap} />
       </div>
     </nav>
   );
