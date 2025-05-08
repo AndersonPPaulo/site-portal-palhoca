@@ -171,39 +171,7 @@ interface CommercialMapProps {
   height?: string;
 }
 
-// Array com cores para diferentes tipos de comércios
-const typeColors: Record<string, string> = {
-  [CommerceTypes.RESTAURANT]: 'bg-red-500',
-  [CommerceTypes.STORE]: 'bg-blue-500',
-  [CommerceTypes.MARKET]: 'bg-green-500',
-  [CommerceTypes.CAFE]: 'bg-yellow-500',
-  [CommerceTypes.SERVICE]: 'bg-purple-500',
-  [CommerceTypes.BAKERY]: 'bg-amber-500',
-  [CommerceTypes.PHARMACY]: 'bg-emerald-500',
-  [CommerceTypes.AUTOPARTS]: 'bg-gray-500',
-  [CommerceTypes.BUTCHER]: 'bg-rose-500',
-  [CommerceTypes.STATIONERY]: 'bg-indigo-500',
-  [CommerceTypes.PETSHOP]: 'bg-cyan-500',
-  [CommerceTypes.MECHANIC]: 'bg-zinc-500',
-  [CommerceTypes.CLOTHING]: 'bg-pink-500'
-};
 
-// Mapeamento de cores do Tailwind para códigos hexadecimais para os pins
-const colorMap: Record<string, string> = {
-  'bg-red-500': '#EF4444',
-  'bg-blue-500': '#3B82F6',
-  'bg-green-500': '#10B981',
-  'bg-yellow-500': '#F59E0B',
-  'bg-purple-500': '#8B5CF6',
-  'bg-amber-500': '#F59E0B',
-  'bg-emerald-500': '#10B981',
-  'bg-gray-500': '#6B7280',
-  'bg-rose-500': '#F43F5E',
-  'bg-indigo-500': '#6366F1',
-  'bg-cyan-500': '#06B6D4',
-  'bg-zinc-500': '#71717A',
-  'bg-pink-500': '#EC4899'
-};
 
 // Função para criar ícone personalizado usando o MapPin do Lucide React
 const createMapPinIcon = (color = '#4B5563') => {
@@ -288,10 +256,10 @@ const CommercialMap: React.FC<CommercialMapProps> = ({
             <Marker 
               key={commerce.id} 
               position={[commerce.lat, commerce.lng]}
-              icon={createMapPinIcon(colorMap[typeColors[commerce.type]] || '#4B5563')}
+              icon={createMapPinIcon('#4B5563')}
             >
               <Popup>
-                <div className="w-64">
+                <div className="w-60">
                   <CardCompany
                     company={{
                       name: commerce.name,

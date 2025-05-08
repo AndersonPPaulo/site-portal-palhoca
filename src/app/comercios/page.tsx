@@ -1,11 +1,13 @@
 "use client";
-import FilteredCommerceList from "@/components/companys/filterCompany";
+
+import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import DefaultPage from "@/components/default-page";
 import Header from "@/components/header";
 import CompanyCategoryMenu from "@/components/menus/company-categorys-menu";
-import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import FilteredCommerceList from "@/components/companys/filterCompany";
 
+// Definir tipos para window global
 declare global {
   interface Window {
     showMap?: boolean;
@@ -19,6 +21,7 @@ export default function Comercio() {
   const [showMap, setShowMap] = useState(false);
   const [activeCategory, setActiveCategory] = useState("Todos");
 
+  // Efeito para sincronizar com o estado global de mapa
   useEffect(() => {
     const updateMapState = () => {
       if (typeof window !== "undefined" && 'showMap' in window) {
@@ -26,23 +29,41 @@ export default function Comercio() {
       }
     };
 
+    // Configurar a função toggleMap no objeto window
+    if (typeof window !== "undefined") {
+      window.toggleMap = () => {
+        const newState = !showMap;
+        window.showMap = newState;
+        setShowMap(newState);
+        window.dispatchEvent(new Event("mapToggled"));
+      };
+    }
+
     updateMapState();
     window.addEventListener("mapToggled", updateMapState);
-    return () => window.removeEventListener("mapToggled", updateMapState);
-  }, []);
+    
+    return () => {
+      window.removeEventListener("mapToggled", updateMapState);
+      // Limpar referência para evitar vazamento de memória
+      if (typeof window !== "undefined") {
+        window.toggleMap = undefined;
+      }
+    };
+  }, [showMap]);
 
+  // Efeito para definir a categoria ativa com base na URL
   useEffect(() => {
     if (pathname === "/comercios") {
       setActiveCategory("Todos");
     } else if (pathname?.startsWith("/comercios/")) {
-      const categorySlug = pathname.split("/")[2] || "";
-      
+      // Usar a categoria da URL ou do estado global
       if (typeof window !== "undefined" && window.activeCategory) {
         setActiveCategory(window.activeCategory);
       }
     }
   }, [pathname]);
 
+  // Efeito para ouvir as mudanças de categoria
   useEffect(() => {
     const handleCategoryChange = () => {
       if (typeof window !== "undefined" && 'activeCategory' in window) {
@@ -63,7 +84,6 @@ export default function Comercio() {
             ? "Comércios de Palhoça" 
             : `Comércios de Palhoça - ${activeCategory}`}
         </h1>
-
         <FilteredCommerceList
           activeCategory={activeCategory}
           showMap={showMap}

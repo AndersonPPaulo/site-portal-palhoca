@@ -140,6 +140,222 @@ export const mockColumnists = [
 
 export const mockCompanys = [
   {
+    name: "kayron",
+    address: "Av. Atlântica, 1520, Centro",
+    category: "Restaurante",
+    image: companyImg
+  },
+  {
+    name: " Delícia Real",
+    address: "Rua das Flores, 234, Jardim Eldorado",
+    category: "Padaria",
+    image: companyImg
+  },
+  {
+    name: " São Jorge",
+    address: "Av. Principal, 789, Centro",
+    category: "Supermercado",
+    image: companyImg
+  },
+  {
+    name: "  Total",
+    address: "Rua dos Ipês, 432, Caminho Novo",
+    category: "Farmácia",
+    image: companyImg
+  },
+  {
+    name: "  Silva",
+    address: "Av. Industrial, 567, Brejaru",
+    category: "Autopeças",
+    image: companyImg
+  },
+  {
+    name: " Bella ",
+    address: "Rua das Palmeiras, 890, Centro",
+    category: "Restaurante",
+    image: companyImg
+  },
+  {
+    name: "Açougue do Paulo",
+    address: "Av. Central, 123, Ponte do Imaruim",
+    category: "Açougue",
+    image: companyImg
+  },
+  {
+    name: "Papelaria Criativa",
+    address: "Rua do Comércio, 456, Centro",
+    category: "Papelaria",
+    image: companyImg
+  },
+  {
+    name: "Pet Shop  Fiel",
+    address: "Av. das Gaivotas, 789, Pachecos",
+    category: "Pet Shop",
+    image: companyImg
+  },
+  {
+    name: "Oficina Mecânica Precisão",
+    address: "Rua Industrial, 321, Aririú",
+    category: "Oficina Mecânica",
+    image: companyImg
+  },
+  {
+    name: " & Bistrô Sabor",
+    address: "Av. Beira Mar, 654, Centro",
+    category: "Cafeteria",
+    image: companyImg
+  },
+  {
+    name: "Loja de Roupas Fashion Style",
+    address: "Rua do Shopping, 987, Centro",
+    category: "Vestuário",
+    image: companyImg
+  },
+  {
+    name: "  Camarão",
+    address: "Av. Atlântica, 1520, Centro",
+    category: "Restaurante",
+    image: companyImg
+  },
+  {
+    name: "Padaria Delícia Real",
+    address: "Rua das Flores, 234, Jardim Eldorado",
+    category: "Padaria",
+    image: companyImg
+  },
+  {
+    name: "Mercado  ",
+    address: "Av. Principal, 789, Centro",
+    category: "Supermercado",
+    image: companyImg
+  },
+  {
+    name: " Saúde ",
+    address: "Rua dos Ipês, 432, Caminho Novo",
+    category: "Farmácia",
+    image: companyImg
+  },
+  {
+    name: "Auto  Silva",
+    address: "Av. Industrial, 567, Brejaru",
+    category: "Autopeças",
+    image: companyImg
+  },
+  {
+    name: "Pizzaria Bella Napoli",
+    address: "Rua das Palmeiras, 890, Centro",
+    category: "Restaurante",
+    image: companyImg
+  },
+  {
+    name: "Açougue do Paulo",
+    address: "Av. Central, 123, Ponte do Imaruim",
+    category: "Açougue",
+    image: companyImg
+  },
+  {
+    name: "Papelaria ",
+    address: "Rua do Comércio, 456, Centro",
+    category: "Papelaria",
+    image: companyImg
+  },
+  {
+    name: "Pet Shop Amigo Fiel",
+    address: "Av. das Gaivotas, 789, Pachecos",
+    category: "Pet Shop",
+    image: companyImg
+  },
+  {
+    name: " Mecânica Precisão",
+    address: "Rua Industrial, 321, Aririú",
+    category: "Oficina Mecânica",
+    image: companyImg
+  },
+  {
+    name: "Café & Bistrô ",
+    address: "Av. Beira Mar, 654, Centro",
+    category: "Cafeteria",
+    image: companyImg
+  },
+  {
+    name: "Loja de Roupas Fashion Style",
+    address: "Rua do Shopping, 987, Centro",
+    category: "Vestuário",
+    image: companyImg
+  },
+  {
+    name: "Amigos do Camarão",
+    address: "Av. Atlântica, 1520, Centro",
+    category: "Restaurante",
+    image: companyImg
+  },
+  {
+    name: "Padaria Delícia Real",
+    address: "Rua das Flores, 234, Jardim Eldorado",
+    category: "Padaria",
+    image: companyImg
+  },
+  {
+    name: "Mercado São Jorge",
+    address: "Av. Principal, 789, Centro",
+    category: "Supermercado",
+    image: companyImg
+  },
+  {
+    name: "Farmácia Saúde Total",
+    address: "Rua dos Ipês, 432, Caminho Novo",
+    category: "Farmácia",
+    image: companyImg
+  },
+  {
+    name: "Auto Peças Silva",
+    address: "Av. Industrial, 567, Brejaru",
+    category: "Autopeças",
+    image: companyImg
+  },
+  {
+    name: "Pizzaria Bella Napoli",
+    address: "Rua das Palmeiras, 890, Centro",
+    category: "Restaurante",
+    image: companyImg
+  },
+  {
+    name: "Açougue do Paulo",
+    address: "Av. Central, 123, Ponte do Imaruim",
+    category: "Açougue",
+    image: companyImg
+  },
+  {
+    name: "Papelaria Criativa",
+    address: "Rua do Comércio, 456, Centro",
+    category: "Papelaria",
+    image: companyImg
+  },
+  {
+    name: "Pet Shop Amigo Fiel",
+    address: "Av. das Gaivotas, 789, Pachecos",
+    category: "Pet Shop",
+    image: companyImg
+  },
+  {
+    name: "Oficina Mecânica Precisão",
+    address: "Rua Industrial, 321, Aririú",
+    category: "Oficina Mecânica",
+    image: companyImg
+  },
+  {
+    name: "Café & Bistrô Sabor",
+    address: "Av. Beira Mar, 654, Centro",
+    category: "Cafeteria",
+    image: companyImg
+  },
+  {
+    name: "Loja de Roupas Fashion Style",
+    address: "Rua do Shopping, 987, Centro",
+    category: "Vestuário",
+    image: companyImg
+  },
+  {
     name: "Amigos do Camarão",
     address: "Av. Atlântica, 1520, Centro",
     category: "Restaurante",

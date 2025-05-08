@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import { mockCompanys } from "@/utils/mock-data";
 import { CardCompany } from "@/components/companys/card-company";
-import { X, AlertCircle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import CommercialMap from "../mapCompany";
+import CompanyPagination from "../companysPagination";
 
 function normalizeText(text: string): string {
   return text
@@ -36,6 +37,12 @@ export default function FilteredCommerceList({
   const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
   const [categoryExists, setCategoryExists] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Estados para paginação
+  const [currentPage, setCurrentPage] = useState(1);
+  const [paginatedCompanies, setPaginatedCompanies] = useState<Company[]>([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPage = 9;
 
   // Lista de categorias válidas
   const validCategories = [
@@ -71,10 +78,11 @@ export default function FilteredCommerceList({
     "Viagem e transporte",
   ];
 
-  // Correção importante: iniciar com array vazio e mostrar loading até verificar a categoria
+  // Verificar a categoria e filtrar os comércios
   useEffect(() => {
     // Primeiro, definir loading para true antes de qualquer verificação
     setIsLoading(true);
+    setCurrentPage(1); // Resetar para a primeira página ao mudar de categoria
 
     // Dar um curto timeout para garantir que a UI mostre o estado de loading
     const timer = setTimeout(() => {
@@ -108,13 +116,21 @@ export default function FilteredCommerceList({
     return () => clearTimeout(timer);
   }, [activeCategory]);
 
-  const closeMap = () => {
-    if (typeof window !== "undefined") {
-      const win = window as any;
-      if (win.toggleMap) {
-        win.toggleMap();
-      }
-    }
+  // Efeito para calcular o total de páginas quando os dados filtrados mudam
+  useEffect(() => {
+    setTotalPages(Math.ceil(filteredCompanies.length / itemsPerPage));
+  }, [filteredCompanies]);
+
+  // Efeito para atualizar as empresas paginadas quando a página atual ou dados filtrados mudam
+  useEffect(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    setPaginatedCompanies(filteredCompanies.slice(start, end));
+  }, [filteredCompanies, currentPage]);
+
+  // Handler para mudança de página
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
   };
 
   // Componente para mensagem de categoria não encontrada
@@ -142,7 +158,7 @@ export default function FilteredCommerceList({
   );
 
   // Componente para mensagem de categoria sem comércios
-  const NoCommercesMessage = () => (
+  const NoCompanyMessage = () => (
     <div className="w-full py-12 text-center bg-red-50 rounded-lg border border-red-200 px-4">
       <div className="inline-flex items-center justify-center w-12 h-12 bg-red-100 rounded-full mb-4">
         <AlertCircle className="h-6 w-6 text-red-500" />
@@ -190,25 +206,33 @@ export default function FilteredCommerceList({
         ) : !categoryExists ? (
           <CategoryNotFoundMessage />
         ) : filteredCompanies.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {filteredCompanies.map((company, index) => (
-              <div className="w-full" key={index}>
-                <CardCompany company={company} />
-              </div>
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {paginatedCompanies.map((company, index) => (
+                <div className="w-full" key={`company-${currentPage}-${index}`}>
+                  <CardCompany company={company} />
+                </div>
+              ))}
+            </div>
+            
+            {/* Componente de paginação separado */}
+            <CompanyPagination 
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={filteredCompanies.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={handlePageChange}
+              className="mt-8"
+            />
+          </>
         ) : (
-          <NoCommercesMessage />
+          <NoCompanyMessage />
         )}
       </div>
 
       {showMap && (
         <CommercialMap
-          editable={true}
           height="h-screen"
-          onCommercesChange={(updatedData) =>
-            console.log("Dados atualizados:", updatedData)
-          }
         />
       )}
     </div>
