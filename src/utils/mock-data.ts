@@ -28,6 +28,7 @@ export interface Company {
   address: string;
   category: string;
   image: any;
+  district: string;
 }
 
 // Interface para empresas com slug
@@ -41,6 +42,7 @@ export const mockCompanys: Company[] = [
     name: "kayron",
     address: "Av. Atlântica, 1520, Centro",
     category: "Restaurante",
+    district: "Centro",
     image: companyImg,
   },
   {
@@ -48,6 +50,7 @@ export const mockCompanys: Company[] = [
     name: " Delícia Real",
     address: "Rua das Flores, 234, Jardim Eldorado",
     category: "Padaria",
+    district: "Jardim Eldorado",
     image: companyImg,
   },
   {
@@ -55,6 +58,7 @@ export const mockCompanys: Company[] = [
     name: " São Jorge",
     address: "Av. Principal, 789, Centro",
     category: "Supermercado",
+    district: "Centro",
     image: companyImg,
   },
   {
@@ -62,6 +66,7 @@ export const mockCompanys: Company[] = [
     name: "  Total",
     address: "Rua dos Ipês, 432, Caminho Novo",
     category: "Farmácia",
+    district: "Caminho Novo",
     image: companyImg,
   },
   {
@@ -69,6 +74,7 @@ export const mockCompanys: Company[] = [
     name: "  Silva",
     address: "Av. Industrial, 567, Brejaru",
     category: "Autopeças",
+    district: "Brejaru",
     image: companyImg,
   },
   {
@@ -76,6 +82,7 @@ export const mockCompanys: Company[] = [
     name: " Bella ",
     address: "Rua das Palmeiras, 890, Centro",
     category: "Restaurante",
+    district: "Centro",
     image: companyImg,
   },
   {
@@ -83,6 +90,7 @@ export const mockCompanys: Company[] = [
     name: "Açougue do Paulo",
     address: "Av. Central, 123, Ponte do Imaruim",
     category: "Açougue",
+    district: "Ponte do Imaruim",
     image: companyImg,
   },
   {
@@ -90,6 +98,7 @@ export const mockCompanys: Company[] = [
     name: "Papelaria Criativa",
     address: "Rua do Comércio, 456, Centro",
     category: "Papelaria",
+    district: "Centro",
     image: companyImg,
   },
   {
@@ -97,6 +106,7 @@ export const mockCompanys: Company[] = [
     name: "Pet Shop  Fiel",
     address: "Av. das Gaivotas, 789, Pachecos",
     category: "Pet Shop",
+    district: "Pachecos",
     image: companyImg,
   },
   {
@@ -104,6 +114,7 @@ export const mockCompanys: Company[] = [
     name: "Oficina Mecânica Precisão",
     address: "Rua Industrial, 321, Aririú",
     category: "Oficina Mecânica",
+    district: "Aririú",
     image: companyImg,
   },
   {
@@ -111,6 +122,7 @@ export const mockCompanys: Company[] = [
     name: " & Bistrô Sabor",
     address: "Av. Beira Mar, 654, Centro",
     category: "Cafeteria",
+    district: "Centro",
     image: companyImg,
   },
   {
@@ -118,6 +130,7 @@ export const mockCompanys: Company[] = [
     name: "Loja de Roupas Fashion Style",
     address: "Rua do Shopping, 987, Centro",
     category: "Vestuário",
+    district: "Centro",
     image: companyImg,
   },
   {
@@ -125,6 +138,7 @@ export const mockCompanys: Company[] = [
     name: "  Camarão",
     address: "Av. Atlântica, 1520, Centro",
     category: "Restaurante",
+    district: "Centro",
     image: companyImg,
   },
   {
@@ -132,6 +146,7 @@ export const mockCompanys: Company[] = [
     name: "Padaria Delícia Real",
     address: "Rua das Flores, 234, Jardim Eldorado",
     category: "Padaria",
+    district: "Jardim Eldorado",
     image: companyImg,
   },
   {
@@ -139,6 +154,7 @@ export const mockCompanys: Company[] = [
     name: "Mercado  ",
     address: "Av. Principal, 789, Centro",
     category: "Supermercado",
+    district: "Centro",
     image: companyImg,
   },
   {
@@ -146,6 +162,7 @@ export const mockCompanys: Company[] = [
     name: " Saúde ",
     address: "Rua dos Ipês, 432, Caminho Novo",
     category: "Farmácia",
+    district: "Caminho Novo",
     image: companyImg,
   },
   {
@@ -153,6 +170,7 @@ export const mockCompanys: Company[] = [
     name: "Auto  Silva",
     address: "Av. Industrial, 567, Brejaru",
     category: "Autopeças",
+    district: "Brejaru",
     image: companyImg,
   },
   {
@@ -160,6 +178,7 @@ export const mockCompanys: Company[] = [
     name: "Pizzaria Bella Napoli",
     address: "Rua das Palmeiras, 890, Centro",
     category: "Restaurante",
+    district: "Centro",
     image: companyImg,
   },
   {
@@ -167,6 +186,7 @@ export const mockCompanys: Company[] = [
     name: "Açougue do Paulo",
     address: "Av. Central, 123, Ponte do Imaruim",
     category: "Açougue",
+    district: "Ponte do Imaruim",
     image: companyImg,
   },
   {
@@ -174,6 +194,7 @@ export const mockCompanys: Company[] = [
     name: "Papelaria ",
     address: "Rua do Comércio, 456, Centro",
     category: "Papelaria",
+    district: "Centro",
     image: companyImg,
   },
   {
@@ -181,6 +202,7 @@ export const mockCompanys: Company[] = [
     name: "Pet Shop Amigo Fiel",
     address: "Av. das Gaivotas, 789, Pachecos",
     category: "Pet Shop",
+    district: "Pachecos",
     image: companyImg,
   },
   {
@@ -188,6 +210,7 @@ export const mockCompanys: Company[] = [
     name: " Mecânica Precisão",
     address: "Rua Industrial, 321, Aririú",
     category: "Oficina Mecânica",
+    district: "Aririú",
     image: companyImg,
   },
   {
@@ -195,6 +218,7 @@ export const mockCompanys: Company[] = [
     name: "Café & Bistrô ",
     address: "Av. Beira Mar, 654, Centro",
     category: "Cafeteria",
+    district: "Centro",
     image: companyImg,
   },
   {
@@ -202,6 +226,7 @@ export const mockCompanys: Company[] = [
     name: "Loja de Roupas Fashion Style",
     address: "Rua do Shopping, 987, Centro",
     category: "Vestuário",
+    district: "Centro",
     image: companyImg,
   },
   {
@@ -209,6 +234,7 @@ export const mockCompanys: Company[] = [
     name: "Amigos do Camarão",
     address: "Av. Atlântica, 1520, Centro",
     category: "Restaurante",
+    district: "Centro",
     image: companyImg,
   },
   {
@@ -216,6 +242,7 @@ export const mockCompanys: Company[] = [
     name: "Padaria Delícia Real",
     address: "Rua das Flores, 234, Jardim Eldorado",
     category: "Padaria",
+    district: "Jardim Eldorado",
     image: companyImg,
   },
   {
@@ -223,6 +250,7 @@ export const mockCompanys: Company[] = [
     name: "Mercado São Jorge",
     address: "Av. Principal, 789, Centro",
     category: "Supermercado",
+    district: "Centro",
     image: companyImg,
   },
   {
@@ -230,6 +258,7 @@ export const mockCompanys: Company[] = [
     name: "Farmácia Saúde Total",
     address: "Rua dos Ipês, 432, Caminho Novo",
     category: "Farmácia",
+    district: "Caminho Novo",
     image: companyImg,
   },
   {
@@ -237,6 +266,7 @@ export const mockCompanys: Company[] = [
     name: "Auto Peças Silva",
     address: "Av. Industrial, 567, Brejaru",
     category: "Autopeças",
+    district: "Brejaru",
     image: companyImg,
   },
   {
@@ -244,6 +274,7 @@ export const mockCompanys: Company[] = [
     name: "Pizzaria Bella Napoli",
     address: "Rua das Palmeiras, 890, Centro",
     category: "Restaurante",
+    district: "Centro",
     image: companyImg,
   },
   {
@@ -251,6 +282,7 @@ export const mockCompanys: Company[] = [
     name: "Açougue do Paulo",
     address: "Av. Central, 123, Ponte do Imaruim",
     category: "Açougue",
+    district: "Ponte do Imaruim",
     image: companyImg,
   },
   {
@@ -258,6 +290,7 @@ export const mockCompanys: Company[] = [
     name: "Papelaria Criativa",
     address: "Rua do Comércio, 456, Centro",
     category: "Papelaria",
+    district: "Centro",
     image: companyImg,
   },
   {
@@ -265,6 +298,7 @@ export const mockCompanys: Company[] = [
     name: "Pet Shop Amigo Fiel",
     address: "Av. das Gaivotas, 789, Pachecos",
     category: "Pet Shop",
+    district: "Pachecos",
     image: companyImg,
   },
   {
@@ -272,6 +306,7 @@ export const mockCompanys: Company[] = [
     name: "Oficina Mecânica Precisão",
     address: "Rua Industrial, 321, Aririú",
     category: "Oficina Mecânica",
+    district: "Aririú",
     image: companyImg,
   },
   {
@@ -279,6 +314,7 @@ export const mockCompanys: Company[] = [
     name: "Café & Bistrô Sabor",
     address: "Av. Beira Mar, 654, Centro",
     category: "Cafeteria",
+    district: "Centro",
     image: companyImg,
   },
   {
@@ -286,6 +322,7 @@ export const mockCompanys: Company[] = [
     name: "Loja de Roupas Fashion Style",
     address: "Rua do Shopping, 987, Centro",
     category: "Vestuário",
+    district: "Centro",
     image: companyImg,
   },
   {
@@ -293,6 +330,7 @@ export const mockCompanys: Company[] = [
     name: "Amigos do Camarão",
     address: "Av. Atlântica, 1520, Centro",
     category: "Restaurante",
+    district: "Centro",
     image: companyImg,
   },
   {
@@ -300,6 +338,7 @@ export const mockCompanys: Company[] = [
     name: "Padaria Delícia Real",
     address: "Rua das Flores, 234, Jardim Eldorado",
     category: "Padaria",
+    district: "Jardim Eldorado",
     image: companyImg,
   },
   {
@@ -307,6 +346,7 @@ export const mockCompanys: Company[] = [
     name: "Mercado São Jorge",
     address: "Av. Principal, 789, Centro",
     category: "Supermercado",
+    district: "Centro",
     image: companyImg,
   },
   {
@@ -314,6 +354,7 @@ export const mockCompanys: Company[] = [
     name: "Farmácia Saúde Total",
     address: "Rua dos Ipês, 432, Caminho Novo",
     category: "Farmácia",
+    district: "Caminho Novo",
     image: companyImg,
   },
   {
@@ -321,6 +362,7 @@ export const mockCompanys: Company[] = [
     name: "Auto Peças Silva",
     address: "Av. Industrial, 567, Brejaru",
     category: "Autopeças",
+    district: "Brejaru",
     image: companyImg,
   },
   {
@@ -328,6 +370,7 @@ export const mockCompanys: Company[] = [
     name: "Pizzaria Bella Napoli",
     address: "Rua das Palmeiras, 890, Centro",
     category: "Restaurante",
+    district: "Centro",
     image: companyImg,
   },
   {
@@ -335,6 +378,7 @@ export const mockCompanys: Company[] = [
     name: "Açougue do Paulo",
     address: "Av. Central, 123, Ponte do Imaruim",
     category: "Açougue",
+    district: "Ponte do Imaruim",
     image: companyImg,
   },
   {
@@ -342,6 +386,7 @@ export const mockCompanys: Company[] = [
     name: "Papelaria Criativa",
     address: "Rua do Comércio, 456, Centro",
     category: "Papelaria",
+    district: "Centro",
     image: companyImg,
   },
   {
@@ -349,6 +394,7 @@ export const mockCompanys: Company[] = [
     name: "Pet Shop Amigo Fiel",
     address: "Av. das Gaivotas, 789, Pachecos",
     category: "Pet Shop",
+    district: "Pachecos",
     image: companyImg,
   },
   {
@@ -356,6 +402,7 @@ export const mockCompanys: Company[] = [
     name: "Oficina Mecânica Precisão",
     address: "Rua Industrial, 321, Aririú",
     category: "Oficina Mecânica",
+    district: "Aririú",
     image: companyImg,
   },
   {
@@ -363,6 +410,7 @@ export const mockCompanys: Company[] = [
     name: "Café & Bistrô Sabor",
     address: "Av. Beira Mar, 654, Centro",
     category: "Cafeteria",
+    district: "Centro",
     image: companyImg,
   },
   {
@@ -370,6 +418,7 @@ export const mockCompanys: Company[] = [
     name: "Loja de Roupas Fashion Style",
     address: "Rua do Shopping, 987, Centro",
     category: "Vestuário",
+    district: "Centro",
     image: companyImg,
   },
 ];

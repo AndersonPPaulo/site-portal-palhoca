@@ -265,12 +265,12 @@ export default function ComercioDetails() {
             </div>
 
             {/* Mapa com largura fixa de 978px */}
-            <div className="h-[300px] w-full bg-gray-200 rounded-md flex items-center justify-center mb-8">
+            <div className="h-[300px] z-0 w-full bg-gray-200 rounded-md flex items-center justify-center mb-8">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3536.2048776911126!2d-48.67345788497173!3d-27.646622382819366!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjfCsDM4JzQ4LjUiUyA0OMKwNDAnMjUuMyJX!5e0!3m2!1spt-BR!2sbr!4v1620838420451!5m2!1spt-BR!2sbr"
                 width="100%"
                 height="100%"
-                style={{ border: 0, borderRadius: "8px" }}
+                style={{ border: 0, borderRadius: "8px", zIndex: 0 }}
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"

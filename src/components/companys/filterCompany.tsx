@@ -29,6 +29,7 @@ export default function FilteredCommerceList({
     name: string;
     address: string;
     category: string;
+    district?: string; // Adicionado o campo district opcional
     image: any;
   }
 
@@ -37,6 +38,7 @@ export default function FilteredCommerceList({
   const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
   const [categoryExists, setCategoryExists] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedDistrict, setSelectedDistrict] = useState<string>("");
   
   // Estados para paginação
   const [currentPage, setCurrentPage] = useState(1);
@@ -78,6 +80,21 @@ export default function FilteredCommerceList({
     "Viagem e transporte",
   ];
 
+  // Ouvir o evento de seleção de bairro
+  useEffect(() => {
+    const handleDistrictSelected = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const district = customEvent.detail;
+      setSelectedDistrict(district);
+      setCurrentPage(1); // Resetar para a primeira página ao mudar de bairro
+    };
+
+    window.addEventListener('districtSelected', handleDistrictSelected);
+    return () => {
+      window.removeEventListener('districtSelected', handleDistrictSelected);
+    };
+  }, []);
+
   // Verificar a categoria e filtrar os comércios
   useEffect(() => {
     // Primeiro, definir loading para true antes de qualquer verificação
@@ -95,17 +112,25 @@ export default function FilteredCommerceList({
 
       setCategoryExists(categoryValid);
 
-      // Filtrar os comércios se a categoria existe
+      // Filtrar os comércios pela categoria e bairro
       if (categoryValid) {
-        if (activeCategory === "Todos") {
-          setFilteredCompanies(typedMockCompanys);
-        } else {
-          const filtered = typedMockCompanys.filter(
+        let filtered = typedMockCompanys;
+        
+        // Filtrar por categoria
+        if (activeCategory !== "Todos") {
+          filtered = filtered.filter(
             (company) => normalizeText(company.category) === categoryNormalized
           );
-
-          setFilteredCompanies(filtered);
         }
+        
+        // Filtrar por bairro, se houver um selecionado
+        if (selectedDistrict) {
+          filtered = filtered.filter(
+            (company) => company.district && company.district === selectedDistrict
+          );
+        }
+
+        setFilteredCompanies(filtered);
       } else {
         setFilteredCompanies([]);
       }
@@ -114,7 +139,7 @@ export default function FilteredCommerceList({
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [activeCategory]);
+  }, [activeCategory, selectedDistrict]); // Adicionei selectedDistrict como dependência
 
   // Efeito para calcular o total de páginas quando os dados filtrados mudam
   useEffect(() => {
@@ -133,54 +158,52 @@ export default function FilteredCommerceList({
     setCurrentPage(page);
   };
 
-  // Componente para mensagem de categoria não encontrada
-  const CategoryNotFoundMessage = () => (
-    <div className="w-full py-12 text-center bg-red-50 rounded-lg border border-red-200 px-4">
-      <div className="inline-flex items-center justify-center w-12 h-12 bg-red-100 rounded-full mb-4">
-        <AlertCircle className="h-6 w-6 text-red-500" />
-      </div>
-      <h3 className="text-xl font-semibold text-red-600 mb-2">
-        Categoria não encontrada
-      </h3>
-      <p className="text-gray-600 max-w-md mx-auto">
-        A categoria <strong>"{activeCategory}"</strong> não existe em nosso
-        sistema.
-      </p>
-      <div className="mt-6">
-        <a
-          href="/comercios"
-          className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
-        >
-          Ver todas as categorias
-        </a>
-      </div>
+// Componente para mensagem de categoria não encontrada
+const CategoryNotFoundMessage = () => (
+  <div className="w-full py-12 text-center bg-red-50 rounded-lg border border-red-200 px-4">
+    <div className="inline-flex items-center justify-center w-12 h-12 bg-red-100 rounded-full mb-4">
+      <AlertCircle className="h-6 w-6 text-red-500" />
     </div>
-  );
-
-  // Componente para mensagem de categoria sem comércios
-  const NoCompanyMessage = () => (
-    <div className="w-full py-12 text-center bg-red-50 rounded-lg border border-red-200 px-4">
-      <div className="inline-flex items-center justify-center w-12 h-12 bg-red-100 rounded-full mb-4">
-        <AlertCircle className="h-6 w-6 text-red-500" />
-      </div>
-      <h3 className="text-xl font-semibold text-red-600 mb-2">
-        Nenhum comércio encontrado
-      </h3>
-      <p className="text-gray-600 max-w-md mx-auto">
-        Não encontramos comércios cadastrados na categoria{" "}
-        <strong>"{activeCategory}"</strong>.
-      </p>
-      <div className="mt-6">
-        <a
-          href="/comercios"
-          className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
-        >
-          Ver todas as categorias
-        </a>
-      </div>
+    <h3 className="text-xl font-semibold text-red-600 mb-2">
+      Categoria não encontrada
+    </h3>
+    <p className="text-gray-600 max-w-md mx-auto">
+      A categoria <strong>"{activeCategory}"</strong> não existe em nosso
+      sistema.
+    </p>
+    <div className="mt-6">
+      <a href="/comercios"
+        className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors">
+        Ver todas as categorias
+      </a>
     </div>
-  );
+  </div>
+);
 
+// Componente para mensagem de nenhum comércio encontrado
+const NoCompanyMessage = () => (
+  <div className="w-full py-12 text-center bg-red-50 rounded-lg border border-red-200 px-4">
+    <div className="inline-flex items-center justify-center w-12 h-12 bg-red-100 rounded-full mb-4">
+      <AlertCircle className="h-6 w-6 text-red-500" />
+    </div>
+    <h3 className="text-xl font-semibold text-red-600 mb-2">
+      Nenhum comércio encontrado
+    </h3>
+    <p className="text-gray-600 max-w-md mx-auto">
+      {selectedDistrict 
+        ? `Não encontramos comércios cadastrados na categoria "${activeCategory}" no bairro "${selectedDistrict}".`
+        : `Não encontramos comércios cadastrados na categoria "${activeCategory}".`
+      }
+    </p>
+    <div className="mt-6">
+      <a 
+        href="/comercios"
+        className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors">
+        Ver todas as categorias
+      </a>
+    </div>
+  </div>
+);
   // Componente para estado de carregamento
   const LoadingState = () => (
     <div className="w-full py-20 text-center">
