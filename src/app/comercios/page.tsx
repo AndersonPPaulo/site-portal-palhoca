@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import DefaultPage from "@/components/default-page";
 import Header from "@/components/header";
-import CompanyCategoryMenu from "@/components/menus/company-categorys-menu";
 import FilteredCommerceList from "@/components/companys/filterCompany";
 
 // Definir tipos para window global

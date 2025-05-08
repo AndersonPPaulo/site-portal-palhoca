@@ -20,6 +20,8 @@ export default function Header() {
   const isComercioPath =
     pathname === "/comercios" || pathname?.startsWith("/comercios/");
 
+ 
+
   // Toggle mobile menu
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);

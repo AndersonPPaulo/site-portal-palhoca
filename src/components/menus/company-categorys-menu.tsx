@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 // Import icons
 import todosIcon from "@/assets/icons/company/todos.png";
@@ -59,7 +60,6 @@ declare global {
   }
 }
 
-
 export default function CompanyCategoryMenu({
   pathname,
 }: {
@@ -70,6 +70,10 @@ export default function CompanyCategoryMenu({
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
   const [showMap, setShowMap] = useState(false);
+
+  // Check if we're on commerce related pages
+  const isComercioPath =
+    pathname === "/comercios" || pathname?.startsWith("/comercios/");
 
   const toggleMap = () => {
     const newMapState = !showMap;
@@ -252,7 +256,7 @@ export default function CompanyCategoryMenu({
 
   const handleCategoryClick = (categoryName: string) => {
     setActiveCategory(categoryName);
-    
+
     if (typeof window !== "undefined") {
       window.activeCategory = categoryName;
       window.dispatchEvent(new Event("categoryChanged"));
@@ -274,6 +278,10 @@ export default function CompanyCategoryMenu({
   if (!pathname?.startsWith("/comercios")) {
     return null;
   }
+
+  // Check if we're on compoany details pages
+  const isDetailsPath =
+    pathname === "/comercios" || pathname?.startsWith("/comercios/detalhes");
 
   return (
     <nav className="flex justify-center w-full bg-white mx-auto mt-6 lg:overflow-x-hidden">
@@ -297,7 +305,6 @@ export default function CompanyCategoryMenu({
             </Button>
           </div>
         )}
-
         <ul
           ref={scrollContainerRef}
           className="flex items-center space-x-4 py-3 lg:mx-10 whitespace-nowrap overflow-x-auto lg:scrollbar-hide scroll-smooth"
@@ -327,10 +334,15 @@ export default function CompanyCategoryMenu({
             </li>
           ))}
         </ul>
-
-        {/* Right scroll button */}
+        {/* // Right scroll button */}
         {showRightArrow && (
-          <div className="absolute right-33 h-full hidden lg:flex items-center justify-center z-30">
+          <div
+            className={`absolute ${
+              pathname?.startsWith("/comercios/detalhes")
+                ? "right-0"
+                : "right-33"
+            } h-full hidden lg:flex items-center justify-center z-30`}
+          >
             <div
               className="h-full w-16 rounded-l-lg"
               style={{
@@ -340,14 +352,17 @@ export default function CompanyCategoryMenu({
             />
             <Button
               onClick={scrollRight}
-              className="absolute z-40 -right-2 rounded-full py-5 bg-red-light shadow-md hover:bg-red-light/80 text-red-primary transition-colors"
+              className={`absolute z-40 ${
+                pathname?.startsWith("/comercios/detalhes")
+                  ? "-right-0"
+                  : "-right-2"
+              } rounded-full py-5 bg-red-light shadow-md hover:bg-red-light/80 text-red-primary transition-colors`}
               aria-label="Scroll right"
             >
               <ChevronRight className="h-6 w-6 text-gray-700" />
             </Button>
           </div>
         )}
-
         {/* Botão do mapa */}
         <ButtonMap onClick={toggleMap} isMapOpen={showMap} />
       </div>
