@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ColumnistsSection } from "../columnists/columnist-section";
+import { ColumnistsSection } from "../../columnists/columnist-section";
 import { mockPosts } from "@/utils/mock-data";
 
 

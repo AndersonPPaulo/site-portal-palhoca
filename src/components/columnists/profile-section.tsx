@@ -1,0 +1,183 @@
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { mockColumnists, mockPosts } from "@/utils/mock-data";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import SideBanner from "../banner/side";
+import PostBanner from "../banner/post-banner";
+import { useMemo } from "react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+
+function normalizeText(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // Remove accents
+    .replace(/[^\w\s]/g, "") // Remove special characters
+    .replace(/\s+/g, ""); // Remove spaces
+}
+
+export default function ProfileColumnist() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const params = useParams();
+
+  const currentPage = Number(searchParams.get("page")) || 1;
+  const postsPerPage = 9;
+
+  const sortedPosts = useMemo(() => {
+    return mockPosts.sort((a, b) => {
+      const [dayA, monthA, yearA] = a.date.split("/").map(Number);
+      const [dayB, monthB, yearB] = b.date.split("/").map(Number);
+
+      const dateA = new Date(yearA, monthA - 1, dayA);
+      const dateB = new Date(yearB, monthB - 1, dayB);
+
+      return dateB.getTime() - dateA.getTime();
+    });
+  }, []);
+
+  const totalPages = Math.ceil(sortedPosts.length / postsPerPage);
+  const startIndex = (currentPage - 1) * postsPerPage;
+  const currentPosts = sortedPosts.slice(startIndex, startIndex + postsPerPage);
+
+  const sidePosts = mockPosts.slice(0, 5);
+  const filteredCol = mockColumnists.find(
+    (item) => item.id.toString() === params.titleColumn?.toString()
+  );
+
+  const handlePageChange = (page: number) => {
+    const url = new URL(window.location.href);
+    url.searchParams.set("page", page.toString());
+    router.push(url.pathname + url.search);
+  };
+
+  return (
+    <section className="flex flex-col lg:flex-row gap-6 mx-auto max-w-[1272px] justify-between">
+      <div className="flex flex-col gap-4 max-w-[840px]">
+        {/* Profile section */}
+        <div className="flex gap-4 bg-secondary ms-2 items-center rounded-2xl p-2">
+          <Image
+            src={filteredCol!.image}
+            alt="Imagem perfil do colunista"
+            className="w-[64px] h-[64px] md:w-[120px] md:h-[120px] rounded-lg"
+          />
+
+          <div className="flex flex-col mt-3">
+            <h2 className="text-dark text-2xl font-semibold md:my-2">
+              {filteredCol!.name}
+            </h2>
+            <p className="text-gray-700 text-md">{filteredCol!.topic}</p>
+          </div>
+        </div>
+
+        {/* Posts grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 max-w-[840px] gap-2 rounded-2xl">
+          {currentPosts.map((post, idx) => (
+            <Link key={idx} href="#">
+              <div className="flex flex-col gap-3 rounded-xl p-2 transition">
+                <div className="relative min-w-[300px]  h-[310px] md:w-[264px] md:min-w-[260px] md:h-[200px] rounded-md overflow-hidden">
+                  <Image
+                    src={post.image}
+                    alt={post.title}
+                    fill
+                    className="object-cover "
+                  />
+                </div>
+                <div className="flex flex-col justify-between">
+                  <h3 className="text-2xl font-semibold leading-tight line-clamp-3">
+                    {post.title}
+                  </h3>
+                  <div className="flex w-full justify-between">
+                    <div className="flex items-center mt-2 gap-4">
+                      <span className="w-min text-xs bg-secondary text-primary px-3 py-1 rounded-2xl">
+                        {post.category}
+                      </span>
+                      <p className="text-xs text-gray-500">{post.date}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        {/* Pagination controls */}
+        <div className="flex justify-center gap-2 my-4">
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="px-3 py-2 rounded-md border border-[#757575] text-[#757575] disabled:opacity-50"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </button>
+
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+            <button
+              key={page}
+              onClick={() => handlePageChange(page)}
+              className={`px-4 py-2 rounded-md ${
+                currentPage === page
+                  ? "border-2 border-primary text-primary font-bold"
+                  : "border border-[#757575] text-[#757575]"
+              }`}
+            >
+              {page}
+            </button>
+          ))}
+
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 rounded-md border border-[#757575] text-[#757575] disabled:opacity-50"
+          >
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+
+        <PostBanner />
+      </div>
+
+      {/* Side Posts */}
+      {/* adicionar postagens do colunista aqui quando for consumir API */}
+      <div className="flex flex-col max-w-[356px]">
+        <div className="shadow-md rounded-lg p-1">
+          <h2 className="ms-2 text-primary text-2xl font-semibold my-2">
+            Mais lidas
+          </h2>
+          {sidePosts.map((post, idx) => (
+            <Link
+              key={idx}
+              href={`/noticia/${normalizeText(post.category)}/${post.id}`}
+            >
+              <div className="flex gap-3 rounded-xl p-2 transition">
+                <div className="relative min-w-[151px] h-[110px] rounded-sm overflow-hidden">
+                  <Image
+                    src={post.image}
+                    alt={post.title}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="flex flex-col justify-between">
+                  <h3 className="text-xl font-semibold leading-tight line-clamp-3">
+                    {post.title}
+                  </h3>
+                  <div className="flex w-full justify-between">
+                    <span className="w-min text-xs bg-secondary text-primary px-3 py-1 rounded-2xl">
+                      {post.category}
+                    </span>
+                    <p className="text-xs text-gray-500">{post.date}</p>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        <SideBanner />
+      </div>
+    </section>
+  );
+}
