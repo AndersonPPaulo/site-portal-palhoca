@@ -1,4 +1,4 @@
-import TopBanner from "@/components/banner/top";
+import PostBanner from "@/components/banner/post-banner";
 import { CompanyGridSection } from "@/components/companys/company-grid-section";
 import DefaultPage from "@/components/default-page";
 import { Footer } from "@/components/footer";
@@ -18,11 +18,13 @@ export default function Home() {
         <PostGridSection />
         <PostGridWwithColumnistSection />
         <CompanyGridSection />
-        <TopBanner/>
-        <PostTopGridSection/>
+        <div className="flex justify-center">
+          <PostBanner />
+        </div>
+        <PostTopGridSection />
       </main>
       <footer>
-        <Footer/>
+        <Footer />
       </footer>
     </DefaultPage>
   );
