@@ -11,21 +11,31 @@ import { ArticleContext } from "@/provider/article";
 import { formatDate } from "@/utils/formatDate";
 import normalizeText from "@/utils/normalize-text";
 import { generateSlug } from "@/utils/string-utils";
+import SlugToText from "@/utils/slugToText";
 
 export default function ProfileColumnist() {
-  const { ListArticlesColumnists, listArticlesColumnists } =
-    useContext(ArticleContext);
-
-  useEffect(() => {
-    ListArticlesColumnists();
-  }, []);
-
   const router = useRouter();
   const searchParams = useSearchParams();
   const params = useParams();
 
-  const currentPage = Number(searchParams.get("page")) || 1;
-  const postsPerPage = 9;
+  const { ListArticlesColumnists, listArticlesColumnists } =
+    useContext(ArticleContext);
+
+  useEffect(() => {
+    const titleColumn = Array.isArray(params.titleColumn)
+      ? params.titleColumn[0]
+      : params.titleColumn;
+
+    const fetchData = async () => {
+      await ListArticlesColumnists(SlugToText(titleColumn ?? ""));
+    };
+
+    fetchData();
+  }, []);
+  console.log("listArticlesColumnists", listArticlesColumnists);
+
+  // const currentPage = Number(searchParams.get("page")) || 1;
+  // const postsPerPage = 9;
 
   const sortedPosts = useMemo(() => {
     return listArticlesColumnists?.sort((a, b) => {
@@ -39,14 +49,9 @@ export default function ProfileColumnist() {
     });
   }, []);
 
-  const totalPages = sortedPosts
-    ? Math.ceil(sortedPosts.length / postsPerPage)
-    : 0;
-  const startIndex = (currentPage - 1) * postsPerPage;
-  const currentPosts = sortedPosts?.slice(
-    startIndex,
-    startIndex + postsPerPage
-  );
+  // const totalPages = sortedPosts
+  //   ? Math.ceil(sortedPosts.length / postsPerPage)
+  //   : 0;
 
   const sidePosts = listArticlesColumnists?.slice(0, 5);
   const filteredCol = listArticlesColumnists?.find(
@@ -54,6 +59,8 @@ export default function ProfileColumnist() {
       generateSlug(item.creator.name.toString()) ===
       params.titleColumn?.toString()
   );
+
+  console.log("filteredCol", filteredCol);
 
   const handlePageChange = (page: number) => {
     const url = new URL(window.location.href);
@@ -97,7 +104,7 @@ export default function ProfileColumnist() {
 
         {/* Posts grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 max-w-[840px] gap-2 rounded-2xl">
-          {currentPosts?.map((post, idx) => (
+          {listArticlesColumnists?.map((post, idx) => (
             <Link
               key={idx}
               href={`/noticia/${normalizeText(post.category.name)}/${
@@ -134,7 +141,7 @@ export default function ProfileColumnist() {
         </div>
 
         {/* Pagination controls */}
-        <div className="flex justify-center gap-2 my-4">
+        {/* <div className="flex justify-center gap-2 my-4">
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
@@ -164,12 +171,11 @@ export default function ProfileColumnist() {
           >
             <ArrowRight className="w-4 h-4" />
           </button>
-        </div>
+        </div> */}
 
         <PostBanner />
       </div>
 
-      {/* Side Posts */}
       {/* adicionar postagens do colunista aqui quando for consumir API */}
       <div className="flex flex-col max-w-[356px]">
         <div className="shadow-md rounded-lg p-1">
