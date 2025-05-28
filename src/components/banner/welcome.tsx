@@ -1,40 +1,49 @@
-'use client'
+"use client";
 
-import { usePathname } from 'next/navigation'
-import { useState, useEffect } from 'react'
-import Image from 'next/image'
-import anuncio from "@/assets/anuncio.png"
-import { Button } from '../ui/button'
+import { usePathname } from "next/navigation";
+import { useState, useEffect, useContext } from "react";
+import Image from "next/image";
+import { Button } from "../ui/button";
+import { BannerContext, BannerItem } from "@/provider/banner";
 
 export const Banner = () => {
-  const [isVisible, setIsVisible] = useState(true)
-  const pathname = usePathname()
+  const { ListBannersWelcome, bannersWelcome } = useContext(BannerContext);
+  const [isVisible, setIsVisible] = useState(false);
+  const [randomBanner, setRandomBanner] = useState<BannerItem | null>(null);
+  const pathname = usePathname();
+  const shouldDisplayBanner = !pathname?.startsWith("/comercios");
 
-  // Check if banner should be displayed based on route
-  const shouldDisplayBanner = !pathname?.startsWith('/comercio')
-
+  // Requisição dos banners quando o componente carrega
   useEffect(() => {
-    if (!shouldDisplayBanner) {
-      setIsVisible(false)
-    } else {
-      setIsVisible(true)
+    if (shouldDisplayBanner) {
+      ListBannersWelcome({});
     }
-  }, [pathname, shouldDisplayBanner])
+  }, [shouldDisplayBanner, pathname]);
+
+  // Escolher o banner aleatório assim que os banners forem carregados
+  useEffect(() => {
+    if (bannersWelcome?.data?.length > 0 && shouldDisplayBanner) {
+      const randomIndex = Math.floor(Math.random() * bannersWelcome.data.length);
+      setRandomBanner(bannersWelcome.data[randomIndex]);
+      setIsVisible(true);
+    }
+  }, [bannersWelcome, shouldDisplayBanner, pathname]);
 
   const handleOutsideClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
-      setIsVisible(false)
+      setIsVisible(false);
     }
-  }
+  };
 
-  if (!isVisible || !shouldDisplayBanner) {
-    return null
-  } 
+  if (!isVisible || !randomBanner) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4" onClick={handleOutsideClick}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
+      onClick={handleOutsideClick}
+    >
       <div className="relative">
-        {/* Close button */}
+        {/* Botão de fechar */}
         <Button
           onClick={() => setIsVisible(false)}
           className="absolute -right-5 -top-5 z-10 rounded-full bg-white p-1 shadow-lg hover:bg-gray-100 hover:cursor-pointer"
@@ -55,33 +64,33 @@ export const Banner = () => {
           </svg>
         </Button>
 
-        {/* Banner content */}
+        {/* Conteúdo do banner */}
         <div className="relative overflow-hidden rounded-lg shadow-xl">
-          {/* Desktop version */}
+          {/* Desktop */}
           <div className="hidden md:block">
             <Image
-              src={anuncio} // Make sure to add this image to your public folder
+              src={randomBanner.url}
               width={900}
               height={560}
-              alt="Outubro Rosa Pet - Campanha de castração"
+              alt="Banner"
               className="h-[560px] w-[900px] object-cover"
               priority
             />
           </div>
 
-          {/* Mobile version */}
+          {/* Mobile */}
           <div className="md:hidden">
             <Image
-              src={anuncio} // Make sure to add this image to your public folder
+              src={randomBanner.url}
               width={360}
               height={225}
-              alt="Outubro Rosa Pet - Campanha de castração"
+              alt="Banner"
               className="h-[225px] w-[360px] object-cover"
               priority
             />
           </div>
 
-          {/* Optional: Add a link wrapper if the banner should be clickable */}
+          {/* Link opcional */}
           <a
             href="https://api.whatsapp.com/send?phone=554831971100"
             target="_blank"
@@ -93,5 +102,5 @@ export const Banner = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
