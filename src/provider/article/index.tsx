@@ -200,7 +200,9 @@ interface IArticleData {
   ): Promise<ArticleResponse>;
   articlesByPortalHighlightPositionFour: ArticleResponse | null;
 
-  ListArticlesColumnists(): Promise<ArticleWithColumnistResponse>;
+  ListArticlesColumnists(
+    name_columnist?: string
+  ): Promise<ArticleWithColumnistResponse>;
   listArticlesColumnists: ArticleWithColumnistResponse | null;
 
   GetArticleBySlug(slug: string): Promise<Article>;
@@ -435,19 +437,24 @@ export const ArticleProvider = ({ children }: ICihldrenReact) => {
 
   const [listArticlesColumnists, setListArticlesColumnists] =
     useState<ArticleWithColumnistResponse | null>(null);
-  const ListArticlesColumnists =
-    async (): Promise<ArticleWithColumnistResponse> => {
-      const response = await api
-        .get("/list-columnist")
-        .then((res) => {
-          setListArticlesColumnists(res.data.response);
-        })
-        .catch((err) => {
-          return err;
-        });
-
-      return response;
+  const ListArticlesColumnists = async (
+    name_columnist?: string
+  ): Promise<ArticleWithColumnistResponse> => {
+    const config = {
+      params: { name_columnist },
     };
+
+    const response = await api
+      .get("/list-columnist", config)
+      .then((res) => {
+        setListArticlesColumnists(res.data.response);
+      })
+      .catch((err) => {
+        return err;
+      });
+
+    return response;
+  };
 
   return (
     <ArticleContext.Provider

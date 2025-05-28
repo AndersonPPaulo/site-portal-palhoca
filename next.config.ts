@@ -1,12 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   images: {
     domains: [
-      "images-i3-portais-bucket.s3.amazonaws.com",
-      "images-i3-portais-bucket.s3.us-east-2.amazonaws.com",
-    ],
+      process.env.IMAGE_DOMAIN_1 || "",
+      process.env.IMAGE_DOMAIN_2 || "",
+    ].filter(Boolean), // para evitar strings vazias
   },
 };
 

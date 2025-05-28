@@ -1,18 +1,24 @@
 "use client";
 
 import { ArticleContext } from "@/provider/article";
-import normalizeText from "@/utils/normalize-text";
+import SlugToText from "@/utils/slugToText";
 import { generateSlug } from "@/utils/string-utils";
 import Image from "next/image";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { useContext, useEffect } from "react";
 
 export const ColumnistsSection = () => {
+  const params = useParams();
+
   const { ListArticlesColumnists, listArticlesColumnists } =
     useContext(ArticleContext);
 
   useEffect(() => {
-    ListArticlesColumnists();
+    const titleColumn = Array.isArray(params.titleColumn)
+      ? params.titleColumn[0]
+      : params.titleColumn;
+    ListArticlesColumnists(SlugToText(titleColumn ?? ""));
   }, []);
 
   return (

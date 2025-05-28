@@ -46,7 +46,7 @@ export default function SearchResults({
       <Card className="w-full shadow-2xl border-0 p-0 bg-white/95 backdrop-blur-sm">
         <CardContent className="p-0">
           {/* Header */}
-          <div className="p-4 border-b bg-gradient-to-r from-blue-50 to-indigo-50">
+          <div className="p-4 border-b rounded-t-2xl bg-gradient-to-r from-blue-50 to-indigo-50">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-800">
                 Resultados da pesquisa
@@ -129,7 +129,7 @@ export default function SearchResults({
 
           {/* Pagination */}
           {publishedArticlesBySearch.meta.totalPages > 1 && (
-            <div className="p-4 border-t bg-gray-50">
+            <div className="p-4 border-t bg-gray-50 rounded-b-2xl">
               <div className="flex items-center justify-between">
                 <div className="text-sm text-gray-600">
                   Página {publishedArticlesBySearch.meta.page} de{" "}
@@ -144,7 +144,7 @@ export default function SearchResults({
                       handlePageChange(publishedArticlesBySearch.meta.page - 1)
                     }
                     disabled={publishedArticlesBySearch.meta.page <= 1}
-                    className="h-8 w-8 p-0"
+                    className="h-8 w-8 p-0 cursor-pointer"
                   >
                     <ChevronLeft size={14} />
                   </Button>
@@ -162,8 +162,10 @@ export default function SearchResults({
                               variant="outline"
                               size="sm"
                               onClick={() => handlePageChange(pageNum)}
-                              className={`h-8 w-8 p-0 text-xs ${
-                                pageNum && "border-primary text-primary"
+                              className={`h-8 w-8 p-0 text-xs cursor-pointer ${
+                                pageNum === publishedArticlesBySearch.meta.page
+                                  ? "text-primary border-primary"
+                                  : ""
                               }`}
                             >
                               {pageNum}
@@ -182,7 +184,7 @@ export default function SearchResults({
                           }
                           size="sm"
                           onClick={() => handlePageChange(1)}
-                          className="h-8 w-8 p-0 text-xs"
+                          className="h-8 w-8 p-0 text-xs cursor-pointer"
                         >
                           1
                         </Button>
@@ -211,7 +213,12 @@ export default function SearchResults({
                                 }
                                 size="sm"
                                 onClick={() => handlePageChange(pageNum)}
-                                className="h-8 w-8 p-0 text-xs"
+                                className={`h-8 w-8 p-0 text-xs cursor-pointer ${
+                                  pageNum ===
+                                  publishedArticlesBySearch.meta.page
+                                    ? "text-primary border-primary"
+                                    : ""
+                                }`}
                               >
                                 {pageNum}
                               </Button>
@@ -240,7 +247,7 @@ export default function SearchResults({
                               publishedArticlesBySearch.meta.totalPages
                             )
                           }
-                          className="h-8 w-8 p-0 text-xs"
+                          className="h-8 w-8 p-0 text-xs cursor-pointer"
                         >
                           {publishedArticlesBySearch.meta.totalPages}
                         </Button>
@@ -258,7 +265,7 @@ export default function SearchResults({
                       publishedArticlesBySearch.meta.page >=
                       publishedArticlesBySearch.meta.totalPages
                     }
-                    className="h-8 w-8 p-0"
+                    className="h-8 w-8 p-0 cursor-pointer"
                   >
                     <ChevronRight size={14} />
                   </Button>
