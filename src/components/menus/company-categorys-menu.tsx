@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
-// Import icons (you'll need to create or source these icons)
+// Import icons
 import todosIcon from "@/assets/icons/company/todos.png";
 import academiaIcon from "@/assets/icons/company/academia.png";
 import advogadosIcon from "@/assets/icons/company/advogados.png";
@@ -50,15 +51,42 @@ function normalizeText(text: string): string {
     .replace(/\s+/g, "-"); // Replace spaces with hyphens for URL format
 }
 
+// Declare a global interface for window to include showMap property
+declare global {
+  interface Window {
+    showMap?: boolean;
+    activeCategory?: string;
+    toggleMap?: () => void;
+  }
+}
+
 export default function CompanyCategoryMenu({
   pathname,
 }: {
-  pathname: string | null
+  pathname: string | null;
 }) {
   const [activeCategory, setActiveCategory] = useState("Todos");
   const scrollContainerRef = useRef<HTMLUListElement>(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(true);
+  const [showMap, setShowMap] = useState(false);
+
+  // Check if we're on commerce related pages
+  const isComercioPath =
+    pathname === "/comercios" || pathname?.startsWith("/comercios/");
+
+  const toggleMap = () => {
+    const newMapState = !showMap;
+    setShowMap(newMapState);
+
+    // Update the global state to share with other components
+    if (typeof window !== "undefined") {
+      window.showMap = newMapState;
+
+      // Dispatch an event for other components to listen for
+      window.dispatchEvent(new Event("mapToggled"));
+    }
+  };
 
   const categories = [
     { name: "Todos", icon: todosIcon, path: "/comercios" },
@@ -108,7 +136,11 @@ export default function CompanyCategoryMenu({
       icon: floricultura,
       path: "/comercios/floricultura",
     },
-    { name: "Imobiliárias", icon: imobiliaria, path: "/comercios/imobiliarias" },
+    {
+      name: "Imobiliárias",
+      icon: imobiliaria,
+      path: "/comercios/imobiliarias",
+    },
     {
       name: "Internet e informática",
       icon: internet_informatica,
@@ -224,8 +256,12 @@ export default function CompanyCategoryMenu({
 
   const handleCategoryClick = (categoryName: string) => {
     setActiveCategory(categoryName);
-  };
 
+    if (typeof window !== "undefined") {
+      window.activeCategory = categoryName;
+      window.dispatchEvent(new Event("categoryChanged"));
+    }
+  };
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollBy({ left: -200, behavior: "smooth" });
@@ -242,6 +278,10 @@ export default function CompanyCategoryMenu({
   if (!pathname?.startsWith("/comercios")) {
     return null;
   }
+
+  // Check if we're on compoany details pages
+  const isDetailsPath =
+    pathname === "/comercios" || pathname?.startsWith("/comercios/detalhes");
 
   return (
     <nav className="flex justify-center w-full bg-white mx-auto mt-6 lg:overflow-x-hidden">
@@ -265,7 +305,6 @@ export default function CompanyCategoryMenu({
             </Button>
           </div>
         )}
-
         <ul
           ref={scrollContainerRef}
           className="flex items-center space-x-4 py-3 lg:mx-10 whitespace-nowrap overflow-x-auto lg:scrollbar-hide scroll-smooth"
@@ -295,9 +334,15 @@ export default function CompanyCategoryMenu({
             </li>
           ))}
         </ul>
-
+        {/* // Right scroll button */}
         {showRightArrow && (
-          <div className="absolute right-33 h-full hidden lg:flex items-center justify-center z-30">
+          <div
+            className={`absolute ${
+              pathname?.startsWith("/comercios/detalhes")
+                ? "right-0"
+                : "right-33"
+            } h-full hidden lg:flex items-center justify-center z-30`}
+          >
             <div
               className="h-full w-16 rounded-l-lg"
               style={{
@@ -307,15 +352,19 @@ export default function CompanyCategoryMenu({
             />
             <Button
               onClick={scrollRight}
-              className="absolute z-40 -right-2 rounded-full py-5 bg-red-light shadow-md hover:bg-red-light/80 text-red-primary transition-colors"
+              className={`absolute z-40 ${
+                pathname?.startsWith("/comercios/detalhes")
+                  ? "-right-0"
+                  : "-right-2"
+              } rounded-full py-5 bg-red-light shadow-md hover:bg-red-light/80 text-red-primary transition-colors`}
               aria-label="Scroll right"
             >
               <ChevronRight className="h-6 w-6 text-gray-700" />
             </Button>
           </div>
         )}
-
-          <ButtonMap />
+        {/* Botão do mapa */}
+        <ButtonMap onClick={toggleMap} isMapOpen={showMap} />
       </div>
     </nav>
   );
