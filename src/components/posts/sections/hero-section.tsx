@@ -1,81 +1,126 @@
-"use client"
+"use client";
 
 import Image from "next/image";
 import Link from "next/link";
-import { mockPosts } from "@/utils/mock-data";
-
-function normalizeText(text: string): string {
-  return text
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "") // Remove accents
-    .replace(/[^\w\s]/g, "") // Remove special characters
-    .replace(/\s+/g, ""); // Remove spaces
-}
+import { useContext, useEffect } from "react";
+import { ArticleContext } from "@/provider/article";
+import { formatDate } from "@/utils/formatDate";
+import { useParams } from "next/navigation";
+import normalizeTextToslug from "@/utils/normalize-text";
 
 export default function HeroSection() {
-  const mainPost = mockPosts[0];
-  const sidePosts = mockPosts.slice(1, 4);
+  const slug = useParams();
+
+  const {
+    GetArticlesByPortalHighlightPositionOne,
+    articlesByPortalHighlightPositionOne,
+
+    articlesByPortalHighlightPositionTwo,
+    GetArticlesByPortalHighlightPositionTwo,
+  } = useContext(ArticleContext);
+
+  useEffect(() => {
+    const fetchArticles = async () => {
+      await GetArticlesByPortalHighlightPositionOne({
+        category_name: slug.name?.toString(),
+        highlight: true,
+        highlightPosition: 1,
+      });
+
+      await GetArticlesByPortalHighlightPositionTwo({
+        category_name: slug.name?.toString(),
+        highlight: true,
+        highlightPosition: 2,
+      });
+    };
+
+    fetchArticles();
+  }, []);
+
+  const mainPost = articlesByPortalHighlightPositionOne?.data[0];
+  const sidePosts = articlesByPortalHighlightPositionTwo?.data.slice(0, 3);
 
   return (
     <section className="flex flex-col lg:flex-row w-full max-w-[360px] gap-6 py-4 lg:max-w-[1272px] mx-auto border-t border-[#e6e6e6]">
       {/* Main Post */}
-      <div className="flex flex-col lg:flex-row gap-6 rounded-xl ">
-        <div className="relative md:min-w-[490px] max-w-[490px] min-h-[406px] max-h-[406px] rounded-xl overflow-hidden">
-          <Image
-            src={mainPost.image}
-            alt={mainPost.title}
-            fill
-            className="object-cover"
-          />
-        </div>
-        <div className="flex flex-col justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold leading-tight">
-              {mainPost.title}
-            </h1>
-            <span className="text-sm bg-secondary text-primary my-4 px-2 py-1 rounded-full inline-block mb-2">
-              {mainPost.category}
-            </span>
-            <p className="text-md text-gray-600 line-clamp-11">
-              {mainPost.description}
-              {mainPost.description}
-            </p>
+
+      {mainPost && (
+        <Link
+          key={mainPost.id}
+          href={`/noticia/${normalizeTextToslug(mainPost.category.name)}/${
+            mainPost.slug
+          }`}
+        >
+          <div className="flex flex-col lg:flex-row gap-6 rounded-xl">
+            <div className="relative md:min-w-[490px] max-w-[490px] min-h-[406px] max-h-[406px] rounded-xl overflow-hidden">
+              <Image
+                src={mainPost?.thumbnail.url}
+                alt={
+                  mainPost?.thumbnail.description ||
+                  mainPost?.title ||
+                  "Imagem do artigo"
+                }
+                fill
+                className="object-cover"
+              />
+            </div>
+            <div className="flex flex-col justify-between pb-9">
+              <div>
+                <h1 className="text-2xl font-semibold leading-tight">
+                  {mainPost.title}
+                </h1>
+                <span className="text-sm bg-secondary text-primary my-4 px-2 py-1 rounded-full inline-block mb-2">
+                  {mainPost.category.name}
+                </span>
+                <p className="text-md text-gray-600 line-clamp-12">
+                  {mainPost.resume_content}
+                </p>
+              </div>
+              <p className="text-xs text-gray-500">
+                {formatDate(mainPost.created_at)}
+              </p>
+            </div>
           </div>
-          <p className="text-xs text-gray-500 mt-4">{mainPost.date}</p>
-        </div>
-      </div>
+        </Link>
+      )}
 
       {/* Side Posts */}
-      <div className="flex flex-col gap-4 shadow-md p-4 rounded-2xl min-w-[300px] md:min-w-[415px] max-w-[415px]">
-        {sidePosts.map((post, idx) => (
-          <Link key={idx} href={`/noticia/${normalizeText(post.category)}/${post.id}`}>
-            <div
-              className="flex gap-3 rounded-xl p-2 transition"
+      {sidePosts?.length !== 0 && (
+        <div className="flex flex-col gap-4 shadow-md p-4 rounded-2xl min-w-[300px] md:min-w-[415px] max-w-[415px]">
+          {sidePosts?.map((post, idx) => (
+            <Link
+              key={idx}
+              href={`/noticia/${normalizeTextToslug(post.category.name)}/${
+                post.slug
+              }`}
             >
-              <div className="relative min-w-[151px] h-[110px] rounded-sm overflow-hidden">
-                <Image
-                  src={post.image}
-                  alt={post.title}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="flex flex-col justify-between">
-                <h3 className="text-xl font-semibold leading-tight line-clamp-3">
-                  {post.title}
-                </h3>
-                <div className="flex w-full justify-between">
-                  <span className="w-min text-xs bg-secondary text-primary px-3 py-1 rounded-2xl">
-                    {post.category}
-                  </span>
-                  <p className="text-xs text-gray-500">{post.date}</p>
+              <div className="flex gap-3 rounded-xl p-2 transition">
+                <div className="relative min-w-[151px] h-[110px] rounded-sm overflow-hidden">
+                  <Image
+                    src={post.thumbnail.url}
+                    alt={post.title}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="flex flex-col justify-between gap-4">
+                  <h3 className="text-xl font-semibold leading-tight line-clamp-3">
+                    {post.title}
+                  </h3>
+                  <div className="flex w-full justify-between items-center">
+                    <span className="w-min text-xs bg-secondary text-primary px-3 py-1 rounded-2xl">
+                      {post.category.name}
+                    </span>
+                    <p className="text-xs text-gray-500">
+                      {formatDate(post.created_at)}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-          </Link>
-        ))}
-      </div>
+            </Link>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

@@ -1,21 +1,23 @@
-import Image, { StaticImageData } from "next/image";
-import Link from "next/link";
-import { mockPosts } from "@/utils/mock-data";
+"use client";
 
-export type NewsProps = {
-  id: number;
-  title: string;
-  category: string;
-  description: string;
-  date: string;
-  image: StaticImageData;
-  orientation?: "horizontal" | "vertical";
-};
+import Image from "next/image";
+import Link from "next/link";
+import { useContext, useEffect } from "react";
+import { ArticleContext } from "@/provider/article";
+import { formatDate } from "@/utils/formatDate";
+import normalizeTextToslug from "@/utils/normalize-text";
 
 export default function PostTopGridSection() {
-  const sortedPosts = mockPosts.sort((a, b) => {
-    const [dayA, monthA, yearA] = a.date.split("/").map(Number);
-    const [dayB, monthB, yearB] = b.date.split("/").map(Number);
+  const { GetPublishedArticles, publishedArticles } =
+    useContext(ArticleContext);
+
+  useEffect(() => {
+    GetPublishedArticles({});
+  }, []);
+
+  const sortedPosts = publishedArticles?.data.slice(0, 9).sort((a, b) => {
+    const [dayA, monthA, yearA] = a.created_at.split("/").map(Number);
+    const [dayB, monthB, yearB] = b.created_at.split("/").map(Number);
 
     const dateA = new Date(yearA, monthA - 1, dayA);
     const dateB = new Date(yearB, monthB - 1, dayB);
@@ -35,13 +37,22 @@ export default function PostTopGridSection() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 justify-between gap-7">
-        {sortedPosts.slice(0, 9).map((post, idx) => (
-          <Link key={idx} href="#">
+        {sortedPosts?.slice(0, 9).map((post, idx) => (
+          <Link
+            key={idx}
+            href={`/noticia/${normalizeTextToslug(post.category.name)}/${
+              post.slug
+            }`}
+          >
             <div className="flex flex-col  rounded-xl transition">
               <div className="relative min-w-[300px] md:w-[405px] h-[310px] rounded-md overflow-hidden">
                 <Image
-                  src={post.image}
-                  alt={post.title}
+                  src={post.thumbnail.url}
+                  alt={
+                    post.title ||
+                    post.thumbnail.description ||
+                    "Imagem da noticia do portal"
+                  }
                   fill
                   className="object-cover"
                 />
@@ -53,9 +64,11 @@ export default function PostTopGridSection() {
                 <div className="flex w-full justify-between">
                   <div className="flex items-center mt-2 gap-4">
                     <span className="w-min text-xs bg-secondary text-primary px-3 py-1 rounded-2xl">
-                      {post.category}
+                      {post.category.name}
                     </span>
-                    <p className="text-xs text-gray-500">{post.date}</p>
+                    <p className="text-xs text-gray-500">
+                      {formatDate(post.created_at)}
+                    </p>
                   </div>
                 </div>
               </div>
