@@ -72,7 +72,7 @@ export default function Header() {
             <Search size={24} />
           </button>
           <Button className="hidden lg:block text-[#FFF] rounded-full h-10 px-6 bg-primary font-[600] hover:bg-primary/80 cursor-pointer transition duration-300 ease-in-out">
-            Mostre sua marca
+            Anúncie sua marca
           </Button>
         </div>
       </div>
@@ -99,7 +99,7 @@ export default function Header() {
             Buscar Comércio
           </Link>
           <Button className="text-[#FFF] rounded-full py-3 px-6 bg-primary font-[600] hover:bg-primary/80 cursor-pointer transition duration-300 ease-in-out w-full mt-2">
-            Mostre sua marca
+            Anúncie sua marca
           </Button>
         </div>
       )}

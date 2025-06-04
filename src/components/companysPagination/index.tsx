@@ -44,7 +44,7 @@ export function CompanyPagination({
   const getPageNumbers = () => {
     const pageNumbers = [];
     const maxPageButtons = 5;
-    
+
     if (totalPages <= maxPageButtons) {
       // Se tiver menos páginas que o máximo de botões, mostrar todas
       for (let i = 1; i <= totalPages; i++) {
@@ -54,30 +54,30 @@ export function CompanyPagination({
       // Estratégia para mostrar páginas em torno da atual
       let startPage = Math.max(1, currentPage - 2);
       let endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
-      
+
       // Ajustar se estivermos próximos do fim
       if (endPage - startPage < maxPageButtons - 1) {
         startPage = Math.max(1, endPage - maxPageButtons + 1);
       }
-      
+
       // Adicionar primeira página
       if (startPage > 1) {
         pageNumbers.push(1);
         if (startPage > 2) pageNumbers.push("...");
       }
-      
+
       // Adicionar páginas intermediárias
       for (let i = startPage; i <= endPage; i++) {
         pageNumbers.push(i);
       }
-      
+
       // Adicionar última página
       if (endPage < totalPages) {
         if (endPage < totalPages - 1) pageNumbers.push("...");
         pageNumbers.push(totalPages);
       }
     }
-    
+
     return pageNumbers;
   };
 
@@ -102,8 +102,8 @@ export function CompanyPagination({
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
-        
-        {getPageNumbers().map((page, index) => (
+
+        {getPageNumbers().map((page, index) =>
           typeof page === "number" ? (
             <Button
               key={index}
@@ -120,8 +120,8 @@ export function CompanyPagination({
               {page}
             </span>
           )
-        ))}
-        
+        )}
+
         <Button
           variant="outline"
           size="icon"
@@ -133,7 +133,7 @@ export function CompanyPagination({
           <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
-      
+
       {/* Contador de resultados */}
       <div className="text-center text-sm text-muted-foreground">
         Mostrando {start}-{end} de {totalItems} resultados
