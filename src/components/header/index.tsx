@@ -39,7 +39,9 @@ export default function Header() {
 
         {/* Logo - centered on mobile, left-aligned on desktop */}
         <div className="flex items-center lg:space-x-4 mx-auto lg:mx-0">
+          <Link href="/" className="flex items-center">
           <Image src={logo} alt="Logo" className="h-10 min-w-[159px]" />
+          </Link>
         </div>
 
         {/* Desktop Navigation - hidden on mobile, visible on desktop (lg+) */}
