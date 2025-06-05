@@ -109,7 +109,7 @@ export function CardCompany({ company, className }: Props) {
           variant="outline"
           onClick={handleViewDetails}
         >
-          <Phone className="mr-2 flex-shrink-0" /> Conferir número
+          <Phone className="mr-2 flex-shrink-0" /> Ver detalhes
         </Button>
       </div>
     </div>
