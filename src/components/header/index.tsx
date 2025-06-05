@@ -39,7 +39,9 @@ export default function Header() {
 
         {/* Logo - centered on mobile, left-aligned on desktop */}
         <div className="flex items-center lg:space-x-4 mx-auto lg:mx-0">
+          <Link href="/" className="flex items-center">
           <Image src={logo} alt="Logo" className="h-10 min-w-[159px]" />
+          </Link>
         </div>
 
         {/* Desktop Navigation - hidden on mobile, visible on desktop (lg+) */}
@@ -72,7 +74,7 @@ export default function Header() {
             <Search size={24} />
           </button>
           <Button className="hidden lg:block text-[#FFF] rounded-full h-10 px-6 bg-primary font-[600] hover:bg-primary/80 cursor-pointer transition duration-300 ease-in-out">
-            Mostre sua marca
+            Anúncie sua marca
           </Button>
         </div>
       </div>
@@ -99,7 +101,7 @@ export default function Header() {
             Buscar Comércio
           </Link>
           <Button className="text-[#FFF] rounded-full py-3 px-6 bg-primary font-[600] hover:bg-primary/80 cursor-pointer transition duration-300 ease-in-out w-full mt-2">
-            Mostre sua marca
+            Anúncie sua marca
           </Button>
         </div>
       )}

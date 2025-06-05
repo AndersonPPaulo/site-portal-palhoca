@@ -11,7 +11,9 @@ export function Footer() {
         <div className="flex flex-col md:flex-row mx-auto justify-between w-full p-4 gap-8">
           {/* Logo and description */}
           <div className="max-w-[380px]">
+            <Link href="#" className="flex items-center">
             <Image src={logo} alt="Portal Palhoça" width={200} height={50} />
+            </Link>
             <p className="mt-4 text-black font-[400] text-md">
               Sua fonte completa de notícias e comércios em Palhoça
             </p>
