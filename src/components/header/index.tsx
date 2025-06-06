@@ -5,7 +5,7 @@ import logo from "@/assets/Group.png";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "../ui/button";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import CustomInput from "../custom-input/custom-input";
 import CompanyCategorysMenu from "../menus/company-categorys-menu";
 import NewsCategoryMenu from "../menus/news-categorys-menu";
@@ -14,15 +14,23 @@ import TopBanner from "../banner/top";
 
 export default function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Check if we're on commerce related pages
   const isComercioPath =
     pathname === "/comercios" || pathname?.startsWith("/comercios/");
+  
+  // Check if we're on contact page
+  const isContatoPath = pathname === "/contato";
 
   // Toggle mobile menu
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleContactsClick = () => {
+    router.push("/contato");
   };
 
   return (
@@ -40,7 +48,7 @@ export default function Header() {
         {/* Logo - centered on mobile, left-aligned on desktop */}
         <div className="flex items-center lg:space-x-4 mx-auto lg:mx-0">
           <Link href="/" className="flex items-center">
-          <Image src={logo} alt="Logo" className="h-10 min-w-[159px]" />
+            <Image src={logo} alt="Logo" className="h-10 min-w-[159px]" />
           </Link>
         </div>
 
@@ -73,7 +81,10 @@ export default function Header() {
           <button className="lg:hidden" aria-label="Search">
             <Search size={24} />
           </button>
-          <Button className="hidden lg:block text-[#FFF] rounded-full h-10 px-6 bg-primary font-[600] hover:bg-primary/80 cursor-pointer transition duration-300 ease-in-out">
+          <Button 
+            onClick={handleContactsClick} 
+            className="hidden lg:block text-[#FFF] rounded-full h-10 px-6 bg-primary font-[600] hover:bg-primary/80 cursor-pointer transition duration-300 ease-in-out"
+          >
             Anúncie sua marca
           </Button>
         </div>
@@ -100,7 +111,10 @@ export default function Header() {
           >
             Buscar Comércio
           </Link>
-          <Button className="text-[#FFF] rounded-full py-3 px-6 bg-primary font-[600] hover:bg-primary/80 cursor-pointer transition duration-300 ease-in-out w-full mt-2">
+          <Button 
+            onClick={handleContactsClick}  
+            className="text-[#FFF] rounded-full py-3 px-6 bg-primary font-[600] hover:bg-primary/80 cursor-pointer transition duration-300 ease-in-out w-full mt-2"
+          >
             Anúncie sua marca
           </Button>
         </div>
@@ -130,26 +144,32 @@ export default function Header() {
         </Link>
       </nav>
 
-      {/* Search bar - Only visible when menu is closed */}
-      {!isMenuOpen && <CustomInput pathname={pathname} />}
-
-      {/* Category menus - Only visible when menu is closed */}
+      {/* Search bar or Contact message - Only visible when menu is closed */}
       {!isMenuOpen && (
         <>
-          {!pathname?.startsWith("/comercios") ||
-          pathname?.startsWith("/noticia") ? (
-            <NewsCategoryMenu pathname={pathname} />
+          {isContatoPath ? (
+            <div className="text-center py-4">
+            </div>
           ) : (
-            pathname.startsWith("/comercios") && (
-              <CompanyCategorysMenu pathname={pathname} />
-            )
+            <CustomInput pathname={pathname} />
           )}
         </>
       )}
 
-      <TopBanner />
+      {/* Category menus - Only visible when menu is closed and not on contact page */}
+      {!isMenuOpen && !isContatoPath && (
+        <>
+          {pathname?.startsWith("/comercios") ? (
+            <CompanyCategorysMenu pathname={pathname} />
+          ) : pathname?.startsWith("/noticia") ? (
+            <NewsCategoryMenu pathname={pathname} />
+          ) : pathname === "/" ? (
+            <NewsCategoryMenu pathname={pathname} />
+          ) : null}
+        </>
+      )}
 
-     
+      <TopBanner />
     </header>
   );
 }
