@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,6 +16,7 @@ import {
   CheckCircle,
   AlertCircle,
 } from "lucide-react";
+import { PublicCompanyContext, IContactFormData } from "@/provider/company";
 
 // Schema de validação com Zod
 const contactFormSchema = z.object({
@@ -38,9 +39,8 @@ const contactFormSchema = z.object({
       "Telefone deve estar no formato (XX) XXXXX-XXXX"
     )
     .min(1, "Telefone é obrigatório"),
-  message: z
+  companyMessage: z
     .string()
-    .min(10, "Mensagem deve ter pelo menos 10 caracteres")
     .max(500, "Mensagem deve ter no máximo 500 caracteres")
     .optional(),
 });
@@ -49,6 +49,8 @@ type ContactFormData = z.infer<typeof contactFormSchema>;
 
 export default function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { createNewLead } = useContext(PublicCompanyContext);
+
   const [submitStatus, setSubmitStatus] = useState<
     "idle" | "success" | "error"
   >("idle");
@@ -89,11 +91,9 @@ export default function ContactForm() {
     setSubmitStatus("idle");
 
     try {
-      // Simular envio - aqui você integraria com sua API
+      await createNewLead(data);
+      console.log("Lead enviado com sucesso!");
       console.log("Dados do formulário:", data);
-
-      // Simular delay de envio
-      await new Promise((resolve) => setTimeout(resolve, 2000));
 
       setSubmitStatus("success");
       reset();
@@ -109,15 +109,14 @@ export default function ContactForm() {
   };
 
   return (
-    <section className="flex flex-col gap-6 max-w-[1272px] mx-auto py-4">
-      {/* Barra decorativa do portal */}
-      <div className="w-[106px] h-2 bg-primary rounded-full" />
+    <section className="flex flex-col gap-4 max-w-[1272px] ">
+      <div className="w-[150px] h-2  bg-primary rounded-full" />
 
       {/* Header */}
       <div className="flex flex-col gap-2">
-        <h2 className="text-2xl font-semibold text-primary">
+        <h1 className="text-2xl font-semibold text-primary">
           Anúncie sua marca no Portal Palhoça
-        </h2>
+        </h1>
         <p className="text-gray-600 max-w-2xl">
           Faça parte do maior portal de notícias e comércios de Palhoça.
           Preencha o formulário abaixo e nossa equipe entrará em contato.
@@ -127,7 +126,7 @@ export default function ContactForm() {
       {/* Formulário */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Coluna do formulário */}
-        <div className="bg-white rounded-xl shadow-lg p-6 border">
+        <div className="bg-white rounded-xl shadow-lg p-6 border-1 border-gray-300">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Nome da Empresa */}
             <div className="space-y-2">
@@ -247,15 +246,15 @@ export default function ContactForm() {
                 id="message"
                 placeholder="Conte-nos mais sobre sua empresa e como podemos ajudar..."
                 rows={4}
-                {...register("message")}
+                {...register("companyMessage")}
                 className={`w-full resize-none ${
-                  errors.message ? "border-red-500" : "border-gray-300"
+                  errors.companyMessage ? "border-red-500" : "border-gray-300"
                 }`}
               />
-              {errors.message && (
+              {errors.companyMessage && (
                 <p className="text-red-500 text-sm flex items-center gap-1">
                   <AlertCircle size={14} />
-                  {errors.message.message}
+                  {errors.companyMessage.message}
                 </p>
               )}
             </div>
@@ -310,7 +309,7 @@ export default function ContactForm() {
         {/* Coluna de informações */}
         <div className="space-y-6">
           {/* Card de benefícios */}
-          <div className="bg-secondary rounded-xl p-6 border">
+          <div className="bg-secondary rounded-xl p-6 border-1 border-green-100">
             <h3 className="text-xl font-semibold text-primary mb-4">
               Por que anunciar conosco?
             </h3>
@@ -356,7 +355,7 @@ export default function ContactForm() {
           </div>
 
           {/* Card de contato direto */}
-          <div className="bg-white rounded-xl shadow-lg p-6 border">
+          <div className="bg-white rounded-xl shadow-lg p-6 border-1 border-gray-300">
             <h3 className="text-xl font-semibold text-primary mb-4">
               Contato Direto
             </h3>
