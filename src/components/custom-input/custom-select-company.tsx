@@ -108,7 +108,7 @@ const DistrictSelect: React.FC<DistrictSelectProps> = ({
     return createPortal(
       <div
         ref={dropdownRef}
-        className="bg-white border border-gray-300 rounded-lg shadow-xl max-h-80 overflow-hidden"
+        className="bg-white border border-gray-200 rounded-lg shadow-xl max-h-80 overflow-hidden"
         style={{
           position: "absolute",
           top: dropdownPosition.top,
@@ -118,13 +118,13 @@ const DistrictSelect: React.FC<DistrictSelectProps> = ({
         }}
       >
         {/* Campo de busca */}
-        <div className="p-1 border-b border-gray-200">
+        <div className="p-2 border-b border-gray-100">
           <Input
             type="text"
             placeholder="Digite o bairro"
             value={searchTerm}
             onChange={handleSearchChange}
-            className="w-full py-2 border-none"
+            className="w-full py-2 border border-gray-200 rounded-md focus:ring-1 focus:ring-primary"
             autoFocus
           />
         </div>
@@ -156,14 +156,14 @@ const DistrictSelect: React.FC<DistrictSelectProps> = ({
     <div className={`relative ${className}`}>
       <div
         ref={inputRef}
-        className="flex items-center border-none flex-grow relative cursor-pointer"
+        className="flex items-center relative cursor-pointer w-full"
         onClick={handleInputClick}
       >
         <Input
           type="text"
           placeholder={placeholder}
           value={selectedDistrict}
-          className="h-[44px] outline-none border-none rounded-b-[12px] rounded-t-none placeholder:text-gray-400 cursor-pointer w-full pr-10"
+          className="h-[44px] outline-none border-none rounded-none shadow-none focus:ring-0 focus:border-none placeholder:text-gray-400 cursor-pointer w-full pr-10 bg-transparent"
           readOnly
         />
         <ChevronDown
