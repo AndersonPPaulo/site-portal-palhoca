@@ -58,7 +58,7 @@ export default function FilteredCommerceList({
   useEffect(() => {
     const loadData = async () => {
       try {
-        await listCompanies(1, 1000);
+        await listCompanies(1, 20);
       } catch (error) {
         console.error("Erro ao carregar empresas:", error);
       }

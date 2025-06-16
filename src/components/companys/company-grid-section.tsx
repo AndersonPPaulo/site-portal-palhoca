@@ -13,7 +13,7 @@ export function CompanyGridSection() {
   // Carregar dados na inicialização
   useEffect(() => {
     if (!companies) {
-      listCompanies(1, 1000); // Carregar todas as empresas
+      listCompanies(1, 20); // Carregar todas as empresas
     }
   }, []);
 
