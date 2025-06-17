@@ -50,7 +50,7 @@ const SearchInputCompany: React.FC<SearchInputCompanyProps> = ({
       {/* Input de pesquisa + lupa */}
       <div className="flex items-center w-full relative">
         <Input
-          type="text"
+          type="search"
           placeholder={placeholder}
           value={searchTerm}
           onChange={handleInputChange}

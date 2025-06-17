@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, X } from "lucide-react";
 import { Input } from "../ui/input";
+import { Button } from "../ui/button";
 import { districtsPalhoca } from "@/utils/mock-data";
 
 // Tipagem para o array de distritos
@@ -119,7 +120,6 @@ const DistrictSelect: React.FC<DistrictSelectProps> = ({
       detail: "",
     });
     window.dispatchEvent(districtSelectedEvent);
-    setIsOpen(!isOpen);
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -196,9 +196,22 @@ const DistrictSelect: React.FC<DistrictSelectProps> = ({
           type="text"
           placeholder={placeholder}
           value={selectedDistrict}
-          className="h-[44px] outline-none border-none rounded-none shadow-none focus:ring-0 focus:border-none placeholder:text-gray-400 cursor-pointer w-full pr-10 bg-transparent"
+          className="h-[44px] outline-none border-none rounded-none shadow-none focus:ring-0 focus:border-none placeholder:text-gray-400 cursor-pointer w-full pr-12 bg-transparent"
           readOnly
         />
+        {selectedDistrict ? (
+          <Button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleClearSelection();
+            }}
+            className="absolute right-10 text-gray-400 hover:text-gray-600 transition-colors bg-transparent border-none shadow-none p-1 h-auto min-h-0"
+            type="button"
+            variant={"outline"}
+          >
+            <X size={16} />
+          </Button>
+        ) : null}
         <ChevronDown
           className={`absolute right-4 text-gray-400 transition-transform duration-200 pointer-events-none ${
             isOpen ? "rotate-180" : ""
