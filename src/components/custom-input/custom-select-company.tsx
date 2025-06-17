@@ -120,6 +120,7 @@ const DistrictSelect: React.FC<DistrictSelectProps> = ({
       detail: "",
     });
     window.dispatchEvent(districtSelectedEvent);
+    setIsOpen(!isOpen)
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
