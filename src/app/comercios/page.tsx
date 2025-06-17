@@ -6,6 +6,8 @@ import DefaultPage from "@/components/default-page";
 import Header from "@/components/header";
 import FilteredCommerceList from "@/components/companys/filterCompany";
 import { usePublicCompany } from "@/provider/company";
+import DistrictSelect from "@/components/custom-input/custom-select-company";
+
 // Definir tipos para window global
 declare global {
   interface Window {
@@ -21,6 +23,7 @@ export default function Comercio() {
   const { companies, loading } = usePublicCompany();
   const [showMap, setShowMap] = useState(false);
   const [activeCategory, setActiveCategory] = useState("Todos");
+  const [selectedDistrict, setSelectedDistrict] = useState<string>("");
 
   // Efeito para sincronizar com o estado global de mapa
   useEffect(() => {
@@ -109,27 +112,17 @@ export default function Comercio() {
       window.removeEventListener("categoryChanged", handleCategoryChange);
   }, []);
 
-  // Calcular quantidade de comércios para exibir no título
-  const getCommerceCount = () => {
-    if (!companies?.data) return 0;
-
-    if (activeCategory !== "Todos") {
-      return companies.data.filter((company) =>
-        company.company_category?.some((cat) => cat.name === activeCategory)
-      ).length;
-    }
-
-    return companies.data.length;
+  // Handler para seleção de distrito
+  const handleDistrictSelect = (district: string) => {
+    setSelectedDistrict(district);
   };
 
   // Gerar título dinâmico
   const getPageTitle = () => {
-    const count = getCommerceCount();
-
     if (activeCategory === "Todos") {
-      return `Comércios em Palhoça`;
+      return `Comércios em Palhoça${selectedDistrict ? ` - ${selectedDistrict}` : ''}`;
     }
-    return `${activeCategory} em Palhoça`;
+    return `${activeCategory} em Palhoça${selectedDistrict ? ` - ${selectedDistrict}` : ''}`;
   };
 
   return (

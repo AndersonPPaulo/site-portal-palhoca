@@ -17,7 +17,7 @@ interface DistrictSelectProps {
 
 const DistrictSelect: React.FC<DistrictSelectProps> = ({
   onSelect,
-  placeholder = "Selecione Bairro",
+  placeholder = "Selecione o Bairro",
   value = "",
   className = "",
 }) => {
@@ -92,9 +92,34 @@ const DistrictSelect: React.FC<DistrictSelectProps> = ({
     setSelectedDistrict(district);
     setIsOpen(false);
     setSearchTerm("");
+
+    // Chama a função onSelect se fornecida
     if (onSelect) {
       onSelect(district);
     }
+
+    // Dispara o evento customizado que o FilteredCommerceList está escutando
+    const districtSelectedEvent = new CustomEvent("districtSelected", {
+      detail: district,
+    });
+    window.dispatchEvent(districtSelectedEvent);
+  };
+
+  // Função para limpar a seleção
+  const handleClearSelection = (): void => {
+    setSelectedDistrict("");
+
+    // Chama a função onSelect com string vazia
+    if (onSelect) {
+      onSelect("");
+    }
+
+    // Dispara o evento com string vazia para limpar o filtro
+    const districtSelectedEvent = new CustomEvent("districtSelected", {
+      detail: "",
+    });
+    window.dispatchEvent(districtSelectedEvent);
+    setIsOpen(!isOpen);
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -131,6 +156,14 @@ const DistrictSelect: React.FC<DistrictSelectProps> = ({
 
         {/* Lista de opções */}
         <div className="max-h-60 overflow-y-auto">
+          {/* Opção para limpar seleção */}
+          <div
+            className="px-4 py-3 hover:bg-gray-100 cursor-pointer transition-colors duration-150 text-sm border-b border-gray-100 font-medium text-gray-600"
+            onClick={handleClearSelection}
+          >
+            Todos os bairros
+          </div>
+
           {filteredDistricts.length > 0 ? (
             filteredDistricts.map((district, index) => (
               <div

@@ -16,6 +16,14 @@ function normalizeText(text: string): string {
     .replace(/\s+/g, "-");
 }
 
+function normalizeDistrict(district: string): string {
+  return district
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim();
+}
+
 interface FilteredCommerceListProps {
   activeCategory: string;
   showMap: boolean;
@@ -44,6 +52,7 @@ export default function FilteredCommerceList({
   const [categoryExists, setCategoryExists] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedDistrict, setSelectedDistrict] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
   // Estados para paginação
   const [currentPage, setCurrentPage] = useState(1);
@@ -151,6 +160,21 @@ export default function FilteredCommerceList({
     };
   }, []);
 
+  // Ouvir o evento de busca por nome
+  useEffect(() => {
+    const handleCompanyNameSearch = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const search = customEvent.detail;
+      setSearchTerm(search);
+      setCurrentPage(1); // Resetar para a primeira página ao buscar
+    };
+
+    window.addEventListener("companyNameSearch", handleCompanyNameSearch);
+    return () => {
+      window.removeEventListener("companyNameSearch", handleCompanyNameSearch);
+    };
+  }, []);
+
   // Controlar loading inicial da API
   useEffect(() => {
     if (loading) {
@@ -178,7 +202,7 @@ export default function FilteredCommerceList({
 
         setCategoryExists(categoryValid);
 
-        // Filtrar os comércios pela categoria e bairro
+        // Filtrar os comércios pela categoria, bairro e nome
         if (categoryValid) {
           let filteredConverted = convertedCompanies;
           let filteredOriginal = companies.data;
@@ -204,14 +228,34 @@ export default function FilteredCommerceList({
 
           // Filtrar por bairro, se houver um selecionado
           if (selectedDistrict) {
+            const normalizedSelectedDistrict =
+              normalizeDistrict(selectedDistrict);
+
             filteredConverted = filteredConverted.filter(
               (company) =>
-                company.district && company.district === selectedDistrict
+                company.district &&
+                normalizeDistrict(company.district) ===
+                  normalizedSelectedDistrict
             );
 
             filteredOriginal = filteredOriginal.filter(
               (company) =>
-                company.district && company.district === selectedDistrict
+                company.district &&
+                normalizeDistrict(company.district) ===
+                  normalizedSelectedDistrict
+            );
+          }
+
+          // Filtrar por nome, se houver um termo de busca
+          if (searchTerm) {
+            const normalizedSearchTerm = normalizeText(searchTerm);
+
+            filteredConverted = filteredConverted.filter((company) =>
+              normalizeText(company.name).includes(normalizedSearchTerm)
+            );
+
+            filteredOriginal = filteredOriginal.filter((company) =>
+              normalizeText(company.name).includes(normalizedSearchTerm)
             );
           }
 
@@ -227,7 +271,14 @@ export default function FilteredCommerceList({
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [activeCategory, selectedDistrict, companies, validCategories, loading]);
+  }, [
+    activeCategory,
+    selectedDistrict,
+    searchTerm,
+    companies,
+    validCategories,
+    loading,
+  ]);
 
   // Efeito para calcular o total de páginas quando os dados filtrados mudam
   useEffect(() => {
@@ -272,29 +323,53 @@ export default function FilteredCommerceList({
   );
 
   // Componente para mensagem de nenhum comércio encontrado
-  const NoCompanyMessage = () => (
-    <div className="w-full py-12 text-center bg-red-50 rounded-lg border border-red-200 px-4">
-      <div className="inline-flex items-center justify-center w-12 h-12 bg-red-100 rounded-full mb-4">
-        <AlertCircle className="h-6 w-6 text-red-500" />
+  const NoCompanyMessage = () => {
+    const getNoResultsMessage = () => {
+      const filters = [];
+
+      if (activeCategory !== "Todos") {
+        filters.push(`categoria "${activeCategory}"`);
+      }
+
+      if (selectedDistrict) {
+        filters.push(`bairro "${selectedDistrict}"`);
+      }
+
+      if (searchTerm) {
+        filters.push(`nome "${searchTerm}"`);
+      }
+
+      if (filters.length === 0) {
+        return "Não encontramos comércios cadastrados.";
+      }
+
+      const filterText = filters.join(", ");
+      return `Não encontramos comércios cadastrados com ${filterText}.`;
+    };
+
+    return (
+      <div className="w-full py-12 text-center bg-red-50 rounded-lg border border-red-200 px-4">
+        <div className="inline-flex items-center justify-center w-12 h-12 bg-red-100 rounded-full mb-4">
+          <AlertCircle className="h-6 w-6 text-red-500" />
+        </div>
+        <h3 className="text-xl font-semibold text-red-600 mb-2">
+          Nenhum comércio encontrado
+        </h3>
+        <p className="text-gray-600 max-w-md mx-auto">
+          {getNoResultsMessage()}
+        </p>
+        <div className="mt-6">
+          <a
+            href="/comercios"
+            className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
+          >
+            Ver todas as categorias
+          </a>
+        </div>
       </div>
-      <h3 className="text-xl font-semibold text-red-600 mb-2">
-        Nenhum comércio encontrado
-      </h3>
-      <p className="text-gray-600 max-w-md mx-auto">
-        {selectedDistrict
-          ? `Não encontramos comércios cadastrados na categoria "${activeCategory}" no bairro "${selectedDistrict}".`
-          : `Não encontramos comércios cadastrados na categoria "${activeCategory}".`}
-      </p>
-      <div className="mt-6">
-        <a
-          href="/comercios"
-          className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
-        >
-          Ver todas as categorias
-        </a>
-      </div>
-    </div>
-  );
+    );
+  };
+
   // Componente para estado de carregamento
   const LoadingState = () => (
     <div className="w-full py-20 text-center">
