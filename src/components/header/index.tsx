@@ -20,7 +20,7 @@ export default function Header() {
   // Check if we're on commerce related pages
   const isComercioPath =
     pathname === "/comercios" || pathname?.startsWith("/comercios/");
-  
+
   // Check if we're on contact page
   const isContatoPath = pathname === "/contato";
 
@@ -81,8 +81,8 @@ export default function Header() {
           <button className="lg:hidden" aria-label="Search">
             <Search size={24} />
           </button>
-          <Button 
-            onClick={handleContactsClick} 
+          <Button
+            onClick={handleContactsClick}
             className="hidden lg:block text-[#FFF] rounded-full h-10 px-6 bg-primary font-[600] hover:bg-primary/80 cursor-pointer transition duration-300 ease-in-out"
           >
             Anúncie sua marca
@@ -111,8 +111,8 @@ export default function Header() {
           >
             Buscar Comércio
           </Link>
-          <Button 
-            onClick={handleContactsClick}  
+          <Button
+            onClick={handleContactsClick}
             className="text-[#FFF] rounded-full py-3 px-6 bg-primary font-[600] hover:bg-primary/80 cursor-pointer transition duration-300 ease-in-out w-full mt-2"
           >
             Anúncie sua marca
@@ -148,8 +148,7 @@ export default function Header() {
       {!isMenuOpen && (
         <>
           {isContatoPath ? (
-            <div className="text-center py-4">
-            </div>
+            <div className="text-center py-4"></div>
           ) : (
             <CustomInput pathname={pathname} />
           )}
@@ -168,8 +167,7 @@ export default function Header() {
           ) : null}
         </>
       )}
-
-      <TopBanner />
+      {!isContatoPath ? <TopBanner /> : null}
     </header>
   );
 }

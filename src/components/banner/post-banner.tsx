@@ -6,13 +6,42 @@ import Link from "next/link";
 
 import { useContext, useEffect, useState } from "react";
 import { BannerContext, BannerItem } from "@/provider/banner";
+import { BannerAnalyticsContext, EventType } from "@/provider/analitcs/banner";
+import { useBannerViewTracking } from "@/hooks/useIntersectionObserver"; // Hook corrigido
 
 const PostBanner = () => {
   const { ListBannersNews, bannersNews } = useContext(BannerContext);
+  const { TrackBannerView, TrackBannerClick } = useContext(
+    BannerAnalyticsContext
+  );
+
   const [isVisible, setIsVisible] = useState(false);
   const [randomBanner, setRandomBanner] = useState<BannerItem | null>(null);
   const pathname = usePathname();
   const shouldDisplayBanner = !pathname?.startsWith("/comercios");
+
+  // Dados para tracking
+  const trackingData = randomBanner
+    ? {
+        page: pathname,
+        section: "post-banner",
+        bannerStyle: randomBanner.banner_style,
+        bannerName: randomBanner.name,
+        company: randomBanner.company?.name,
+        selectedFrom: bannersNews?.data?.length || 0,
+      }
+    : {};
+
+  // Hook personalizado para intersection tracking 
+  const {
+    ref: bannerRef,
+    registerInitialView,
+    hasInitialView,
+  } = useBannerViewTracking(
+    randomBanner?.id || "",
+    trackingData,
+    TrackBannerView
+  );
 
   // Requisição dos banners quando o componente carrega
   useEffect(() => {
@@ -30,25 +59,48 @@ const PostBanner = () => {
     }
   }, [bannersNews, shouldDisplayBanner, pathname]);
 
+  // Registrar view inicial quando banner for exibido
+  useEffect(() => {
+    if (randomBanner && isVisible) {
+      registerInitialView();
+    }
+  }, [randomBanner, isVisible, registerInitialView]);
+
+  // Analytics: Função para registrar clique
+  const handleBannerClick = () => {
+    if (randomBanner) {
+      TrackBannerClick(randomBanner.id, {
+        ...trackingData,
+        targetUrl: randomBanner.link_direction,
+        clickPosition: "banner-image",
+        timestamp: new Date().toISOString(),
+      });
+    }
+  };
+
   if (!isVisible || !randomBanner) return null;
 
   return (
-    <div className="flex flex-col md:flex-row mx-auto px-0 md:px-8 py-3 items-center relative">
+    <div
+      ref={bannerRef} // Ref do hook personalizado
+      className="flex flex-col md:flex-row mx-auto px-0 md:px-8 py-3 items-center relative"
+    >
       <span className="block w-full min-w-[360px] md:w-18 md:min-w-0 text-[12px] text-gray-400 md:absolute md:left-[-30px] md:top-1/2 md:-translate-y-1/2 mb-1 md:mb-0 md:transform md:-rotate-90">
         PUBLICIDADE
       </span>
       <div className="rounded-2xl bg-white shadow-md">
         <Link
-          href="https://www.hospitalveterinariasantavida.com.br"
+          href={randomBanner.link_direction}
           target="_blank"
           rel="noopener noreferrer"
           className="relative block"
+          onClick={handleBannerClick}
         >
           <Image
             src={randomBanner.url}
             width={730}
             height={250}
-            alt="Hospital Veterinário Santa Vida"
+            alt={randomBanner.name}
             priority
             className="bg-cover rounded-lg min-h-[110px] lg:min-h-[240px]"
           />

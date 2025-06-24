@@ -5,11 +5,17 @@ import { useState, useEffect, useContext } from "react";
 import Image from "next/image";
 import { Button } from "../ui/button";
 import { BannerContext, BannerItem } from "@/provider/banner";
+import { BannerAnalyticsContext } from "@/provider/analitcs/banner";
 
 export const Banner = () => {
   const { ListBannersWelcome, bannersWelcome } = useContext(BannerContext);
+  const { TrackBannerView, TrackBannerClick } = useContext(
+    BannerAnalyticsContext
+  );
+
   const [isVisible, setIsVisible] = useState(false);
   const [randomBanner, setRandomBanner] = useState<BannerItem | null>(null);
+  const [hasTrackedView, setHasTrackedView] = useState(false);
   const pathname = usePathname();
   const shouldDisplayBanner = !pathname?.startsWith("/comercios");
 
@@ -23,14 +29,89 @@ export const Banner = () => {
   // Escolher o banner aleatório assim que os banners forem carregados
   useEffect(() => {
     if (bannersWelcome?.data?.length > 0 && shouldDisplayBanner) {
-      const randomIndex = Math.floor(Math.random() * bannersWelcome.data.length);
+      const randomIndex = Math.floor(
+        Math.random() * bannersWelcome.data.length
+      );
       setRandomBanner(bannersWelcome.data[randomIndex]);
       setIsVisible(true);
     }
   }, [bannersWelcome, shouldDisplayBanner, pathname]);
 
+  // Analytics: Registrar VIEW inicial quando o banner modal for exibido
+  useEffect(() => {
+    if (randomBanner && isVisible && !hasTrackedView) {
+      TrackBannerView(randomBanner.id, {
+        page: pathname,
+        section: "welcome-banner",
+        bannerStyle: randomBanner.banner_style,
+        bannerName: randomBanner.name,
+        company: randomBanner.company?.name,
+        selectedFrom: bannersWelcome?.data?.length || 0,
+        viewType: "initial",
+        modalType: "welcome-overlay",
+        timestamp: new Date().toISOString(),
+      });
+      setHasTrackedView(true);
+    }
+  }, [
+    randomBanner,
+    isVisible,
+    hasTrackedView,
+    TrackBannerView,
+    pathname,
+    bannersWelcome?.data?.length,
+  ]);
+
+  // Analytics: Função para registrar clique no banner
+  const handleBannerClick = () => {
+    if (randomBanner) {
+      TrackBannerClick(randomBanner.id, {
+        page: pathname,
+        section: "welcome-banner",
+        bannerStyle: randomBanner.banner_style,
+        bannerName: randomBanner.name,
+        company: randomBanner.company?.name,
+        targetUrl: randomBanner.link_direction,
+        clickPosition: "welcome-banner-overlay",
+        modalType: "welcome-overlay",
+        timestamp: new Date().toISOString(),
+      });
+    }
+  };
+
+  // Analytics: Função para registrar fechamento do modal
+  const handleCloseModal = () => {
+    if (randomBanner) {
+      TrackBannerClick(randomBanner.id, {
+        page: pathname,
+        section: "welcome-banner",
+        bannerStyle: randomBanner.banner_style,
+        bannerName: randomBanner.name,
+        company: randomBanner.company?.name,
+        clickPosition: "close-button",
+        modalType: "welcome-overlay",
+        action: "modal-close",
+        timestamp: new Date().toISOString(),
+      });
+    }
+    setIsVisible(false);
+  };
+
   const handleOutsideClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
+      if (randomBanner) {
+        TrackBannerClick(randomBanner.id, {
+          page: pathname,
+          section: "welcome-banner",
+          bannerStyle: randomBanner.banner_style,
+          bannerName: randomBanner.name,
+          company: randomBanner.company?.name,
+          clickPosition: "outside-click",
+          modalType: "welcome-overlay",
+          action: "modal-close",
+          timestamp: new Date().toISOString(),
+        });
+      }
       setIsVisible(false);
     }
   };
@@ -45,7 +126,7 @@ export const Banner = () => {
       <div className="relative">
         {/* Botão de fechar */}
         <Button
-          onClick={() => setIsVisible(false)}
+          onClick={handleCloseModal}
           className="absolute -right-5 -top-5 z-10 rounded-full bg-white p-1 shadow-lg hover:bg-gray-100 hover:cursor-pointer"
         >
           <svg
@@ -72,7 +153,7 @@ export const Banner = () => {
               src={randomBanner.url}
               width={900}
               height={560}
-              alt="Banner"
+              alt={randomBanner.name}
               className="h-[560px] w-[900px] object-cover"
               priority
             />
@@ -84,20 +165,23 @@ export const Banner = () => {
               src={randomBanner.url}
               width={360}
               height={225}
-              alt="Banner"
+              alt={randomBanner.name}
               className="h-[225px] w-[360px] object-cover"
               priority
             />
           </div>
 
-          {/* Link opcional */}
+          {/* Link dinâmico */}
           <a
-            href="https://api.whatsapp.com/send?phone=554831971100"
+            href={randomBanner.link_direction}
             target="_blank"
             rel="noopener noreferrer"
             className="absolute inset-0"
+            onClick={handleBannerClick}
           >
-            <span className="sr-only">Saiba mais sobre a campanha</span>
+            <span className="sr-only">
+              Saiba mais sobre {randomBanner.name}
+            </span>
           </a>
         </div>
       </div>
