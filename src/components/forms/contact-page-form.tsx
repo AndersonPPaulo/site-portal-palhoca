@@ -104,6 +104,10 @@ export default function ContactForm() {
     const formatted = formatPhone(e.target.value);
     setValue("phone", formatted);
   };
+  const handleCnpjChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatCNPJ(e.target.value);
+    setValue("cnpj", formatted);
+  };
 
   const onSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true);
@@ -237,7 +241,8 @@ export default function ContactForm() {
                 id="cnpj"
                 type="cnpj"
                 placeholder="00.000.000/0000-00"
-                {...register("cnpj")}
+                onChange={handleCnpjChange}
+                value={watch("cnpj") || ""}
                 className={`w-full ${
                   errors.cnpj ? "border-red-500" : "border-gray-300"
                 }`}

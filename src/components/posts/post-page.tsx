@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { mockPosts } from "@/utils/mock-data";
 import PostTopGridSection from "./sections/post-top-grid-section";
 import { useParams } from "next/navigation";
 import PostBanner from "../banner/post-banner";
@@ -18,9 +17,10 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "../ui/breadcrumb";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { ArticleContext } from "@/provider/article";
 import { formatDate } from "@/utils/formatDate";
+import { ArticleAnalyticsContext } from "@/provider/analitcs/article";
 
 function normalizeText(text: string): string {
   return text
@@ -38,7 +38,59 @@ export default function PostPage() {
     GetPublishedArticles,
     publishedArticles,
   } = useContext(ArticleContext);
+  
+  const { TrackArticleViewEnd } = useContext(ArticleAnalyticsContext); 
+  
   const slug = useParams();
+  const whatsappButtonRef = useRef<HTMLDivElement>(null);
+  const viewEndTrackedRef = useRef(false); // Para evitar múltiplos disparos
+
+  useEffect(() => {
+    if (slug.slug?.toString()) {
+      Promise.all([
+        GetArticleBySlug(slug.slug?.toString()),
+        GetPublishedArticles({ category_name: slug.name?.toString() }),
+      ]);
+    }
+  }, [slug]);
+
+  // Observer para detectar quando o usuário passa pelo botão WhatsApp
+  useEffect(() => {
+    if (!whatsappButtonRef.current || !articleBySlug?.id || viewEndTrackedRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !viewEndTrackedRef.current) {
+            // Dispara o view_end quando o botão entra na viewport
+            TrackArticleViewEnd(articleBySlug.id, {
+              article_title: articleBySlug.title,
+              trigger: "scroll_to_whatsapp_button",
+              timestamp: new Date().toISOString(),
+            });
+            
+            viewEndTrackedRef.current = true; // Marca como já disparado
+            console.log(`VIEW_END disparado para artigo: ${articleBySlug.id}`);
+          }
+        });
+      },
+      {
+        threshold: 0.5, // Dispara quando 50% do botão está visível
+        rootMargin: '0px 0px -10% 0px' // Margem para garantir que o usuário realmente chegou lá
+      }
+    );
+
+    observer.observe(whatsappButtonRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [articleBySlug?.id, TrackArticleViewEnd]);
+
+  // Reset do tracking quando mudar de artigo
+  useEffect(() => {
+    viewEndTrackedRef.current = false;
+  }, [articleBySlug?.id]);
 
   useEffect(() => {
     if (slug.slug?.toString()) {
@@ -50,6 +102,7 @@ export default function PostPage() {
   }, [slug]);
 
   const sidePosts = publishedArticles?.data.slice(0, 5);
+  
   return (
     <section className="flex flex-col gap-6 mx-auto max-w-[1272px] justify-between">
       <Breadcrumb className="font-semibold">
@@ -132,7 +185,11 @@ export default function PostPage() {
                   __html: articleBySlug?.content || "",
                 }}
               />
-              <ButtonCTAWhatsAppButton />
+              
+              {/* Botão CTA com observer para view_end */}
+              <div ref={whatsappButtonRef}>
+                <ButtonCTAWhatsAppButton />
+              </div>
             </div>
           }
         </div>

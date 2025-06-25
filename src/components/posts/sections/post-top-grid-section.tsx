@@ -2,14 +2,28 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { ArticleContext } from "@/provider/article";
+import { ArticleAnalyticsContext } from "@/provider/analitcs/article";
 import { formatDate } from "@/utils/formatDate";
 import normalizeTextToslug from "@/utils/normalize-text";
 
 export default function PostTopGridSection() {
+  const pathname = usePathname();
+
   const { GetPublishedArticles, publishedArticles } =
     useContext(ArticleContext);
+  const { TrackArticleView, TrackArticleClick } = useContext(
+    ArticleAnalyticsContext
+  );
+
+  // Estados para controle de analytics
+  const [hasInitialView, setHasInitialView] = useState(false);
+
+  // Refs para Intersection Observer
+  const topGridSectionRef = useRef<HTMLElement>(null);
+  const postsRef = useRef<Record<string, HTMLDivElement | null>>({});
 
   useEffect(() => {
     GetPublishedArticles({});
@@ -25,8 +39,113 @@ export default function PostTopGridSection() {
     return dateB.getTime() - dateA.getTime(); // ordem decrescente (mais recente primeiro)
   });
 
+  const topPosts = sortedPosts?.slice(0, 9) || [];
+
+  // Analytics: Registrar view inicial quando componente carrega
+  useEffect(() => {
+    if (!hasInitialView && topPosts.length > 0) {
+      topPosts.forEach((post, index) => {
+        TrackArticleView(post.id, {
+          page: pathname,
+          section: "top-portal-grid",
+          position: "grid-item",
+          categoryName: post.category.name,
+          articleTitle: post.title,
+          gridIndex: index,
+          gridPosition: `${Math.floor(index / 3) + 1}-${(index % 3) + 1}`, 
+          gridSize: topPosts.length,
+          gridRows: Math.ceil(topPosts.length / 3),
+          gridCols: 3,
+          sortOrder: "newest_first",
+          viewType: "initial",
+          timestamp: new Date().toISOString(),
+        });
+      });
+
+      setHasInitialView(true);
+    }
+  }, [topPosts, hasInitialView, TrackArticleView, pathname]);
+
+  // Intersection Observer: Para detectar quando grid sai/volta à tela
+  useEffect(() => {
+    if (!topGridSectionRef.current || !hasInitialView || topPosts.length === 0)
+      return;
+
+    let hasLeft = false;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            if (hasLeft) {
+              topPosts.forEach((post, index) => {
+                TrackArticleView(post.id, {
+                  page: pathname,
+                  section: "top-portal-grid",
+                  position: "grid-item",
+                  categoryName: post.category.name,
+                  articleTitle: post.title,
+                  gridIndex: index,
+                  gridPosition: `${Math.floor(index / 3) + 1}-${
+                    (index % 3) + 1
+                  }`,
+                  gridSize: topPosts.length,
+                  gridRows: Math.ceil(topPosts.length / 3),
+                  gridCols: 3,
+                  sortOrder: "newest_first",
+                  viewType: "reappear",
+                  intersectionRatio: entry.intersectionRatio,
+                  timestamp: new Date().toISOString(),
+                });
+              });
+
+              hasLeft = false;
+            }
+          } else {
+            hasLeft = true;
+          }
+        });
+      },
+      {
+        threshold: 0.3,
+        rootMargin: "0px",
+      }
+    );
+
+    observer.observe(topGridSectionRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [hasInitialView, topPosts, TrackArticleView, pathname]);
+
+  // Analytics: Função para registrar clique no post do top grid
+  const handleTopGridPostClick = (post: any, index: number) => {
+    TrackArticleClick(post.id, {
+      page: pathname,
+      section: "top-portal-grid",
+      position: "grid-item",
+      categoryName: post.category.name,
+      articleTitle: post.title,
+      targetUrl: `/noticia/${normalizeTextToslug(post.category.name)}/${
+        post.slug
+      }`,
+      clickPosition: "top-portal-post",
+      gridIndex: index,
+      gridPosition: `${Math.floor(index / 3) + 1}-${(index % 3) + 1}`,
+      gridSize: topPosts.length,
+      gridRows: Math.ceil(topPosts.length / 3),
+      gridCols: 3,
+      sortOrder: "newest_first",
+      timestamp: new Date().toISOString(),
+    });
+  };
+
   return (
-    <section className="flex flex-col gap-6 max-w-[1272px] mx-auto py-4 justify-between">
+    <section
+      ref={topGridSectionRef}
+      className="flex flex-col gap-6 max-w-[1272px] mx-auto py-4 justify-between"
+    >
       <div className="w-[106px] h-2 bg-primary rounded-full" />
 
       {/* Header */}
@@ -37,14 +156,20 @@ export default function PostTopGridSection() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 justify-between gap-7">
-        {sortedPosts?.slice(0, 9).map((post, idx) => (
+        {topPosts.map((post, idx) => (
           <Link
-            key={idx}
+            key={post.id}
             href={`/noticia/${normalizeTextToslug(post.category.name)}/${
               post.slug
             }`}
+            onClick={() => handleTopGridPostClick(post, idx)}
           >
-            <div className="flex flex-col  rounded-xl transition">
+            <div
+              ref={(el) => {
+                if (el) postsRef.current[post.id] = el;
+              }}
+              className="flex flex-col rounded-xl transition hover:shadow-lg hover:transform hover:scale-105"
+            >
               <div className="relative min-w-[300px] md:w-[405px] h-[310px] rounded-md overflow-hidden">
                 <Image
                   src={post.thumbnail.url}

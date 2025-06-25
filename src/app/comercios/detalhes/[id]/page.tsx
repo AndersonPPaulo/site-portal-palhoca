@@ -271,7 +271,7 @@ export default function ComercioDetails() {
               {/* Botão WhatsApp */}
               {company.linkWhatsapp && (
                 <Button
-                  className="bg-green-200 hover:bg-green-100 mt-6 rounded-4xl px-4 py-2 text-green-600 flex items-center gap-2"
+                  className="bg-green-200 hover:bg-green-100 cursor-pointer mt-6 rounded-4xl px-4 py-2 text-green-600 flex items-center gap-2"
                   variant="default"
                   onClick={() => window.open(company.linkWhatsapp, "_blank")}
                 >
@@ -299,7 +299,7 @@ export default function ComercioDetails() {
               <div className="flex gap-4">
                 <Button
                   variant="outline"
-                  className="border-gray-300 rounded-4xl flex items-center gap-2"
+                  className="border-gray-300 cursor-pointer  rounded-4xl flex items-center gap-2"
                   onClick={() =>
                     company.linkLocationMaps &&
                     window.open(company.linkLocationMaps, "_blank")
@@ -313,7 +313,7 @@ export default function ComercioDetails() {
                 </Button>
                 <Button
                   variant="outline"
-                  className="border-gray-300 rounded-4xl flex items-center gap-2"
+                  className="border-gray-300 cursor-pointer rounded-4xl flex items-center gap-2"
                   onClick={() =>
                     company.linkLocationWaze &&
                     window.open(company.linkLocationWaze, "_blank")
