@@ -23,7 +23,7 @@ export default function ButtonMap({
   return (
     <button
       onClick={onClick}
-      className="flex items-center bg-red-600 py-2 px-4 text-white rounded-full shadow-lg hover:bg-red-700 transition duration-300 ease-in-out"
+      className="flex items-center cursor-pointer bg-red-600 py-2 px-4 text-white rounded-full shadow-lg hover:bg-red-700 transition duration-300 ease-in-out"
     >
       {isMapOpen ? (
         <>
@@ -35,7 +35,7 @@ export default function ButtonMap({
       ) : (
         <>
           <MapPin className="min-h-5 min-w-5 text-white" />
-          <span className="min-w-[60px] text-[14px] font-medium">
+          <span className="min-w-[60px] text-[14px] font-medium ">
             Ver no mapa
           </span>
         </>

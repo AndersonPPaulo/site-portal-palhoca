@@ -32,6 +32,85 @@ export default function Comercio() {
   const [hasInitialView, setHasInitialView] = useState(false);
   const trackedCompaniesRef = useRef(new Set<string>());
   const lastFilterStateRef = useRef("");
+  const lastPageRef = useRef(1);
+
+  // Analytics: Função para trackear apenas empresas da página atual
+  const trackCurrentPageCompanies = (viewType: string, currentPage: number = 1, itemsPerPage: number = 9) => {
+    if (!TrackCompanyView || !companies?.data) return;
+
+    // Calcular índices da página atual
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    
+    // Pegar apenas as empresas da página atual
+    const currentPageCompanies = companies.data.slice(startIndex, endIndex);
+    
+    console.log(`📊 ${viewType}: Página ${currentPage} - Tracking ${currentPageCompanies.length} empresas (índices ${startIndex}-${Math.min(endIndex - 1, companies.data.length - 1)}) de ${companies.data.length} total`);
+    
+    currentPageCompanies.forEach((company, pageIndex) => {
+      const trackingKey = `${viewType}-${currentPage}-${company.id}`;
+      
+      if (company.id && !trackedCompaniesRef.current.has(trackingKey)) {
+        TrackCompanyView(company.id, {
+          page: pathname,
+          section: "commerce-page",
+          position: "company-list",
+          companyName: company.name,
+          categories: company.company_category?.map((cat) => cat.name) || [],
+          activeCategory: activeCategory,
+          selectedDistrict: selectedDistrict,
+          showMapMode: showMap,
+          gridIndex: pageIndex, // Índice na página (0-8)
+          globalIndex: startIndex + pageIndex, // Índice global
+          currentPage: currentPage,
+          totalPages: Math.ceil(companies.data.length / itemsPerPage),
+          itemsPerPage: itemsPerPage,
+          totalCompanies: companies.data.length,
+          pageCompaniesCount: currentPageCompanies.length,
+          viewType: viewType,
+          timestamp: new Date().toISOString(),
+        });
+        
+        // Marcar como já rastreado
+        trackedCompaniesRef.current.add(trackingKey);
+      }
+    });
+  };
+
+  // Função para ser chamada quando a página mudar (será passada para o componente de paginação)
+  const handlePageChange = (newPage: number) => {
+    console.log(`📄 Mudança de página: ${lastPageRef.current} → ${newPage}`);
+    
+    if (newPage !== lastPageRef.current) {
+      // Limpar tracking de paginação anterior
+      trackedCompaniesRef.current.forEach(key => {
+        if (key.startsWith('pagination-')) {
+          trackedCompaniesRef.current.delete(key);
+        }
+      });
+      
+      // Track da nova página
+      trackCurrentPageCompanies('pagination', newPage, 9);
+      lastPageRef.current = newPage;
+    }
+  };
+
+  // Handler para seleção de distrito
+  const handleDistrictSelect = (district: string) => {
+    setSelectedDistrict(district);
+  };
+
+  // Gerar título dinâmico
+  const getPageTitle = () => {
+    if (activeCategory === "Todos") {
+      return `Comércios em Palhoça${
+        selectedDistrict ? ` - ${selectedDistrict}` : ""
+      }`;
+    }
+    return `${activeCategory} em Palhoça${
+      selectedDistrict ? ` - ${selectedDistrict}` : ""
+    }`;
+  };
 
   // Efeito para sincronizar com o estado global de mapa
   useEffect(() => {
@@ -120,106 +199,43 @@ export default function Comercio() {
       window.removeEventListener("categoryChanged", handleCategoryChange);
   }, []);
 
-  // Analytics: Track inicial das empresas visíveis (APENAS UMA VEZ)
+  // Analytics: Track inicial da primeira página
   useEffect(() => {
-    if (
-      !hasInitialView &&
-      companies?.data &&
-      companies.data.length > 0 &&
-      !loading &&
-      TrackCompanyView
-    ) {
-      console.log(
-        "📊 Registrando views iniciais para",
-        companies.data.length,
-        "empresas"
-      );
-
-      // Registra view para todas as empresas da primeira página
-      companies.data.forEach((company, index) => {
-        if (company.id && !trackedCompaniesRef.current.has(company.id)) {
-          TrackCompanyView(company.id, {
-            page: pathname,
-            section: "commerce-page",
-            position: "company-list",
-            companyName: company.name,
-            categories: company.company_category?.map((cat) => cat.name) || [],
-            activeCategory: activeCategory,
-            selectedDistrict: selectedDistrict,
-            showMapMode: showMap,
-            gridIndex: index,
-            viewType: "initial",
-            timestamp: new Date().toISOString(),
-          });
-
-          // Marcar como já rastreado
-          trackedCompaniesRef.current.add(company.id);
-        }
-      });
-
+    if (!hasInitialView && !loading && companies?.data && companies.data.length > 0) {
       setHasInitialView(true);
+      lastPageRef.current = 1;
+      
+      // Track apenas da primeira página (9 empresas ou menos)
+      trackCurrentPageCompanies('initial', 1, 9);
     }
-  }, [companies?.data?.length, hasInitialView, loading]); // Dependências mínimas
+  }, [companies?.data?.length, hasInitialView, loading]);
 
-  // Analytics: Track quando filtros mudam (sem loop)
+  // Analytics: Track quando filtros mudam
   useEffect(() => {
     const currentFilterState = `${activeCategory}|${selectedDistrict}`;
 
-    if (
-      hasInitialView &&
-      companies?.data &&
-      currentFilterState !== lastFilterStateRef.current &&
-      lastFilterStateRef.current !== ""
-    ) {
-      // Não executar na primeira vez
-
-      console.log("🔍 Filtros mudaram:", currentFilterState);
-
-      // Limpar empresas já rastreadas quando filtros mudam
-      trackedCompaniesRef.current.clear();
-
-      // Track das empresas com novos filtros
-      companies.data.forEach((company, index) => {
-        if (company.id && TrackCompanyView) {
-          TrackCompanyView(company.id, {
-            page: pathname,
-            section: "commerce-page",
-            position: "company-list",
-            companyName: company.name,
-            categories: company.company_category?.map((cat) => cat.name) || [],
-            activeCategory: activeCategory,
-            selectedDistrict: selectedDistrict,
-            showMapMode: showMap,
-            gridIndex: index,
-            viewType: "filter_change",
-            timestamp: new Date().toISOString(),
-          });
-
-          trackedCompaniesRef.current.add(company.id);
+    if (hasInitialView && 
+        currentFilterState !== lastFilterStateRef.current &&
+        lastFilterStateRef.current !== "") {
+      
+      console.log("🔍 Filtros mudaram:", currentFilterState, "- Resetando para página 1");
+      
+      // Limpar tracking anterior de filtros
+      trackedCompaniesRef.current.forEach(key => {
+        if (key.startsWith('filter_change-') || key.startsWith('initial-')) {
+          trackedCompaniesRef.current.delete(key);
         }
       });
+      
+      // Reset para página 1 quando filtros mudam
+      lastPageRef.current = 1;
+      
+      // Track apenas da primeira página com novos filtros
+      trackCurrentPageCompanies('filter_change', 1, 9);
     }
-
-    // Atualizar o estado dos filtros
+    
     lastFilterStateRef.current = currentFilterState;
-  }, [activeCategory, selectedDistrict]); // Só quando filtros mudam
-
-  // Handler para seleção de distrito
-  const handleDistrictSelect = (district: string) => {
-    setSelectedDistrict(district);
-  };
-
-  // Gerar título dinâmico
-  const getPageTitle = () => {
-    if (activeCategory === "Todos") {
-      return `Comércios em Palhoça${
-        selectedDistrict ? ` - ${selectedDistrict}` : ""
-      }`;
-    }
-    return `${activeCategory} em Palhoça${
-      selectedDistrict ? ` - ${selectedDistrict}` : ""
-    }`;
-  };
+  }, [activeCategory, selectedDistrict]);
 
   return (
     <DefaultPage>
@@ -231,6 +247,7 @@ export default function Comercio() {
         <FilteredCommerceList
           activeCategory={activeCategory}
           showMap={showMap}
+          onPageChange={handlePageChange}
         />
       </div>
     </DefaultPage>

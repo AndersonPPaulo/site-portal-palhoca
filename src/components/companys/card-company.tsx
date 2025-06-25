@@ -22,24 +22,17 @@ interface Props {
   section?: string; // Seção onde o card está sendo exibido
 }
 
-export function CardCompany({
-  company,
-  className,
-  gridIndex,
-  section = "company-list",
-}: Props) {
+export function CardCompany({ company, className, gridIndex, section = "company-list" }: Props) {
   const router = useRouter();
   const pathname = usePathname();
-
+  
   const companyAnalytics = useContext(CompanyAnalyticsContext);
-
+  
   // Verificação se o contexto está disponível
   if (!companyAnalytics) {
-    console.warn(
-      "CompanyAnalyticsContext não encontrado. Verifique se o provider está configurado."
-    );
+    console.warn("CompanyAnalyticsContext não encontrado. Verifique se o provider está configurado.");
   }
-
+  
   const { TrackCompanyClick } = companyAnalytics || {};
 
   // Função para processar categorias (string ou array)
@@ -91,6 +84,7 @@ export function CardCompany({
 
   // Função para redirecionar para a página de detalhes
   const handleViewDetails = (clickType: string = "button") => {
+    // Registra o clique antes de navegar
     handleCompanyClick(clickType);
 
     // Pequeno delay para garantir que o evento seja enviado
@@ -101,6 +95,9 @@ export function CardCompany({
 
   return (
     <div
+      data-company-id={companyId}
+      data-company-name={company.name}
+      data-company-category={primaryCategory}
       className={`overflow-hidden rounded-3xl shadow-lg h-full w-full hover:shadow-xl hover:transform hover:scale-105 transition-all duration-300 ${className}`}
     >
       <div

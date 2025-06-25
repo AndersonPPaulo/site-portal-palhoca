@@ -27,19 +27,20 @@ function normalizeDistrict(district: string): string {
 interface FilteredCommerceListProps {
   activeCategory: string;
   showMap: boolean;
+  onPageChange?: (page: number) => void;
 }
 
 export default function FilteredCommerceList({
   activeCategory,
   showMap,
+  onPageChange, 
 }: FilteredCommerceListProps) {
   const { companies, loading, error, listCompanies } = usePublicCompany();
 
-  // Adaptar dados da API para o formato esperado pelos componentes
   interface Company {
     name: string;
     address: string;
-    category: string | string[]; // Pode ser string ou array
+    category: string | string[];
     district?: string;
     image: any;
     id?: string;
@@ -184,16 +185,12 @@ export default function FilteredCommerceList({
 
   // Verificar a categoria e filtrar os comércios
   useEffect(() => {
-    // Primeiro, definir loading para true antes de qualquer verificação
     setIsLoading(loading);
     setCurrentPage(1);
-    // Dar um curto timeout para garantir que a UI mostre o estado de loading
     const timer = setTimeout(() => {
       if (companies?.data) {
-        // Converter dados da API para formato esperado
         const convertedCompanies = companies.data.map(convertApiDataToCompany);
 
-        // Verificar se a categoria existe na lista de categorias válidas
         const categoryNormalized = normalizeText(activeCategory);
         const categoryValid =
           validCategories.some(
@@ -293,9 +290,15 @@ export default function FilteredCommerceList({
     setPaginatedApiCompanies(filteredApiCompanies.slice(start, end));
   }, [filteredCompanies, filteredApiCompanies, currentPage]);
 
-  // Handler para mudança de página
+  // Handler para mudança de página (MODIFICADO para incluir analytics)
   const handlePageChange = (page: number) => {
+    console.log(`📄 FilteredCommerceList: Mudança de página para ${page}`);
+
     setCurrentPage(page);
+
+    if (onPageChange) {
+      onPageChange(page);
+    }
   };
 
   // Componente para mensagem de categoria não encontrada
@@ -439,7 +442,7 @@ export default function FilteredCommerceList({
               ))}
             </div>
 
-            {/* Componente de paginação separado */}
+            {/* Componente de paginação com função de analytics */}
             <CompanyPagination
               currentPage={currentPage}
               totalPages={totalPages}
