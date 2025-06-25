@@ -115,8 +115,6 @@ export default function ContactForm() {
 
     try {
       await createNewLead(data);
-      console.log("Lead enviado com sucesso!");
-      console.log("Dados do formulário:", data);
 
       setSubmitStatus("success");
       reset();

@@ -292,7 +292,6 @@ export default function FilteredCommerceList({
 
   // Handler para mudança de página (MODIFICADO para incluir analytics)
   const handlePageChange = (page: number) => {
-    console.log(`📄 FilteredCommerceList: Mudança de página para ${page}`);
 
     setCurrentPage(page);
 

@@ -150,7 +150,6 @@ export default function ComercioDetails() {
       });
 
       setHasTrackedInitialView(true);
-      console.log("📊 Tracked company detail view:", company.name);
     }
   }, [company, hasTrackedInitialView, TrackCompanyView, pathname]);
 
@@ -168,7 +167,6 @@ export default function ComercioDetails() {
         timestamp: new Date().toISOString(),
       });
 
-      console.log("📞 Tracked WhatsApp click for:", company.name);
     }
 
     // Pequeno delay para garantir envio do evento antes de abrir link
@@ -195,7 +193,6 @@ export default function ComercioDetails() {
         timestamp: new Date().toISOString(),
       });
 
-      console.log("🗺️ Tracked Google Maps click for:", company.name);
     }
 
     // Pequeno delay para garantir envio do evento antes de abrir link
@@ -222,7 +219,6 @@ export default function ComercioDetails() {
         timestamp: new Date().toISOString(),
       });
 
-      console.log("🗺️ Tracked Waze click for:", company.name);
     }
 
     // Pequeno delay para garantir envio do evento antes de abrir link

@@ -70,7 +70,6 @@ export default function PostPage() {
             });
             
             viewEndTrackedRef.current = true; // Marca como já disparado
-            console.log(`VIEW_END disparado para artigo: ${articleBySlug.id}`);
           }
         });
       },

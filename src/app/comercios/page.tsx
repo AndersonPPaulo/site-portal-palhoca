@@ -35,21 +35,23 @@ export default function Comercio() {
   const lastPageRef = useRef(1);
 
   // Analytics: Função para trackear apenas empresas da página atual
-  const trackCurrentPageCompanies = (viewType: string, currentPage: number = 1, itemsPerPage: number = 9) => {
+  const trackCurrentPageCompanies = (
+    viewType: string,
+    currentPage: number = 1,
+    itemsPerPage: number = 9
+  ) => {
     if (!TrackCompanyView || !companies?.data) return;
 
     // Calcular índices da página atual
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-    
+
     // Pegar apenas as empresas da página atual
     const currentPageCompanies = companies.data.slice(startIndex, endIndex);
-    
-    console.log(`📊 ${viewType}: Página ${currentPage} - Tracking ${currentPageCompanies.length} empresas (índices ${startIndex}-${Math.min(endIndex - 1, companies.data.length - 1)}) de ${companies.data.length} total`);
-    
+
     currentPageCompanies.forEach((company, pageIndex) => {
       const trackingKey = `${viewType}-${currentPage}-${company.id}`;
-      
+
       if (company.id && !trackedCompaniesRef.current.has(trackingKey)) {
         TrackCompanyView(company.id, {
           page: pathname,
@@ -70,7 +72,7 @@ export default function Comercio() {
           viewType: viewType,
           timestamp: new Date().toISOString(),
         });
-        
+
         // Marcar como já rastreado
         trackedCompaniesRef.current.add(trackingKey);
       }
@@ -79,18 +81,16 @@ export default function Comercio() {
 
   // Função para ser chamada quando a página mudar (será passada para o componente de paginação)
   const handlePageChange = (newPage: number) => {
-    console.log(`📄 Mudança de página: ${lastPageRef.current} → ${newPage}`);
-    
     if (newPage !== lastPageRef.current) {
       // Limpar tracking de paginação anterior
-      trackedCompaniesRef.current.forEach(key => {
-        if (key.startsWith('pagination-')) {
+      trackedCompaniesRef.current.forEach((key) => {
+        if (key.startsWith("pagination-")) {
           trackedCompaniesRef.current.delete(key);
         }
       });
-      
+
       // Track da nova página
-      trackCurrentPageCompanies('pagination', newPage, 9);
+      trackCurrentPageCompanies("pagination", newPage, 9);
       lastPageRef.current = newPage;
     }
   };
@@ -201,12 +201,17 @@ export default function Comercio() {
 
   // Analytics: Track inicial da primeira página
   useEffect(() => {
-    if (!hasInitialView && !loading && companies?.data && companies.data.length > 0) {
+    if (
+      !hasInitialView &&
+      !loading &&
+      companies?.data &&
+      companies.data.length > 0
+    ) {
       setHasInitialView(true);
       lastPageRef.current = 1;
-      
+
       // Track apenas da primeira página (9 empresas ou menos)
-      trackCurrentPageCompanies('initial', 1, 9);
+      trackCurrentPageCompanies("initial", 1, 9);
     }
   }, [companies?.data?.length, hasInitialView, loading]);
 
@@ -214,26 +219,25 @@ export default function Comercio() {
   useEffect(() => {
     const currentFilterState = `${activeCategory}|${selectedDistrict}`;
 
-    if (hasInitialView && 
-        currentFilterState !== lastFilterStateRef.current &&
-        lastFilterStateRef.current !== "") {
-      
-      console.log("🔍 Filtros mudaram:", currentFilterState, "- Resetando para página 1");
-      
+    if (
+      hasInitialView &&
+      currentFilterState !== lastFilterStateRef.current &&
+      lastFilterStateRef.current !== ""
+    ) {
       // Limpar tracking anterior de filtros
-      trackedCompaniesRef.current.forEach(key => {
-        if (key.startsWith('filter_change-') || key.startsWith('initial-')) {
+      trackedCompaniesRef.current.forEach((key) => {
+        if (key.startsWith("filter_change-") || key.startsWith("initial-")) {
           trackedCompaniesRef.current.delete(key);
         }
       });
-      
+
       // Reset para página 1 quando filtros mudam
       lastPageRef.current = 1;
-      
+
       // Track apenas da primeira página com novos filtros
-      trackCurrentPageCompanies('filter_change', 1, 9);
+      trackCurrentPageCompanies("filter_change", 1, 9);
     }
-    
+
     lastFilterStateRef.current = currentFilterState;
   }, [activeCategory, selectedDistrict]);
 

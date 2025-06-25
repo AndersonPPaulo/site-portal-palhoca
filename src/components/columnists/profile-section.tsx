@@ -32,7 +32,6 @@ export default function ProfileColumnist() {
 
     fetchData();
   }, []);
-  console.log("listArticlesColumnists", listArticlesColumnists);
 
   // const currentPage = Number(searchParams.get("page")) || 1;
   // const postsPerPage = 9;
@@ -60,7 +59,6 @@ export default function ProfileColumnist() {
       params.titleColumn?.toString()
   );
 
-  console.log("filteredCol", filteredCol);
 
   const handlePageChange = (page: number) => {
     const url = new URL(window.location.href);
