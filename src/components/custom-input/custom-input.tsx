@@ -6,6 +6,8 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { ArticleContext } from "@/provider/article";
 import { Button } from "../ui/button";
 import SearchResults from "./search-results";
+import DistrictSelect from "@/components/custom-input/custom-select-company";
+import SearchInputCompany from "./search-results-company";
 
 export default function CustomInput({ pathname }: { pathname: string | null }) {
   const { GetPublishedArticlesBySearch, publishedArticlesBySearch } =
@@ -15,6 +17,7 @@ export default function CustomInput({ pathname }: { pathname: string | null }) {
   const [isSearching, setIsSearching] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const [page, setPage] = useState(1);
+  const [selectedDistrict, setSelectedDistrict] = useState("");
 
   useEffect(() => {
     if (input.trim()) {
@@ -63,26 +66,15 @@ export default function CustomInput({ pathname }: { pathname: string | null }) {
       {isComercio ? (
         <div className="flex flex-col md:flex-row w-full overflow-hidden  rounded-[12px] border border-[#e6e6e6]">
           {/* Input de pesquisa + lupa */}
-          <div className="flex items-center flex-grow relative ">
-            <Input
-              type="text"
-              placeholder="Pesquisar"
-              className="bg-transparent h-[44px] shadow-none outline-none border-none rounded-t-[12px] rounded-b-none placeholder:text-gray-400 "
-            />
-            <Search className="absolute right-4 text-gray-400" size={20} />
+          <div className="flex items-center w-full ">
+            <SearchInputCompany/>
           </div>
 
           {/* Divisor */}
-          <div className="w-full md:w-px h-px md:h-[44px] bg-[#E6E6E6]" />
+          <div className="w-full md:w-px h-px md:h-[52px] bg-[#E6E6E6]" />
           {/* Input/select de bairros */}
-          <div className="flex items-center flex-grow relative cursor-pointer">
-            <Input
-              type="text"
-              placeholder="Selecione Bairro"
-              className="bg-transparent h-[44px] outline-none border-none rounded-b-[12px] rounded-t-none placeholder:text-gray-400 cursor-pointer"
-              readOnly
-            />
-            <ChevronDown className="absolute right-4 text-gray-400" size={20} />
+          <div className="p-1 w-full mx-auto border-none">
+            <DistrictSelect value={selectedDistrict} />
           </div>
         </div>
       ) : (

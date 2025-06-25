@@ -91,16 +91,16 @@ export function CompanyPagination({
   return (
     <div className={`${className} space-y-4`}>
       {/* Navegação por páginas */}
-      <div className="flex justify-center items-center gap-2">
+      <div className="flex justify-center  items-center gap-2">
         <Button
           variant="outline"
           size="icon"
           onClick={goToPreviousPage}
           disabled={currentPage === 1}
-          className="h-10 w-10 rounded-full"
+          className="h-10 w-10 rounded-full cursor-pointer"
           aria-label="Página anterior"
         >
-          <ChevronLeft className="h-4 w-4" />
+          <ChevronLeft className="h-4 w-4 cursor-pointer" />
         </Button>
 
         {getPageNumbers().map((page, index) =>
@@ -109,7 +109,7 @@ export function CompanyPagination({
               key={index}
               variant={currentPage === page ? "default" : "outline"}
               onClick={() => goToPage(page)}
-              className={`h-10 w-10 rounded-full ${
+              className={`h-10 w-10 rounded-full cursor-pointer ${
                 currentPage === page ? "bg-red-600 hover:bg-red-700" : ""
               }`}
             >
@@ -127,7 +127,7 @@ export function CompanyPagination({
           size="icon"
           onClick={goToNextPage}
           disabled={currentPage === totalPages}
-          className="h-10 w-10 rounded-full"
+          className="h-10 w-10 rounded-full cursor-pointer"
           aria-label="Próxima página"
         >
           <ChevronRight className="h-4 w-4" />

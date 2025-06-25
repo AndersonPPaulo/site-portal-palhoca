@@ -13,7 +13,7 @@ export function CompanyGridSection() {
   // Carregar dados na inicialização
   useEffect(() => {
     if (!companies) {
-      listCompanies(1, 1000); // Carregar todas as empresas
+      listCompanies(1, 20); // Carregar todas as empresas
     }
   }, []);
 
@@ -42,10 +42,10 @@ export function CompanyGridSection() {
 
   return (
     <section className="w-full py-12 max-w-[1272px] mx-auto px-4">
-      <div className="w-[106px] h-2 bg-red-500 rounded-full mb-6" />
+      <div className="w-[106px] h-2 bg-red-500 rounded-full mt-15" />
 
-      <div className="flex flex-col md:flex-row items-start gap-3 md:items-center justify-between mb-4 md:mb-8">
-        <h2 className="text-2xl font-semibold text-red-500">
+      <div className="flex flex-col  md:flex-row items-start gap-3 md:items-center justify-between  ">
+        <h2 className="text-2xl font-semibold text-red-500 py-6">
           Comércios que são destaques em Palhoça!
         </h2>
         <Link

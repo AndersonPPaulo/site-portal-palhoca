@@ -359,7 +359,7 @@ export default function CompanyCategoryMenu({
               } rounded-full py-5 bg-red-light shadow-md hover:bg-red-light/80 text-red-primary transition-colors`}
               aria-label="Scroll right"
             >
-              <ChevronRight className="h-6 w-6 text-gray-700" />
+              <ChevronRight className="h-6 w-6 text-gray-700 " />
             </Button>
           </div>
         )}

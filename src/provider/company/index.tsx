@@ -37,6 +37,26 @@ export interface IPublicCompany {
   }[];
 }
 
+// Interface para dados do formulário público
+export interface IContactFormData {
+  companyName: string;
+  responsibleName: string;
+  email: string;
+  phone: string;
+  companyMessage?: string;
+  status?: "new_lead";
+}
+
+// Interface para dados do backend
+export interface ICreateNewLead {
+  name: string;
+  email: string;
+  responsibleName: string;
+  companyMessage: string;
+  phone?: string;
+  openingHours?: string;
+}
+
 export interface PublicCompanyListResponse {
   total: number;
   page: number;
@@ -67,6 +87,7 @@ interface IPublicCompanyContext {
   getCompanyById(companyId: string): Promise<IPublicCompany>;
   clearSelectedCompany(): void;
   clearError(): void;
+  createNewLead(data: IContactFormData): Promise<void>;
 }
 
 interface IChildrenReact {
@@ -78,8 +99,12 @@ export const PublicCompanyContext = createContext<IPublicCompanyContext>(
 );
 
 export const PublicCompanyProvider = ({ children }: IChildrenReact) => {
-  const [companies, setCompanies] = useState<PublicCompanyListResponse | null>(null);
-  const [selectedCompany, setSelectedCompany] = useState<IPublicCompany | null>(null);
+  const [companies, setCompanies] = useState<PublicCompanyListResponse | null>(
+    null
+  );
+  const [selectedCompany, setSelectedCompany] = useState<IPublicCompany | null>(
+    null
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -94,31 +119,36 @@ export const PublicCompanyProvider = ({ children }: IChildrenReact) => {
     try {
       const params = { page, limit };
       const response = await api.get("/company", { params });
-      
+
       // Filtrar apenas empresas ativas
       let filteredCompanies = response.data.response.data.filter(
-        (company: IPublicCompany) => company.status === 'active'
+        (company: IPublicCompany) => company.status === "active"
       );
 
       // Aplicar filtros do frontend
       if (filters.search) {
         const searchTerm = filters.search.toLowerCase();
-        filteredCompanies = filteredCompanies.filter((company: IPublicCompany) =>
-          company.name?.toLowerCase().includes(searchTerm) ||
-          company.description?.toLowerCase().includes(searchTerm) ||
-          company.address?.toLowerCase().includes(searchTerm)
+        filteredCompanies = filteredCompanies.filter(
+          (company: IPublicCompany) =>
+            company.name?.toLowerCase().includes(searchTerm) ||
+            company.description?.toLowerCase().includes(searchTerm) ||
+            company.address?.toLowerCase().includes(searchTerm)
         );
       }
 
       if (filters.category) {
-        filteredCompanies = filteredCompanies.filter((company: IPublicCompany) =>
-          company.company_category?.some(cat => cat.id === filters.category)
+        filteredCompanies = filteredCompanies.filter(
+          (company: IPublicCompany) =>
+            company.company_category?.some((cat) => cat.id === filters.category)
         );
       }
 
       if (filters.district) {
-        filteredCompanies = filteredCompanies.filter((company: IPublicCompany) =>
-          company.district?.toLowerCase().includes(filters.district!.toLowerCase())
+        filteredCompanies = filteredCompanies.filter(
+          (company: IPublicCompany) =>
+            company.district
+              ?.toLowerCase()
+              .includes(filters.district!.toLowerCase())
         );
       }
 
@@ -133,7 +163,8 @@ export const PublicCompanyProvider = ({ children }: IChildrenReact) => {
       setCompanies(formattedResponse);
       return formattedResponse;
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || "Erro ao carregar comércios";
+      const errorMessage =
+        err.response?.data?.message || "Erro ao carregar comércios";
       setError(errorMessage);
       console.error("Erro ao listar empresas:", err);
       throw new Error(errorMessage);
@@ -151,14 +182,15 @@ export const PublicCompanyProvider = ({ children }: IChildrenReact) => {
       const company: IPublicCompany = response.data.response;
 
       // Verificar se a empresa está ativa
-      if (company.status !== 'active') {
+      if (company.status !== "active") {
         throw new Error("Comércio não encontrado ou indisponível");
       }
 
       setSelectedCompany(company);
       return company;
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || "Erro ao carregar detalhes do comércio";
+      const errorMessage =
+        err.response?.data?.message || "Erro ao carregar detalhes do comércio";
       setError(errorMessage);
       console.error("Erro ao buscar empresa:", err);
       throw new Error(errorMessage);
@@ -175,6 +207,32 @@ export const PublicCompanyProvider = ({ children }: IChildrenReact) => {
     setError(null);
   };
 
+  const createNewLead = async (formData: IContactFormData): Promise<void> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const leadData: ICreateNewLead = {
+        name: formData.companyName,
+        email: formData.email,
+        responsibleName: formData.responsibleName,
+        companyMessage: formData.companyMessage || "",
+        phone: formData.phone,
+      };
+
+      const response = await api.post("/company", leadData);
+      return response.data;
+    } catch (err: any) {
+      const errorMessage =
+        err.response?.data?.message || "Erro ao enviar informações da empresa";
+      setError(errorMessage);
+      console.error("Erro ao criar lead:", err);
+      
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <PublicCompanyContext.Provider
       value={{
@@ -186,6 +244,7 @@ export const PublicCompanyProvider = ({ children }: IChildrenReact) => {
         getCompanyById,
         clearSelectedCompany,
         clearError,
+        createNewLead,
       }}
     >
       {children}
@@ -196,12 +255,12 @@ export const PublicCompanyProvider = ({ children }: IChildrenReact) => {
 // Hook customizado para usar o contexto
 export const usePublicCompany = () => {
   const context = useContext(PublicCompanyContext);
-  
+
   if (!context) {
     throw new Error(
       "usePublicCompany deve ser usado dentro de um PublicCompanyProvider"
     );
   }
-  
+
   return context;
 };

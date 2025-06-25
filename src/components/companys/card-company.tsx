@@ -3,7 +3,9 @@
 import Image, { StaticImageData } from "next/image";
 import { Button } from "@/components/ui/button";
 import { MapPin, Phone } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
+import { useContext } from "react";
+import { CompanyAnalyticsContext } from "@/provider/analytics/company";
 
 interface CardCompanyProps {
   name: string;
@@ -16,10 +18,22 @@ interface CardCompanyProps {
 interface Props {
   company: CardCompanyProps;
   className?: string;
+  gridIndex?: number; // Índice na lista/grid (opcional)
+  section?: string; // Seção onde o card está sendo exibido
 }
 
-export function CardCompany({ company, className }: Props) {
+export function CardCompany({ company, className, gridIndex, section = "company-list" }: Props) {
   const router = useRouter();
+  const pathname = usePathname();
+  
+  const companyAnalytics = useContext(CompanyAnalyticsContext);
+  
+  // Verificação se o contexto está disponível
+  if (!companyAnalytics) {
+    console.warn("CompanyAnalyticsContext não encontrado. Verifique se o provider está configurado.");
+  }
+  
+  const { TrackCompanyClick } = companyAnalytics || {};
 
   // Função para processar categorias (string ou array)
   const processCategories = () => {
@@ -46,20 +60,49 @@ export function CardCompany({ company, className }: Props) {
       .replace(/--+/g, "-");
   };
 
-  // Função para redirecionar para a página de detalhes
-  const handleViewDetails = () => {
-    const companyId = company.id || generateSlug(company.name);
+  const companyId = company.id || generateSlug(company.name);
 
-    router.push(`/comercios/detalhes/${companyId}`);
+  // Analytics: Função para registrar clique
+  const handleCompanyClick = (clickType: string) => {
+    if (companyId && TrackCompanyClick) {
+      TrackCompanyClick(companyId, {
+        page: pathname,
+        section: section,
+        position: "company-card",
+        companyName: company.name,
+        primaryCategory: primaryCategory,
+        allCategories: categories,
+        hasMultipleCategories: hasMultipleCategories,
+        gridIndex: gridIndex,
+        address: company.address,
+        clickType: clickType,
+        targetUrl: `/comercios/detalhes/${companyId}`,
+        timestamp: new Date().toISOString(),
+      });
+    }
+  };
+
+  // Função para redirecionar para a página de detalhes
+  const handleViewDetails = (clickType: string = "button") => {
+    // Registra o clique antes de navegar
+    handleCompanyClick(clickType);
+
+    // Pequeno delay para garantir que o evento seja enviado
+    setTimeout(() => {
+      router.push(`/comercios/detalhes/${companyId}`);
+    }, 100);
   };
 
   return (
     <div
-      className={`overflow-hidden rounded-3xl shadow-lg h-full w-full ${className}`}
+      data-company-id={companyId}
+      data-company-name={company.name}
+      data-company-category={primaryCategory}
+      className={`overflow-hidden rounded-3xl shadow-lg h-full w-full hover:shadow-xl hover:transform hover:scale-105 transition-all duration-300 ${className}`}
     >
       <div
         className="relative h-[156px] w-full cursor-pointer"
-        onClick={handleViewDetails}
+        onClick={() => handleViewDetails("image")}
       >
         <Image
           src={company.image}
@@ -96,7 +139,7 @@ export function CardCompany({ company, className }: Props) {
           className={`text-base lg:text-xl font-semibold mb-2 truncate cursor-pointer hover:text-red-600 transition-colors ${
             hasMultipleCategories ? "mt-3" : "mt-4"
           }`}
-          onClick={handleViewDetails}
+          onClick={() => handleViewDetails("title")}
         >
           {company.name}
         </h3>
@@ -107,9 +150,9 @@ export function CardCompany({ company, className }: Props) {
         <Button
           className="w-full rounded-full hover:text-red-600 cursor-pointer"
           variant="outline"
-          onClick={handleViewDetails}
+          onClick={() => handleViewDetails("button")}
         >
-          <Phone className="mr-2 flex-shrink-0" /> Conferir número
+          <Phone className="mr-2 flex-shrink-0" /> Ver detalhes
         </Button>
       </div>
     </div>
