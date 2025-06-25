@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useState, useEffect, useContext } from "react";
+import { useParams, useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
 import { Clock, MapPin, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import Header from "@/components/header";
 import { Footer } from "@/components/footer";
 import Link from "next/link";
 import { usePublicCompany } from "@/provider/company";
+import { CompanyAnalyticsContext } from "@/provider/analytics/company";
 
 // Função para extrair coordenadas do link do Google Maps
 function extractCoordinatesFromMapsLink(
@@ -65,12 +66,19 @@ function normalizeText(text: string): string {
 export default function ComercioDetails() {
   const params = useParams();
   const router = useRouter();
+  const pathname = usePathname();
   const { selectedCompany, loading, error, getCompanyById } =
     usePublicCompany();
+
+  // Analytics Context
+  const companyAnalytics = useContext(CompanyAnalyticsContext);
+  const { TrackCompanyView, TrackCompanyMapClick, TrackCompanyWhatsappClick } =
+    companyAnalytics || {};
 
   const [company, setCompany] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
+  const [hasTrackedInitialView, setHasTrackedInitialView] = useState(false);
 
   useEffect(() => {
     const loadCompanyDetails = async () => {
@@ -119,6 +127,111 @@ export default function ComercioDetails() {
 
     loadCompanyDetails();
   }, [params.id]);
+
+  // Analytics: Track view inicial da página de detalhes
+  useEffect(() => {
+    if (company && !hasTrackedInitialView && TrackCompanyView) {
+      TrackCompanyView(company.id, {
+        page: pathname,
+        section: "company-details",
+        position: "detail-page",
+        companyName: company.name,
+        categories: company.categories?.map((cat: any) => cat.name) || [
+          company.category,
+        ],
+        primaryCategory: company.category,
+        address: company.address,
+        phone: company.phone,
+        hasWhatsapp: !!company.linkWhatsapp,
+        hasMapsLink: !!company.linkLocationMaps,
+        hasWazeLink: !!company.linkLocationWaze,
+        viewType: "detail_view",
+        timestamp: new Date().toISOString(),
+      });
+
+      setHasTrackedInitialView(true);
+      console.log("📊 Tracked company detail view:", company.name);
+    }
+  }, [company, hasTrackedInitialView, TrackCompanyView, pathname]);
+
+  // Analytics: Função para tracking de clique no WhatsApp
+  const handleWhatsAppClick = () => {
+    if (company?.id && TrackCompanyWhatsappClick) {
+      TrackCompanyWhatsappClick(company.id, {
+        page: pathname,
+        section: "company-details",
+        position: "whatsapp-button",
+        companyName: company.name,
+        primaryCategory: company.category,
+        whatsappLink: company.linkWhatsapp,
+        clickSource: "detail_page_button",
+        timestamp: new Date().toISOString(),
+      });
+
+      console.log("📞 Tracked WhatsApp click for:", company.name);
+    }
+
+    // Pequeno delay para garantir envio do evento antes de abrir link
+    setTimeout(() => {
+      if (company?.linkWhatsapp) {
+        window.open(company.linkWhatsapp, "_blank");
+      }
+    }, 100);
+  };
+
+  // Analytics: Função para tracking de clique no Maps
+  const handleMapsClick = () => {
+    if (company?.id && TrackCompanyMapClick) {
+      TrackCompanyMapClick(company.id, {
+        page: pathname,
+        section: "company-details",
+        position: "maps-button",
+        companyName: company.name,
+        primaryCategory: company.category,
+        mapService: "google_maps",
+        mapsLink: company.linkLocationMaps,
+        coordinates: company.location,
+        clickSource: "detail_page_button",
+        timestamp: new Date().toISOString(),
+      });
+
+      console.log("🗺️ Tracked Google Maps click for:", company.name);
+    }
+
+    // Pequeno delay para garantir envio do evento antes de abrir link
+    setTimeout(() => {
+      if (company?.linkLocationMaps) {
+        window.open(company.linkLocationMaps, "_blank");
+      }
+    }, 100);
+  };
+
+  // Analytics: Função para tracking de clique no Waze
+  const handleWazeClick = () => {
+    if (company?.id && TrackCompanyMapClick) {
+      TrackCompanyMapClick(company.id, {
+        page: pathname,
+        section: "company-details",
+        position: "waze-button",
+        companyName: company.name,
+        primaryCategory: company.category,
+        mapService: "waze",
+        wazeLink: company.linkLocationWaze,
+        coordinates: company.location,
+        clickSource: "detail_page_button",
+        timestamp: new Date().toISOString(),
+      });
+
+      console.log("🗺️ Tracked Waze click for:", company.name);
+    }
+
+    // Pequeno delay para garantir envio do evento antes de abrir link
+    setTimeout(() => {
+      if (company?.linkLocationWaze) {
+        window.open(company.linkLocationWaze, "_blank");
+      }
+    }, 100);
+  };
 
   if (isLoading || loading) {
     return (
@@ -268,12 +381,12 @@ export default function ComercioDetails() {
                 </div>
               </div>
 
-              {/* Botão WhatsApp */}
+              {/* Botão WhatsApp com analytics */}
               {company.linkWhatsapp && (
                 <Button
                   className="bg-green-200 hover:bg-green-100 cursor-pointer mt-6 rounded-4xl px-4 py-2 text-green-600 flex items-center gap-2"
                   variant="default"
-                  onClick={() => window.open(company.linkWhatsapp, "_blank")}
+                  onClick={handleWhatsAppClick}
                 >
                   <svg
                     viewBox="0 0 24 24"
@@ -300,10 +413,7 @@ export default function ComercioDetails() {
                 <Button
                   variant="outline"
                   className="border-gray-300 cursor-pointer  rounded-4xl flex items-center gap-2"
-                  onClick={() =>
-                    company.linkLocationMaps &&
-                    window.open(company.linkLocationMaps, "_blank")
-                  }
+                  onClick={handleMapsClick}
                   disabled={!company.linkLocationMaps}
                 >
                   <svg viewBox="0 0 20 20" fill="#363636">
@@ -314,10 +424,7 @@ export default function ComercioDetails() {
                 <Button
                   variant="outline"
                   className="border-gray-300 cursor-pointer rounded-4xl flex items-center gap-2"
-                  onClick={() =>
-                    company.linkLocationWaze &&
-                    window.open(company.linkLocationWaze, "_blank")
-                  }
+                  onClick={handleWazeClick}
                   disabled={!company.linkLocationWaze}
                 >
                   <svg viewBox="0 0 20 20" fill="#363636">

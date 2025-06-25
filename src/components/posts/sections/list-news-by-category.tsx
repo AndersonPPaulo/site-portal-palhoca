@@ -10,7 +10,7 @@ import {
   usePathname,
 } from "next/navigation";
 import { ArticleContext } from "@/provider/article";
-import { ArticleAnalyticsContext } from "@/provider/analitcs/article";
+import { ArticleAnalyticsContext } from "@/provider/analytics/article";
 import { formatDate } from "@/utils/formatDate";
 import SideBanner from "@/components/banner/side";
 import normalizeTextToslug from "@/utils/normalize-text";

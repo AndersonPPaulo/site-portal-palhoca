@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useContext, useEffect, useState } from "react";
 import { BannerContext, BannerItem } from "@/provider/banner";
-import { BannerAnalyticsContext } from "@/provider/analitcs/banner";
+import { BannerAnalyticsContext } from "@/provider/analytics/banner";
 import { useBannerViewTracking } from "@/hooks/useIntersectionObserverBanner";
 
 export const TopBanner = () => {

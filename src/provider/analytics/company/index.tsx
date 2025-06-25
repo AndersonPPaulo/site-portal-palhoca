@@ -14,25 +14,25 @@ export enum EventType {
 }
 
 // Interfaces dos dados
-export interface BannerEvent {
+export interface CompanyEvent {
   event_type: EventType;
   virtual_count: number;
 }
 
-export interface TotalBannerEvent {
+export interface TotalCompanyEvent {
   event_type: EventType;
   total: number;
 }
 
 // Interfaces das respostas da API
-interface IEventsByBannerResponse {
+interface IEventsByCompanyResponse {
   message: string;
-  events: BannerEvent[];
+  events: CompanyEvent[];
 }
 
 interface ITotalEventsResponse {
   message: string;
-  events: TotalBannerEvent[];
+  events: TotalCompanyEvent[];
 }
 
 interface IRegisterEventResponse {
@@ -47,48 +47,48 @@ interface IUpdateVirtualEventResponse {
 
 // Interfaces para parâmetros das funções
 interface IRegisterEventProps {
-  bannerId: string;
+  companyId: string;
   eventType: EventType;
   extra_data?: Record<string, any>;
   virtualIncrement?: number;
 }
 
 interface IUpdateVirtualEventProps {
-  banner_id: string;
+  company_id: string;
   eventType: EventType;
   newVirtualCount?: number;
 }
 
 // Interface principal do contexto
-interface IBannerAnalyticsData {
-  RegisterBannerEvent(data: IRegisterEventProps): Promise<void>;
-  TrackBannerView(
-    bannerId: string,
+interface ICompanyAnalyticsData {
+  RegisterCompanyEvent(data: IRegisterEventProps): Promise<void>;
+  TrackCompanyView(
+    companyId: string,
     extraData?: Record<string, any>
   ): Promise<void>;
-  TrackBannerClick(
-    bannerId: string,
+  TrackCompanyClick(
+    companyId: string,
     extraData?: Record<string, any>
   ): Promise<void>;
-  TrackBannerWhatsappClick(
-    bannerId: string,
+  TrackCompanyWhatsappClick(
+    companyId: string,
     extraData?: Record<string, any>
   ): Promise<void>;
-  TrackBannerMapClick(
-    bannerId: string,
+  TrackCompanyMapClick(
+    companyId: string,
     extraData?: Record<string, any>
   ): Promise<void>;
-  TrackBannerProfileView(
-    bannerId: string,
+  TrackCompanyProfileView(
+    companyId: string,
     extraData?: Record<string, any>
   ): Promise<void>;
 
-  GetEventsByBanner(bannerId: string): Promise<void>;
+  GetEventsByCompany(companyId: string): Promise<void>;
   GetTotalEvents(): Promise<void>;
   UpdateVirtualEvent(data: IUpdateVirtualEventProps): Promise<void>;
 
-  bannerEvents: Record<string, BannerEvent[]>;
-  totalEvents: TotalBannerEvent[];
+  companyEvents: Record<string, CompanyEvent[]>;
+  totalEvents: TotalCompanyEvent[];
   loading: boolean;
   error: string | null;
 
@@ -99,21 +99,21 @@ interface IChildrenReact {
   children: ReactNode;
 }
 
-export const BannerAnalyticsContext = createContext<IBannerAnalyticsData>(
-  {} as IBannerAnalyticsData
+export const CompanyAnalyticsContext = createContext<ICompanyAnalyticsData>(
+  {} as ICompanyAnalyticsData
 );
 
-export const BannerAnalyticsProvider = ({ children }: IChildrenReact) => {
-  const [bannerEvents, setBannerEvents] = useState<
-    Record<string, BannerEvent[]>
+export const CompanyAnalyticsProvider = ({ children }: IChildrenReact) => {
+  const [companyEvents, setCompanyEvents] = useState<
+    Record<string, CompanyEvent[]>
   >({});
-  const [totalEvents, setTotalEvents] = useState<TotalBannerEvent[]>([]);
+  const [totalEvents, setTotalEvents] = useState<TotalCompanyEvent[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   // Função para registrar evento (pública - sem auth)
-  const RegisterBannerEvent = async ({
-    bannerId,
+  const RegisterCompanyEvent = async ({
+    companyId,
     eventType,
     extra_data = {},
     virtualIncrement = 1,
@@ -128,14 +128,14 @@ export const BannerAnalyticsProvider = ({ children }: IChildrenReact) => {
     };
 
     const requestData = {
-      bannerId,
+      companyId,
       eventType,
       extra_data,
       virtualIncrement,
     };
 
     const response = await api
-      .post("/analytics/event-banner", requestData, config)
+      .post("/analytics/event-company", requestData, config)
       .then((res) => {
         setLoading(false);
       })
@@ -148,8 +148,8 @@ export const BannerAnalyticsProvider = ({ children }: IChildrenReact) => {
     return response;
   };
 
-  // Função para buscar eventos por banner (privada - com auth)
-  const GetEventsByBanner = async (bannerId: string): Promise<void> => {
+  // Função para buscar eventos por company (privada - com auth)
+  const GetEventsByCompany = async (companyId: string): Promise<void> => {
     setLoading(true);
     setError(null);
 
@@ -161,18 +161,18 @@ export const BannerAnalyticsProvider = ({ children }: IChildrenReact) => {
     };
 
     const response = await api
-      .get(`/analytics/event-banner/${bannerId}/banner`, config)
+      .get(`/analytics/event-company/${companyId}/company`, config)
       .then((res) => {
-        const responseData: IEventsByBannerResponse = res.data.response;
-        setBannerEvents((prev) => ({
+        const responseData: IEventsByCompanyResponse = res.data.response;
+        setCompanyEvents((prev) => ({
           ...prev,
-          [bannerId]: responseData.events || [],
+          [companyId]: responseData.events || [],
         }));
         setLoading(false);
       })
       .catch((err) => {
         setError(
-          err.response?.data?.message || "Erro ao buscar eventos do banner"
+          err.response?.data?.message || "Erro ao buscar eventos do comércio"
         );
         setLoading(false);
         return err;
@@ -194,7 +194,7 @@ export const BannerAnalyticsProvider = ({ children }: IChildrenReact) => {
     };
 
     const response = await api
-      .get("/analytics/event-banner", config)
+      .get("/analytics/event-company", config)
       .then((res) => {
         const responseData: ITotalEventsResponse = res.data.response;
         setTotalEvents(responseData.events || []);
@@ -213,7 +213,7 @@ export const BannerAnalyticsProvider = ({ children }: IChildrenReact) => {
 
   // Função para atualizar evento virtual (privada - com auth)
   const UpdateVirtualEvent = async ({
-    banner_id,
+    company_id,
     eventType,
     newVirtualCount,
   }: IUpdateVirtualEventProps): Promise<void> => {
@@ -233,9 +233,13 @@ export const BannerAnalyticsProvider = ({ children }: IChildrenReact) => {
     };
 
     const response = await api
-      .patch(`/analytics/event-banner/${banner_id}/banner`, requestData, config)
+      .patch(
+        `/analytics/event-company/${company_id}/company`,
+        requestData,
+        config
+      )
       .then((res) => {
-        GetEventsByBanner(banner_id);
+        GetEventsByCompany(company_id);
         setLoading(false);
       })
       .catch((err) => {
@@ -250,82 +254,85 @@ export const BannerAnalyticsProvider = ({ children }: IChildrenReact) => {
   };
 
   // Função utilitária para track de visualização
-  const TrackBannerView = async (
-    bannerId: string,
+  const TrackCompanyView = async (
+    companyId: string,
     extraData?: Record<string, any>
   ): Promise<void> => {
     try {
-      await RegisterBannerEvent({
-        bannerId,
+      await RegisterCompanyEvent({
+        companyId,
         eventType: EventType.VIEW,
         extra_data: extraData,
       });
     } catch (error) {
-      console.warn("Erro ao registrar visualização do banner:", error);
+      console.warn("Erro ao registrar visualização do comércio:", error);
     }
   };
 
   // Função utilitária para track de clique
-  const TrackBannerClick = async (
-    bannerId: string,
+  const TrackCompanyClick = async (
+    companyId: string,
     extraData?: Record<string, any>
   ): Promise<void> => {
     try {
-      await RegisterBannerEvent({
-        bannerId,
+      await RegisterCompanyEvent({
+        companyId,
         eventType: EventType.CLICK,
         extra_data: extraData,
       });
     } catch (error) {
-      console.warn("Erro ao registrar clique do banner:", error);
+      console.warn("Erro ao registrar clique do comércio:", error);
     }
   };
 
   // Função utilitária para track de clique no WhatsApp
-  const TrackBannerWhatsappClick = async (
-    bannerId: string,
+  const TrackCompanyWhatsappClick = async (
+    companyId: string,
     extraData?: Record<string, any>
   ): Promise<void> => {
     try {
-      await RegisterBannerEvent({
-        bannerId,
+      await RegisterCompanyEvent({
+        companyId,
         eventType: EventType.WHATSAPP_CLICK,
         extra_data: extraData,
       });
     } catch (error) {
-      console.warn("Erro ao registrar clique WhatsApp do banner:", error);
+      console.warn("Erro ao registrar clique WhatsApp do comércio:", error);
     }
   };
 
   // Função utilitária para track de clique no mapa
-  const TrackBannerMapClick = async (
-    bannerId: string,
+  const TrackCompanyMapClick = async (
+    companyId: string,
     extraData?: Record<string, any>
   ): Promise<void> => {
     try {
-      await RegisterBannerEvent({
-        bannerId,
+      await RegisterCompanyEvent({
+        companyId,
         eventType: EventType.MAP_CLICK,
         extra_data: extraData,
       });
     } catch (error) {
-      console.warn("Erro ao registrar clique no mapa do banner:", error);
+      console.warn("Erro ao registrar clique no mapa do comércio:", error);
     }
   };
 
   // Função utilitária para track de visualização de perfil
-  const TrackBannerProfileView = async (
-    bannerId: string,
+  const TrackCompanyProfileView = async (
+    companyId: string,
     extraData?: Record<string, any>
   ): Promise<void> => {
     try {
-      await RegisterBannerEvent({
-        bannerId,
+      await RegisterCompanyEvent({
+        companyId,
         eventType: EventType.PROFILE_VIEW,
         extra_data: extraData,
       });
     } catch (error) {
-      console.warn("Erro ao registrar visualização de perfil do banner:", error);
+      console.warn(
+        "Erro ao registrar visualização de perfil do comércio:",
+        error
+      );
     }
   };
 
@@ -335,18 +342,18 @@ export const BannerAnalyticsProvider = ({ children }: IChildrenReact) => {
   };
 
   return (
-    <BannerAnalyticsContext.Provider
+    <CompanyAnalyticsContext.Provider
       value={{
-        RegisterBannerEvent,
-        TrackBannerView,
-        TrackBannerClick,
-        TrackBannerWhatsappClick,
-        TrackBannerMapClick,
-        TrackBannerProfileView,
-        GetEventsByBanner,
+        RegisterCompanyEvent,
+        TrackCompanyView,
+        TrackCompanyClick,
+        TrackCompanyWhatsappClick,
+        TrackCompanyMapClick,
+        TrackCompanyProfileView,
+        GetEventsByCompany,
         GetTotalEvents,
         UpdateVirtualEvent,
-        bannerEvents,
+        companyEvents,
         totalEvents,
         loading,
         error,
@@ -354,6 +361,6 @@ export const BannerAnalyticsProvider = ({ children }: IChildrenReact) => {
       }}
     >
       {children}
-    </BannerAnalyticsContext.Provider>
+    </CompanyAnalyticsContext.Provider>
   );
 };

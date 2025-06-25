@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import { usePathname } from "next/navigation";
 import DefaultPage from "@/components/default-page";
 import Header from "@/components/header";
 import FilteredCommerceList from "@/components/companys/filterCompany";
 import { usePublicCompany } from "@/provider/company";
 import DistrictSelect from "@/components/custom-input/custom-select-company";
+import { CompanyAnalyticsContext } from "@/provider/analytics/company";
 
 // Definir tipos para window global
 declare global {
@@ -21,9 +22,16 @@ declare global {
 export default function Comercio() {
   const pathname = usePathname();
   const { companies, loading } = usePublicCompany();
+  const { TrackCompanyView } = useContext(CompanyAnalyticsContext);
+
   const [showMap, setShowMap] = useState(false);
   const [activeCategory, setActiveCategory] = useState("Todos");
   const [selectedDistrict, setSelectedDistrict] = useState<string>("");
+
+  // Estados para controle de analytics
+  const [hasInitialView, setHasInitialView] = useState(false);
+  const trackedCompaniesRef = useRef(new Set<string>());
+  const lastFilterStateRef = useRef("");
 
   // Efeito para sincronizar com o estado global de mapa
   useEffect(() => {
@@ -112,6 +120,90 @@ export default function Comercio() {
       window.removeEventListener("categoryChanged", handleCategoryChange);
   }, []);
 
+  // Analytics: Track inicial das empresas visíveis (APENAS UMA VEZ)
+  useEffect(() => {
+    if (
+      !hasInitialView &&
+      companies?.data &&
+      companies.data.length > 0 &&
+      !loading &&
+      TrackCompanyView
+    ) {
+      console.log(
+        "📊 Registrando views iniciais para",
+        companies.data.length,
+        "empresas"
+      );
+
+      // Registra view para todas as empresas da primeira página
+      companies.data.forEach((company, index) => {
+        if (company.id && !trackedCompaniesRef.current.has(company.id)) {
+          TrackCompanyView(company.id, {
+            page: pathname,
+            section: "commerce-page",
+            position: "company-list",
+            companyName: company.name,
+            categories: company.company_category?.map((cat) => cat.name) || [],
+            activeCategory: activeCategory,
+            selectedDistrict: selectedDistrict,
+            showMapMode: showMap,
+            gridIndex: index,
+            viewType: "initial",
+            timestamp: new Date().toISOString(),
+          });
+
+          // Marcar como já rastreado
+          trackedCompaniesRef.current.add(company.id);
+        }
+      });
+
+      setHasInitialView(true);
+    }
+  }, [companies?.data?.length, hasInitialView, loading]); // Dependências mínimas
+
+  // Analytics: Track quando filtros mudam (sem loop)
+  useEffect(() => {
+    const currentFilterState = `${activeCategory}|${selectedDistrict}`;
+
+    if (
+      hasInitialView &&
+      companies?.data &&
+      currentFilterState !== lastFilterStateRef.current &&
+      lastFilterStateRef.current !== ""
+    ) {
+      // Não executar na primeira vez
+
+      console.log("🔍 Filtros mudaram:", currentFilterState);
+
+      // Limpar empresas já rastreadas quando filtros mudam
+      trackedCompaniesRef.current.clear();
+
+      // Track das empresas com novos filtros
+      companies.data.forEach((company, index) => {
+        if (company.id && TrackCompanyView) {
+          TrackCompanyView(company.id, {
+            page: pathname,
+            section: "commerce-page",
+            position: "company-list",
+            companyName: company.name,
+            categories: company.company_category?.map((cat) => cat.name) || [],
+            activeCategory: activeCategory,
+            selectedDistrict: selectedDistrict,
+            showMapMode: showMap,
+            gridIndex: index,
+            viewType: "filter_change",
+            timestamp: new Date().toISOString(),
+          });
+
+          trackedCompaniesRef.current.add(company.id);
+        }
+      });
+    }
+
+    // Atualizar o estado dos filtros
+    lastFilterStateRef.current = currentFilterState;
+  }, [activeCategory, selectedDistrict]); // Só quando filtros mudam
+
   // Handler para seleção de distrito
   const handleDistrictSelect = (district: string) => {
     setSelectedDistrict(district);
@@ -120,9 +212,13 @@ export default function Comercio() {
   // Gerar título dinâmico
   const getPageTitle = () => {
     if (activeCategory === "Todos") {
-      return `Comércios em Palhoça${selectedDistrict ? ` - ${selectedDistrict}` : ''}`;
+      return `Comércios em Palhoça${
+        selectedDistrict ? ` - ${selectedDistrict}` : ""
+      }`;
     }
-    return `${activeCategory} em Palhoça${selectedDistrict ? ` - ${selectedDistrict}` : ''}`;
+    return `${activeCategory} em Palhoça${
+      selectedDistrict ? ` - ${selectedDistrict}` : ""
+    }`;
   };
 
   return (

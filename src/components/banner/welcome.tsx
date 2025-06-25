@@ -5,7 +5,7 @@ import { useState, useEffect, useContext } from "react";
 import Image from "next/image";
 import { Button } from "../ui/button";
 import { BannerContext, BannerItem } from "@/provider/banner";
-import { BannerAnalyticsContext } from "@/provider/analitcs/banner";
+import { BannerAnalyticsContext } from "@/provider/analytics/banner";
 
 export const Banner = () => {
   const { ListBannersWelcome, bannersWelcome } = useContext(BannerContext);

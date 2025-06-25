@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useContext, useEffect, useRef, useState } from "react";
 import { useParams, usePathname } from "next/navigation";
 import { ArticleContext } from "@/provider/article";
-import { ArticleAnalyticsContext } from "@/provider/analitcs/article";
+import { ArticleAnalyticsContext } from "@/provider/analytics/article";
 import { formatDate } from "@/utils/formatDate";
 import normalizeTextToslug from "@/utils/normalize-text";
 
