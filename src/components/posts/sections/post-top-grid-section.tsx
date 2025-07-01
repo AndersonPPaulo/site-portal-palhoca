@@ -172,7 +172,7 @@ export default function PostTopGridSection() {
             >
               <div className="relative min-w-[300px] md:w-[405px] h-[310px] rounded-md overflow-hidden">
                 <Image
-                  src={post.thumbnail.url}
+                  src={post.thumbnail?.url}
                   alt={
                     post.title ||
                     post.thumbnail.description ||

@@ -8,6 +8,7 @@ import { ArticleContext } from "@/provider/article";
 import { ArticleAnalyticsContext } from "@/provider/analytics/article";
 import { formatDate } from "@/utils/formatDate";
 import normalizeTextToslug from "@/utils/normalize-text";
+import default_image from "@/assets/default image.webp";
 
 export default function PostGridSection() {
   const slug = useParams();
@@ -152,11 +153,11 @@ export default function PostGridSection() {
               ref={(el) => {
                 if (el) postsRef.current[post.id] = el;
               }}
-              className="flex flex-col rounded-xl transition max-w-[405px] hover:shadow-lg hover:transform hover:scale-105"
+              className="flex flex-col rounded-xl transition max-w-[405px]  hover:transform hover:scale-105"
             >
               <div className="relative min-w-[300px] md:w-[405px] h-[310px] rounded-md overflow-hidden">
                 <Image
-                  src={post.thumbnail.url}
+                  src={post.thumbnail?.url || default_image}
                   alt={post.title}
                   fill
                   className="object-cover"

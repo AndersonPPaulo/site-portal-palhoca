@@ -179,7 +179,7 @@ export default function ListArticlesByCategory() {
             >
               <div className="relative min-w-[300px] md:w-[328px] h-[310px] md:h-[227px] rounded-md overflow-hidden">
                 <Image
-                  src={post.thumbnail.url}
+                  src={post.thumbnail?.url}
                   alt={post.title}
                   fill
                   className="object-cover"

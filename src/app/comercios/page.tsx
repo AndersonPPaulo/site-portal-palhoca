@@ -6,7 +6,6 @@ import DefaultPage from "@/components/default-page";
 import Header from "@/components/header";
 import FilteredCommerceList from "@/components/companys/filterCompany";
 import { usePublicCompany } from "@/provider/company";
-import DistrictSelect from "@/components/custom-input/custom-select-company";
 import { CompanyAnalyticsContext } from "@/provider/analytics/company";
 
 // Definir tipos para window global

@@ -32,7 +32,7 @@ const PostBanner = () => {
       }
     : {};
 
-  // Hook personalizado para intersection tracking 
+  // Hook personalizado para intersection tracking
   const {
     ref: bannerRef,
     registerInitialView,
@@ -88,7 +88,7 @@ const PostBanner = () => {
       <span className="block w-full min-w-[360px] md:w-18 md:min-w-0 text-[12px] text-gray-400 md:absolute md:left-[-30px] md:top-1/2 md:-translate-y-1/2 mb-1 md:mb-0 md:transform md:-rotate-90">
         PUBLICIDADE
       </span>
-      <div className="rounded-2xl bg-white shadow-md">
+      <div className="rounded-2xl bg-white shadow-md max-h-[110px] lg:max-h-[240px]">
         <Link
           href={randomBanner.link_direction}
           target="_blank"
@@ -102,7 +102,7 @@ const PostBanner = () => {
             height={250}
             alt={randomBanner.name}
             priority
-            className="bg-cover rounded-lg min-h-[110px] lg:min-h-[240px]"
+            className="bg-cover rounded-lg min-h-[110px] lg:min-h-[240px] max-h-[110px] lg:max-h-[240px]"
           />
         </Link>
       </div>

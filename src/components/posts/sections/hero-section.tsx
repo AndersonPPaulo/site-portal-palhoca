@@ -9,6 +9,7 @@ import { ArticleAnalyticsContext } from "@/provider/analytics/article";
 import { formatDate } from "@/utils/formatDate";
 import { useParams } from "next/navigation";
 import normalizeTextToslug from "@/utils/normalize-text";
+import default_image from "@/assets/default image.webp";
 
 export default function HeroSection() {
   const slug = useParams();
@@ -205,7 +206,7 @@ export default function HeroSection() {
           >
             <div className="relative md:min-w-[490px] max-w-[490px] min-h-[406px] max-h-[406px] rounded-xl overflow-hidden">
               <Image
-                src={mainPost?.thumbnail.url}
+                src={mainPost?.thumbnail?.url || default_image}
                 alt={
                   mainPost?.thumbnail.description ||
                   mainPost?.title ||
@@ -252,7 +253,7 @@ export default function HeroSection() {
               <div className="flex gap-3 rounded-xl p-2 transition">
                 <div className="relative min-w-[151px] h-[110px] rounded-sm overflow-hidden">
                   <Image
-                    src={post.thumbnail.url}
+                    src={post.thumbnail?.url || default_image}
                     alt={post.title}
                     fill
                     className="object-cover"

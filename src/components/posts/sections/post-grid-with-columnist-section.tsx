@@ -9,6 +9,7 @@ import { ArticleContext } from "@/provider/article";
 import { ArticleAnalyticsContext } from "@/provider/analytics/article";
 import { formatDate } from "@/utils/formatDate";
 import normalizeTextToslug from "@/utils/normalize-text";
+import default_image from "@/assets/default image.webp";
 
 export default function PostGridWwithColumnistSection() {
   const slug = useParams();
@@ -183,7 +184,7 @@ export default function PostGridWwithColumnistSection() {
                 }`}
               >
                 <Image
-                  src={post.thumbnail.url}
+                  src={post.thumbnail?.url || default_image}
                   alt={post.title}
                   fill
                   className="object-cover"

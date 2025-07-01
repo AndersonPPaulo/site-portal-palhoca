@@ -21,6 +21,7 @@ import { useContext, useEffect, useRef } from "react";
 import { ArticleContext } from "@/provider/article";
 import { formatDate } from "@/utils/formatDate";
 import { ArticleAnalyticsContext } from "@/provider/analytics/article";
+import default_image from "@/assets/default image.webp";
 
 function normalizeText(text: string): string {
   return text
@@ -38,9 +39,9 @@ export default function PostPage() {
     GetPublishedArticles,
     publishedArticles,
   } = useContext(ArticleContext);
-  
-  const { TrackArticleViewEnd } = useContext(ArticleAnalyticsContext); 
-  
+
+  const { TrackArticleViewEnd } = useContext(ArticleAnalyticsContext);
+
   const slug = useParams();
   const whatsappButtonRef = useRef<HTMLDivElement>(null);
   const viewEndTrackedRef = useRef(false); // Para evitar múltiplos disparos
@@ -56,7 +57,12 @@ export default function PostPage() {
 
   // Observer para detectar quando o usuário passa pelo botão WhatsApp
   useEffect(() => {
-    if (!whatsappButtonRef.current || !articleBySlug?.id || viewEndTrackedRef.current) return;
+    if (
+      !whatsappButtonRef.current ||
+      !articleBySlug?.id ||
+      viewEndTrackedRef.current
+    )
+      return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -68,14 +74,14 @@ export default function PostPage() {
               trigger: "scroll_to_whatsapp_button",
               timestamp: new Date().toISOString(),
             });
-            
+
             viewEndTrackedRef.current = true; // Marca como já disparado
           }
         });
       },
       {
         threshold: 0.5, // Dispara quando 50% do botão está visível
-        rootMargin: '0px 0px -10% 0px' // Margem para garantir que o usuário realmente chegou lá
+        rootMargin: "0px 0px -10% 0px", // Margem para garantir que o usuário realmente chegou lá
       }
     );
 
@@ -101,7 +107,7 @@ export default function PostPage() {
   }, [slug]);
 
   const sidePosts = publishedArticles?.data.slice(0, 5);
-  
+
   return (
     <section className="flex flex-col gap-6 mx-auto max-w-[1272px] justify-between">
       <Breadcrumb className="font-semibold">
@@ -156,12 +162,19 @@ export default function PostPage() {
 
               {/* imagem */}
               <div className="relative max-w-[340px] lg:max-w-[840px] h-[475px] rounded-md overflow-hidden">
-                {articleBySlug?.thumbnail?.url && (
+                {articleBySlug?.thumbnail?.url ? (
                   <Image
-                    src={articleBySlug.thumbnail.url}
+                    src={articleBySlug.thumbnail.url || default_image}
                     alt={
                       articleBySlug.thumbnail.description || "Imagem do artigo"
                     }
+                    fill
+                    className="object-cover"
+                  />
+                ) : (
+                  <Image
+                    src={default_image}
+                    alt={"Sem imagem cadastrada na noticia"}
                     fill
                     className="object-cover"
                   />
@@ -170,8 +183,7 @@ export default function PostPage() {
 
               <span className="text-xs text-[#757575]">
                 Foto:{" "}
-                {articleBySlug?.thumbnail.description ??
-                  "Imagem pertencente a noticia do Portal"}
+                {articleBySlug?.thumbnail?.description ? articleBySlug?.thumbnail?.description : !articleBySlug?.thumbnail?.url ? "Sem imagem cadastrada no momento" : "Imagem pertencente a noticia do Portal" }
               </span>
 
               {/* post banner */}
@@ -184,7 +196,7 @@ export default function PostPage() {
                   __html: articleBySlug?.content || "",
                 }}
               />
-              
+
               {/* Botão CTA com observer para view_end */}
               <div ref={whatsappButtonRef}>
                 <ButtonCTAWhatsAppButton />

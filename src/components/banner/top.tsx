@@ -81,12 +81,12 @@ export const TopBanner = () => {
   return (
     <div
       ref={bannerRef}
-      className="flex flex-col md:flex-row max-w-[670px] mx-auto px-0 md:px-4 py-3 items-center relative"
+      className="flex flex-col md:flex-row min-w-[360px] min-h-max-[150px] sm:max-w-[670px] mx-auto px-0 md:px-4 py-3 items-center relative"
     >
       <span className="block w-full min-w-[360px] md:w-18 md:min-w-0 text-[12px] text-gray-400 md:absolute md:left-[-30px] md:top-1/2 md:-translate-y-1/2 mb-1 md:mb-0 md:transform md:-rotate-90">
         PUBLICIDADE
       </span>
-      <div className="rounded-2xl flex justify-center w-full min-w-[360px] md:max-w-[650px] bg-white shadow-md">
+      <div className="rounded-2xl flex justify-center min-h-[50px] max-h-[120px] w-full min-w-[360px] md:min-w-[640px] md:max-w-[650px] shadow-md">
         <Link
           href={randomBanner.link_direction}
           target="_blank"

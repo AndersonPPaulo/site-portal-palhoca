@@ -73,7 +73,7 @@ export default function ProfileColumnist() {
         {filteredCol && (
           <div className="flex gap-4 bg-secondary ms-2 items-center rounded-2xl p-2">
             <Image
-              src={filteredCol.creator.user_image.url}
+              src={filteredCol.creator.user_image?.url}
               width={140}
               height={140}
               alt="Imagem perfil do colunista"
@@ -112,7 +112,7 @@ export default function ProfileColumnist() {
               <div className="flex flex-col gap-3 rounded-xl p-2 transition">
                 <div className="relative min-w-[300px]  h-[310px] md:w-[264px] md:min-w-[260px] md:h-[200px] rounded-md overflow-hidden">
                   <Image
-                    src={post.thumbnail.url}
+                    src={post.thumbnail?.url}
                     alt={post.title}
                     fill
                     className="object-cover "
