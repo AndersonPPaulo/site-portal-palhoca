@@ -2,24 +2,24 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import SideBanner from "../banner/side";
 import PostBanner from "../banner/post-banner";
-import { useContext, useEffect, useMemo } from "react";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { useContext, useEffect } from "react";
 import { ArticleContext } from "@/provider/article";
 import { formatDate } from "@/utils/formatDate";
 import normalizeText from "@/utils/normalize-text";
 import { generateSlug } from "@/utils/string-utils";
 import SlugToText from "@/utils/slugToText";
+import default_image from "@/assets/default image.webp";
 
 export default function ProfileColumnist() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const params = useParams();
 
   const { ListArticlesColumnists, listArticlesColumnists } =
     useContext(ArticleContext);
+  console.log("listArticlesColumnists", listArticlesColumnists);
 
   useEffect(() => {
     const titleColumn = Array.isArray(params.titleColumn)
@@ -33,38 +33,12 @@ export default function ProfileColumnist() {
     fetchData();
   }, []);
 
-  // const currentPage = Number(searchParams.get("page")) || 1;
-  // const postsPerPage = 9;
-
-  const sortedPosts = useMemo(() => {
-    return listArticlesColumnists?.sort((a, b) => {
-      const [dayA, monthA, yearA] = a.created_at.split("/").map(Number);
-      const [dayB, monthB, yearB] = b.created_at.split("/").map(Number);
-
-      const dateA = new Date(yearA, monthA - 1, dayA);
-      const dateB = new Date(yearB, monthB - 1, dayB);
-
-      return dateB.getTime() - dateA.getTime();
-    });
-  }, []);
-
-  // const totalPages = sortedPosts
-  //   ? Math.ceil(sortedPosts.length / postsPerPage)
-  //   : 0;
-
   const sidePosts = listArticlesColumnists?.slice(0, 5);
   const filteredCol = listArticlesColumnists?.find(
     (item) =>
       generateSlug(item.creator.name.toString()) ===
       params.titleColumn?.toString()
   );
-
-
-  const handlePageChange = (page: number) => {
-    const url = new URL(window.location.href);
-    url.searchParams.set("page", page.toString());
-    router.push(url.pathname + url.search);
-  };
 
   return (
     <section className="flex flex-col lg:flex-row gap-6 mx-auto max-w-[1272px] justify-between">
@@ -73,7 +47,7 @@ export default function ProfileColumnist() {
         {filteredCol && (
           <div className="flex gap-4 bg-secondary ms-2 items-center rounded-2xl p-2">
             <Image
-              src={filteredCol.creator.user_image?.url}
+              src={filteredCol.creator.user_image?.url || default_image}
               width={140}
               height={140}
               alt="Imagem perfil do colunista"
@@ -112,7 +86,7 @@ export default function ProfileColumnist() {
               <div className="flex flex-col gap-3 rounded-xl p-2 transition">
                 <div className="relative min-w-[300px]  h-[310px] md:w-[264px] md:min-w-[260px] md:h-[200px] rounded-md overflow-hidden">
                   <Image
-                    src={post.thumbnail?.url}
+                    src={post.thumbnail?.url || default_image}
                     alt={post.title}
                     fill
                     className="object-cover "
@@ -138,39 +112,6 @@ export default function ProfileColumnist() {
           ))}
         </div>
 
-        {/* Pagination controls */}
-        {/* <div className="flex justify-center gap-2 my-4">
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-            className="px-3 py-2 rounded-md border border-[#757575] text-[#757575] disabled:opacity-50"
-          >
-            <ArrowLeft className="w-4 h-4" />
-          </button>
-
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <button
-              key={page}
-              onClick={() => handlePageChange(page)}
-              className={`px-4 py-2 rounded-md ${
-                currentPage === page
-                  ? "border-2 border-primary text-primary font-bold"
-                  : "border border-[#757575] text-[#757575]"
-              }`}
-            >
-              {page}
-            </button>
-          ))}
-
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className="px-4 py-2 rounded-md border border-[#757575] text-[#757575] disabled:opacity-50"
-          >
-            <ArrowRight className="w-4 h-4" />
-          </button>
-        </div> */}
-
         <PostBanner />
       </div>
 
@@ -188,16 +129,14 @@ export default function ProfileColumnist() {
               }`}
             >
               <div className="flex gap-3 rounded-xl p-2 transition">
-                {post.thumbnail?.url && (
-                  <div className="relative min-w-[151px] h-[110px] rounded-sm overflow-hidden">
-                    <Image
-                      src={post.thumbnail.url}
-                      alt={post.thumbnail.description || "Imagem da notícia"}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                )}
+                <div className="relative min-w-[151px] h-[110px] rounded-sm overflow-hidden">
+                  <Image
+                    src={post.thumbnail?.url || default_image}
+                    alt={post.thumbnail?.description || "Imagem da notícia"}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
                 <div className="flex flex-col justify-between">
                   <h3 className="text-xl font-semibold leading-tight line-clamp-3">
                     {post.title}

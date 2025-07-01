@@ -117,48 +117,17 @@ export const PublicCompanyProvider = ({ children }: IChildrenReact) => {
     setError(null);
 
     try {
-      const params = { page, limit };
-      const response = await api.get("/company", { params });
-
-      // Filtrar apenas empresas ativas
-      let filteredCompanies = response.data.response.data.filter(
-        (company: IPublicCompany) => company.status === "active"
-      );
-
-      // Aplicar filtros do frontend
-      if (filters.search) {
-        const searchTerm = filters.search.toLowerCase();
-        filteredCompanies = filteredCompanies.filter(
-          (company: IPublicCompany) =>
-            company.name?.toLowerCase().includes(searchTerm) ||
-            company.description?.toLowerCase().includes(searchTerm) ||
-            company.address?.toLowerCase().includes(searchTerm)
-        );
-      }
-
-      if (filters.category) {
-        filteredCompanies = filteredCompanies.filter(
-          (company: IPublicCompany) =>
-            company.company_category?.some((cat) => cat.id === filters.category)
-        );
-      }
-
-      if (filters.district) {
-        filteredCompanies = filteredCompanies.filter(
-          (company: IPublicCompany) =>
-            company.district
-              ?.toLowerCase()
-              .includes(filters.district!.toLowerCase())
-        );
-      }
-
-      const formattedResponse: PublicCompanyListResponse = {
-        total: filteredCompanies.length,
+      const params = {
         page,
         limit,
-        totalPages: Math.ceil(filteredCompanies.length / limit),
-        data: filteredCompanies,
+        ...(filters.search && { name: filters.search }),
+        ...(filters.category && { category: filters.category }),
+        ...(filters.district && { district: filters.district }),
       };
+
+      const response = await api.get("/company/site", { params });
+
+      const formattedResponse: PublicCompanyListResponse = response.data;
 
       setCompanies(formattedResponse);
       return formattedResponse;
@@ -227,7 +196,6 @@ export const PublicCompanyProvider = ({ children }: IChildrenReact) => {
         err.response?.data?.message || "Erro ao enviar informações da empresa";
       setError(errorMessage);
       console.error("Erro ao criar lead:", err);
-      
     } finally {
       setLoading(false);
     }

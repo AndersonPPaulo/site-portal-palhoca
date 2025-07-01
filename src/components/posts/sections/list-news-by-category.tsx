@@ -15,6 +15,7 @@ import { formatDate } from "@/utils/formatDate";
 import SideBanner from "@/components/banner/side";
 import normalizeTextToslug from "@/utils/normalize-text";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import default_image from "@/assets/default image.webp";
 
 export default function ListArticlesByCategory() {
   const slug = useParams();
@@ -156,6 +157,24 @@ export default function ListArticlesByCategory() {
     router.push(url.pathname + url.search);
   };
 
+  const getVisiblePages = (current: number, total: number) => {
+    const pages = [];
+
+    if (total <= 7) {
+      for (let i = 1; i <= total; i++) pages.push(i);
+    } else {
+      if (current <= 4) {
+        pages.push(1, 2, 3, 4, 5, "...", total);
+      } else if (current >= total - 3) {
+        pages.push(1, "...", total - 4, total - 3, total - 2, total - 1, total);
+      } else {
+        pages.push(1, "...", current - 1, current, current + 1, "...", total);
+      }
+    }
+
+    return pages;
+  };
+
   return (
     <section
       ref={listSectionRef}
@@ -179,7 +198,7 @@ export default function ListArticlesByCategory() {
             >
               <div className="relative min-w-[300px] md:w-[328px] h-[310px] md:h-[227px] rounded-md overflow-hidden">
                 <Image
-                  src={post.thumbnail?.url}
+                  src={post.thumbnail?.url || default_image}
                   alt={post.title}
                   fill
                   className="object-cover"
@@ -208,7 +227,7 @@ export default function ListArticlesByCategory() {
         ))}
 
         {/* Pagination */}
-        <div className="flex justify-center gap-2 my-4">
+        <div className="flex justify-center gap-2 my-4 flex-wrap">
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
@@ -217,19 +236,28 @@ export default function ListArticlesByCategory() {
             <ArrowLeft className="w-4 h-4" />
           </button>
 
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <button
-              key={page}
-              onClick={() => handlePageChange(page)}
-              className={`px-4 py-2 rounded-md hover:bg-gray-100 ${
-                currentPage === page
-                  ? "border-2 border-primary text-primary font-bold"
-                  : "border border-[#757575] text-[#757575]"
-              }`}
-            >
-              {page}
-            </button>
-          ))}
+          {getVisiblePages(currentPage, totalPages).map((page, idx) =>
+            page === "..." ? (
+              <span
+                key={`dots-${idx}`}
+                className="px-3 py-2 text-[#757575] select-none"
+              >
+                ...
+              </span>
+            ) : (
+              <button
+                key={`page-${page}`} // Agora sempre é único
+                onClick={() => handlePageChange(page as number)}
+                className={`px-4 py-2 rounded-md hover:bg-gray-100 ${
+                  currentPage === page
+                    ? "border-2 border-primary text-primary font-bold"
+                    : "border border-[#757575] text-[#757575]"
+                }`}
+              >
+                {page}
+              </button>
+            )
+          )}
 
           <button
             onClick={() => handlePageChange(currentPage + 1)}

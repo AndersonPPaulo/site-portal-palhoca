@@ -158,13 +158,13 @@ export default function Header() {
       {/* Category menus - Only visible when menu is closed and not on contact page */}
       {!isMenuOpen && !isContatoPath && (
         <>
-          {pathname?.startsWith("/comercios") ? (
+          {pathname?.startsWith("/comercios") && (
             <CompanyCategorysMenu pathname={pathname} />
-          ) : pathname?.startsWith("/noticia") ? (
+          )}
+          {pathname?.startsWith("/noticia") && (
             <NewsCategoryMenu pathname={pathname} />
-          ) : pathname === "/" ? (
-            <NewsCategoryMenu pathname={pathname} />
-          ) : null}
+          )}
+          {pathname === "/" && <NewsCategoryMenu pathname={pathname} />}
         </>
       )}
       {!isContatoPath ? <TopBanner /> : null}
