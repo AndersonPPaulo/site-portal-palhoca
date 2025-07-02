@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +15,7 @@ interface SearchResultsProps {
   isVisible: boolean;
   searchTerm: string;
   publishedArticlesBySearch: ArticleResponse | null;
-  onPageChange: (page: number) => void; // <-- adicione isso
+  onPageChange: (page: number) => void;
 }
 
 export default function SearchResults({
@@ -22,6 +24,8 @@ export default function SearchResults({
   publishedArticlesBySearch,
   onPageChange,
 }: SearchResultsProps) {
+  const router = useRouter();
+
   if (
     !isVisible ||
     !searchTerm.trim() ||
@@ -32,9 +36,59 @@ export default function SearchResults({
 
   const { data: articles, meta } = publishedArticlesBySearch;
 
-  const handlePageChange = (page: number) => {
-    onPageChange(page); // <-- executa a função que realmente faz o fetch
+  // Otimização: useCallback para evitar re-renders desnecessários
+  const handlePageChange = useCallback(
+    (page: number) => {
+      onPageChange(page);
+    },
+    [onPageChange]
+  );
+
+  // Função para converter nome em slug
+  const createSlug = (text: string) => {
+    return text
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^\w\s]/g, "")
+      .replace(/\s+/g, "-");
   };
+
+  // Navegação otimizada com prefetch automático usando categoria e slug
+  const handleArticleClick = useCallback(
+    (article: any, event: React.MouseEvent) => {
+      const categorySlug =
+        article.category?.slug ||
+        createSlug(article.category?.name || "noticia");
+      const articleSlug = article.slug || createSlug(article.title);
+      const url = `/noticia/${categorySlug}/${articleSlug}`;
+
+      // Permitir Ctrl+Click ou Command+Click para abrir em nova aba
+      if (event.metaKey || event.ctrlKey) {
+        window.open(url, "_blank");
+        return;
+      }
+
+      // Navegação normal
+      router.push(url);
+    },
+    [router]
+  );
+
+  // Suporte a navegação por teclado (acessibilidade)
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent, article: any) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        const categorySlug =
+          article.category?.slug ||
+          createSlug(article.category?.name || "noticia");
+        const articleSlug = article.slug || createSlug(article.title);
+        router.push(`/noticia/${categorySlug}/${articleSlug}`);
+      }
+    },
+    [router]
+  );
 
   const truncateText = (text: string, maxLength: number) => {
     if (text.length <= maxLength) return text;
@@ -66,27 +120,33 @@ export default function SearchResults({
             {articles.map((article: any, index: number) => (
               <div
                 key={article.id || index}
+                onClick={(e) => handleArticleClick(article, e)}
+                onKeyDown={(e) => handleKeyDown(e, article)}
+                tabIndex={0}
+                role="button"
+                aria-label={`Ler artigo: ${article.title}`}
                 className={cn(
-                  "flex gap-4 p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer",
+                  "flex gap-4 p-4 border-b border-gray-100 hover:bg-gray-50 focus:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset transition-all cursor-pointer group",
                   index === articles.length - 1 && "border-b-0"
                 )}
               >
-                {/* Image */}
-                <div className="w-28 h-28 flex-shrink-0 rounded-md overflow-hidden bg-gray-100">
+                {/* Image com Link interno para melhor SEO */}
+                <div className="w-28 h-28 flex-shrink-0 rounded-md overflow-hidden bg-gray-100 group-hover:shadow-md transition-shadow">
                   <img
                     src={article.thumbnail.url || "/placeholder.png"}
                     alt={
                       article.thumbnail.description ||
                       "imagem da noticia publicada"
                     }
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    loading="lazy"
                   />
                 </div>
 
                 {/* Content */}
                 <div className="flex flex-col justify-between space-y-2 w-full">
                   {/* Title */}
-                  <h3 className="font-semibold text-gray-900 line-clamp-2 hover:text-blue-600 transition-colors">
+                  <h3 className="font-semibold text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors">
                     {article.title}
                   </h3>
                   <h4 className="text-md text-gray-600 line-clamp-2">
@@ -123,6 +183,19 @@ export default function SearchResults({
                     )}
                   </div>
                 </div>
+
+                {/* Link invisível para melhor SEO e acessibilidade */}
+                <Link
+                  href={`/noticia/${
+                    article.category?.slug ||
+                    createSlug(article.category?.name || "noticia")
+                  }/${article.slug || createSlug(article.title)}`}
+                  className="sr-only"
+                  tabIndex={-1}
+                  prefetch={true}
+                >
+                  {article.title}
+                </Link>
               </div>
             ))}
           </div>
@@ -140,18 +213,19 @@ export default function SearchResults({
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() =>
-                      handlePageChange(publishedArticlesBySearch.meta.page - 1)
-                    }
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handlePageChange(publishedArticlesBySearch.meta.page - 1);
+                    }}
                     disabled={publishedArticlesBySearch.meta.page <= 1}
                     className="h-8 w-8 p-0 cursor-pointer"
+                    aria-label="Página anterior"
                   >
                     <ChevronLeft size={14} />
                   </Button>
 
                   <div className="flex items-center gap-1">
                     {publishedArticlesBySearch.meta.totalPages <= 7 ? (
-                      // Caso simples: poucas páginas, mostra todas
                       Array.from(
                         { length: publishedArticlesBySearch.meta.totalPages },
                         (_, i) => {
@@ -161,12 +235,21 @@ export default function SearchResults({
                               key={pageNum}
                               variant="outline"
                               size="sm"
-                              onClick={() => handlePageChange(pageNum)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handlePageChange(pageNum);
+                              }}
                               className={`h-8 w-8 p-0 text-xs cursor-pointer ${
                                 pageNum === publishedArticlesBySearch.meta.page
                                   ? "text-primary border-primary"
                                   : ""
                               }`}
+                              aria-label={`Ir para página ${pageNum}`}
+                              aria-current={
+                                pageNum === publishedArticlesBySearch.meta.page
+                                  ? "page"
+                                  : undefined
+                              }
                             >
                               {pageNum}
                             </Button>
@@ -175,7 +258,6 @@ export default function SearchResults({
                       )
                     ) : (
                       <>
-                        {/* Primeiro botão */}
                         <Button
                           variant={
                             publishedArticlesBySearch.meta.page === 1
@@ -183,18 +265,20 @@ export default function SearchResults({
                               : "outline"
                           }
                           size="sm"
-                          onClick={() => handlePageChange(1)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handlePageChange(1);
+                          }}
                           className="h-8 w-8 p-0 text-xs cursor-pointer"
+                          aria-label="Primeira página"
                         >
                           1
                         </Button>
 
-                        {/* Reticências após o primeiro botão */}
                         {publishedArticlesBySearch.meta.page > 4 && (
                           <span className="px-1">...</span>
                         )}
 
-                        {/* Janela de 3 páginas antes e depois do atual */}
                         {Array.from({ length: 5 }, (_, i) => {
                           const pageNum =
                             publishedArticlesBySearch.meta.page - 2 + i;
@@ -212,13 +296,23 @@ export default function SearchResults({
                                     : "outline"
                                 }
                                 size="sm"
-                                onClick={() => handlePageChange(pageNum)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handlePageChange(pageNum);
+                                }}
                                 className={`h-8 w-8 p-0 text-xs cursor-pointer ${
                                   pageNum ===
                                   publishedArticlesBySearch.meta.page
                                     ? "text-primary border-primary"
                                     : ""
                                 }`}
+                                aria-label={`Ir para página ${pageNum}`}
+                                aria-current={
+                                  pageNum ===
+                                  publishedArticlesBySearch.meta.page
+                                    ? "page"
+                                    : undefined
+                                }
                               >
                                 {pageNum}
                               </Button>
@@ -227,13 +321,11 @@ export default function SearchResults({
                           return null;
                         })}
 
-                        {/* Reticências antes do último botão */}
                         {publishedArticlesBySearch.meta.page <
                           publishedArticlesBySearch.meta.totalPages - 3 && (
                           <span className="px-1">...</span>
                         )}
 
-                        {/* Último botão */}
                         <Button
                           variant={
                             publishedArticlesBySearch.meta.page ===
@@ -242,12 +334,14 @@ export default function SearchResults({
                               : "outline"
                           }
                           size="sm"
-                          onClick={() =>
+                          onClick={(e) => {
+                            e.stopPropagation();
                             handlePageChange(
                               publishedArticlesBySearch.meta.totalPages
-                            )
-                          }
+                            );
+                          }}
                           className="h-8 w-8 p-0 text-xs cursor-pointer"
+                          aria-label="Última página"
                         >
                           {publishedArticlesBySearch.meta.totalPages}
                         </Button>
@@ -258,14 +352,16 @@ export default function SearchResults({
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() =>
-                      handlePageChange(publishedArticlesBySearch.meta.page + 1)
-                    }
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handlePageChange(publishedArticlesBySearch.meta.page + 1);
+                    }}
                     disabled={
                       publishedArticlesBySearch.meta.page >=
                       publishedArticlesBySearch.meta.totalPages
                     }
                     className="h-8 w-8 p-0 cursor-pointer"
+                    aria-label="Próxima página"
                   >
                     <ChevronRight size={14} />
                   </Button>
