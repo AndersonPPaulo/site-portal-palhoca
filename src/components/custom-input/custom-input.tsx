@@ -59,26 +59,28 @@ export default function CustomInput({ pathname }: { pathname: string | null }) {
     setShowResults(false);
   };
 
-  const isComercio = pathname === "/comercios";
+  // Função para verificar se é página de comércio (tanto /comercios quanto /comercios/categoria)
+  const isComercio = pathname?.startsWith("/comercios") || false;
 
   return (
     <div className="w-full max-w-[628px] mx-auto -mb-4 md:mb-2 lg:mt-2">
       {isComercio ? (
-        <div className="flex flex-col md:flex-row w-full overflow-hidden  rounded-[12px] border border-[#e6e6e6]">
+        <div className="flex flex-col md:flex-row w-full overflow-hidden rounded-[12px] border border-[#e6e6e6]">
           {/* Input de pesquisa + lupa */}
-          <div className="flex items-center w-full ">
-            <SearchInputCompany/>
+          <div className="flex items-center w-full">
+            <SearchInputCompany />
           </div>
 
           {/* Divisor */}
           <div className="w-full md:w-px h-px md:h-[52px] bg-[#E6E6E6]" />
+          
           {/* Input/select de bairros */}
           <div className="p-1 w-full mx-auto border-none">
             <DistrictSelect value={selectedDistrict} />
           </div>
         </div>
       ) : (
-        <div className="relative w-full">
+        <div className="relative w-full" ref={searchRef}>
           <form onSubmit={handleSearch}>
             <Input
               type="text"
