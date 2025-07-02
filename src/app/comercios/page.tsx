@@ -8,7 +8,6 @@ import FilteredCommerceList from "@/components/companys/filterCompany";
 import { usePublicCompany } from "@/provider/company";
 import { CompanyAnalyticsContext } from "@/provider/analytics/company";
 
-
 type TrackCompanyViewParams = {
   page: string;
   section: string;
@@ -41,11 +40,13 @@ declare global {
 
 export default function Comercio() {
   const pathname = usePathname();
+
+  const categoryParams = pathname.split("/")[2];
+
   const { companies, loading } = usePublicCompany();
   const { TrackCompanyView } = useContext(CompanyAnalyticsContext);
 
   const [showMap, setShowMap] = useState(false);
-  const [activeCategory, setActiveCategory] = useState("Todos");
   const [selectedDistrict, setSelectedDistrict] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -73,7 +74,7 @@ export default function Comercio() {
             categories: (company.company_category?.map(
               (cat: { name: string }) => cat.name
             ) || []) as string[],
-            activeCategory: activeCategory as string,
+            activeCategory: categoryParams ? categoryParams : "Todos",
             selectedDistrict: selectedDistrict as string,
             showMapMode: showMap as boolean,
             gridIndex: index as number,
@@ -101,6 +102,9 @@ export default function Comercio() {
 
   // Gerar título dinâmico
   const getPageTitle = () => {
+    const activeCategory =
+      categoryParams === undefined ? "Todos" : categoryParams;
+
     if (activeCategory === "Todos") {
       return `Comércios em Palhoça${
         selectedDistrict ? ` - ${selectedDistrict}` : ""
@@ -132,22 +136,6 @@ export default function Comercio() {
       };
     }
   }, [showMap]);
-
-  // Configurar categoria ativa baseada na URL
-  useEffect(() => {
-    if (pathname === "/comercios") {
-      setActiveCategory("Todos");
-      if (typeof window !== "undefined") {
-        window.activeCategory = "Todos";
-      }
-    } else if (
-      pathname?.startsWith("/comercios/") &&
-      typeof window !== "undefined" &&
-      window.activeCategory
-    ) {
-      setActiveCategory(window.activeCategory);
-    }
-  }, [pathname]);
 
   // Analytics inicial
   useEffect(() => {
@@ -182,7 +170,7 @@ export default function Comercio() {
           {loading ? "Carregando comércios..." : getPageTitle()}
         </h1>
         <FilteredCommerceList
-          activeCategory={activeCategory}
+          activeCategory={categoryParams ? categoryParams : "Todos"}
           showMap={showMap}
           onPageChange={handlePageChange}
         />
