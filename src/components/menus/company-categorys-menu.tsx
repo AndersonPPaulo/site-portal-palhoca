@@ -36,6 +36,7 @@ import saude_beleza from "@/assets/icons/company/saude-beleza.png";
 import servico_publico from "@/assets/icons/company/servico-publico.png";
 import supermercado from "@/assets/icons/company/supermercado.png";
 import viagem_transportes from "@/assets/icons/company/viagem-transporte.png";
+import beer from "@/assets/icons/company/beer.png";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "../ui/button";
@@ -90,7 +91,7 @@ export default function CompanyCategoryMenu({
 
   const categories = [
     { name: "Todos", icon: todosIcon, path: "/comercios" },
-    { name: "Academia", icon: academiaIcon, path: "/comercios/academia" },
+    { name: "Academias", icon: academiaIcon, path: "/comercios/academias" },
     { name: "Advogados", icon: advogadosIcon, path: "/comercios/advogados" },
     {
       name: "Agência de viagem",
@@ -110,9 +111,14 @@ export default function CompanyCategoryMenu({
       path: "/comercios/casa-construcao",
     },
     {
-      name: "Compras várias",
+      name: "Compras e Varejo",
       icon: comprasVariasIcon,
-      path: "/comercios/compras-varias",
+      path: "/comercios/compras-e-varejo",
+    },
+    {
+      name: "Distribuidoras",
+      icon: beer,
+      path: "/comercios/distribuidoras",
     },
     { name: "Eletrônico", icon: eletronico, path: "/comercios/eletronico" },
     {
@@ -123,9 +129,9 @@ export default function CompanyCategoryMenu({
     {
       name: "Escolas e faculdades",
       icon: escola_faculdade,
-      path: "/comercios/escolas-faculdades",
+      path: "/comercios/escolas-e-faculdades",
     },
-    { name: "Farmácia", icon: farmacia, path: "/comercios/farmacia" },
+    { name: "Farmácias", icon: farmacia, path: "/comercios/farmacias" },
     {
       name: "Festas e eventos",
       icon: festa_eventos,
@@ -169,7 +175,7 @@ export default function CompanyCategoryMenu({
       path: "/comercios/posto-combustivel",
     },
     {
-      name: "Produto e serviço",
+      name: "Produtos e serviços",
       icon: produto_servico,
       path: "/comercios/produto-servico",
     },
@@ -194,7 +200,7 @@ export default function CompanyCategoryMenu({
       path: "/comercios/servico-publico",
     },
     {
-      name: "Supermercado",
+      name: "Supermercados",
       icon: supermercado,
       path: "/comercios/supermercado",
     },

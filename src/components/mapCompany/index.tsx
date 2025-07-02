@@ -9,7 +9,6 @@ import ReactDOMServer from "react-dom/server";
 import { CardCompany } from "../companys/card-company";
 import { IPublicCompany } from "@/provider/company";
 
-// Função para extrair coordenadas do link do Google Maps
 function extractCoordinatesFromMapsLink(
   mapsLink: string
 ): { lat: number; lng: number } | null {
@@ -35,7 +34,6 @@ function extractCoordinatesFromMapsLink(
   return null;
 }
 
-// Interface para os dados processados do comércio no mapa
 interface CommerceMapData {
   id: string;
   name: string;

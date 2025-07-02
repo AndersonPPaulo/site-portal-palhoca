@@ -6,22 +6,15 @@ import { AlertCircle } from "lucide-react";
 import CommercialMap from "../mapCompany";
 import CompanyPagination from "../companysPagination";
 import { IPublicCompany, usePublicCompany } from "@/provider/company";
+import default_image from "@/assets/default image.webp";
 
 function normalizeText(text: string): string {
   return text
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^\w\s]/g, "")
-    .replace(/\s+/g, "-");
-}
-
-function normalizeDistrict(district: string): string {
-  return district
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .trim();
+    .replace(/[\u0300-\u036f]/g, "") // remove acentos
+    .replace(/ç/g, "c") // transforma cedilha em 'c'
+    .replace(/[^\w\s]/g, ""); // remove caracteres especiais
 }
 
 interface FilteredCommerceListProps {
@@ -44,61 +37,74 @@ export default function FilteredCommerceList({
   showMap,
   onPageChange,
 }: FilteredCommerceListProps) {
-  const { companies, loading, error, listCompanies } = usePublicCompany();
+  const { companies, loading, listCompanies } = usePublicCompany();
 
-  // Estados principais
+
+  const [currentPage, setCurrentPage] = useState(1);
   const [selectedDistrict, setSelectedDistrict] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [currentPage, setCurrentPage] = useState(1);
-
+  const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 9;
 
-  // Lista de categorias válidas
-  const validCategories = [
-    "Todos",
-    "Academia",
-    "Advogados",
-    "Agência de viagem",
-    "Alimentação",
-    "Barbearia",
-    "Bares",
-    "Casa e construção",
-    "Compras várias",
-    "Eletrônico",
-    "Empresa médica",
-    "Escolas e faculdades",
-    "Farmácia",
-    "Festas e eventos",
-    "Floricultura",
-    "Imobiliárias",
-    "Internet e informática",
-    "Limpeza e organização",
-    "Marketing e publicidade",
-    "Oficina mecânica",
-    "Outra",
-    "Pet shop",
-    "Posto de combustível",
-    "Produto e serviço",
-    "Restaurante japonês",
-    "Revenda de carros",
-    "Saúde e beleza",
-    "Serviço público",
-    "Supermercado",
-    "Viagem e transporte",
-  ];
-
-  // Carregar dados da API
+  // Reset página quando categoria muda
   useEffect(() => {
-    if (!companies?.data && !loading) {
-      listCompanies(1, 20);
+    setCurrentPage(1);
+  }, [activeCategory]);
+
+  // Reset página quando distrito muda
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedDistrict]);
+
+  // Reset página quando busca muda
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        console.log("Filtros aplicados:", {
+          category:
+            activeCategory !== "Todos"
+              ? normalizeText(activeCategory)
+              : undefined,
+          district: selectedDistrict || undefined,
+          search: searchTerm || undefined,
+          page: currentPage,
+          itemsPerPage,
+        });
+
+        await listCompanies(currentPage, itemsPerPage, {
+          category:
+            activeCategory !== "Todos"
+              ? normalizeText(activeCategory)
+              : undefined,
+          district: selectedDistrict || undefined,
+          search: searchTerm || undefined,
+        });
+      } catch (error) {
+        console.error("Erro ao carregar empresas:", error);
+      }
+    };
+
+    fetchCompanies();
+  }, [activeCategory, selectedDistrict, searchTerm, currentPage]);
+
+  useEffect(() => {
+    if (companies?.total) {
+      setTotalPages(Math.ceil(companies.total / itemsPerPage));
     }
   }, [companies?.data, loading, listCompanies]);
 
-  // Converter dados da API para formato do CardCompany
-  const convertApiDataToCompany = (apiCompany: IPublicCompany): Company => {
-    const allCategories = apiCompany.company_category?.map(
-      (cat) => cat.name
-    ) || ["Comércio"];
+
+  useEffect(() => {
+    const handleDistrictSelected = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const district = customEvent.detail;
+      console.log("Distrito selecionado:", district);
+      setSelectedDistrict(district);
+    };
 
     return {
       name: apiCompany.name,
@@ -120,6 +126,7 @@ export default function FilteredCommerceList({
       ) || activeCategory === "Todos"
     );
   }, [activeCategory]);
+
 
   // Filtrar empresas
   const filteredData = useMemo(() => {
@@ -216,6 +223,7 @@ export default function FilteredCommerceList({
   }, []);
 
   // Componentes de mensagem
+ 
   const CategoryNotFoundMessage = () => (
     <div className="w-full py-12 text-center bg-red-50 rounded-lg border border-red-200 px-4">
       <div className="inline-flex items-center justify-center w-12 h-12 bg-red-100 rounded-full mb-4">
@@ -254,6 +262,7 @@ export default function FilteredCommerceList({
       return `Não encontramos comércios cadastrados com ${filters.join(", ")}.`;
     };
 
+
     return (
       <div className="w-full py-12 text-center bg-red-50 rounded-lg border border-red-200 px-4">
         <div className="inline-flex items-center justify-center w-12 h-12 bg-red-100 rounded-full mb-4">
@@ -262,9 +271,7 @@ export default function FilteredCommerceList({
         <h3 className="text-xl font-semibold text-red-600 mb-2">
           Nenhum comércio encontrado
         </h3>
-        <p className="text-gray-600 max-w-md mx-auto">
-          {getNoResultsMessage()}
-        </p>
+        <p className="text-gray-600 max-w-md mx-auto">{message}</p>
         <div className="mt-6">
           <a
             href="/comercios"
@@ -332,6 +339,7 @@ export default function FilteredCommerceList({
     );
   }
 
+
   return (
     <div className="flex flex-col lg:flex-row gap-6">
       <div
@@ -349,6 +357,7 @@ export default function FilteredCommerceList({
                   className="w-full"
                   key={`${company.id}-${currentPage}-${index}`}
                 >
+
                   <CardCompany company={company} />
                 </div>
               ))}
@@ -356,13 +365,15 @@ export default function FilteredCommerceList({
 
             <CompanyPagination
               currentPage={currentPage}
-              totalPages={paginatedData.totalPages}
-              totalItems={filteredData.companies.length}
+              totalPages={totalPages}
+              totalItems={companies?.total || 0}
               itemsPerPage={itemsPerPage}
               onPageChange={handlePageChange}
               className="mt-8"
             />
           </>
+        ) : activeCategory !== "Todos" ? (
+          <CategoryNotFoundMessage />
         ) : (
           <NoCompanyMessage />
         )}
@@ -370,8 +381,8 @@ export default function FilteredCommerceList({
 
       {showMap && (
         <CommercialMap
-          companies={paginatedData.apiCompanies}
-          height="h-[1100px]"
+          companies={companies?.data || []}
+          height="h-[778px]"
           width="w-[408px]"
           currentPage={currentPage}
         />

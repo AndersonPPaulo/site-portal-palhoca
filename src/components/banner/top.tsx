@@ -97,7 +97,7 @@ export const TopBanner = () => {
           <img
             src={randomBanner.url}
             alt={randomBanner.name}
-            className="rounded-lg"
+            className="rounded-lg max-h-[120px] object-cover w-full"
           />
         </Link>
       </div>
