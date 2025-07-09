@@ -4,17 +4,14 @@ frontend:
     preBuild:
       commands:
         - npm ci
-    build:
-      commands:
-        - npm run build
-  artifacts:
-    baseDirectory: .next
-    files:
-      - "**/*"
-  cache:
-    paths:
-      - node_modules/**/*
-  redirects:
-    - source: "</^[^.]+$|\\.(?!(css|js|png|jpg|svg|json)$)([^.]+$)/>"
-      target: "/index.html"
-      status: 200
+  build:
+    commands:
+      - npm run build
+artifacts:
+  baseDirectory: .next
+  files:
+    - "**/*"
+cache:
+  paths:
+    - node_modules/**/*
+    - .next/cache/*
