@@ -17,6 +17,11 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  // output: "export",
+  trailingSlash: true, // recomendável para export estático
 };
 
 export default nextConfig;

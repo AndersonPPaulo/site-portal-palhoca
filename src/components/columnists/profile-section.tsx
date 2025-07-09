@@ -14,12 +14,10 @@ import SlugToText from "@/utils/slugToText";
 import default_image from "@/assets/default image.webp";
 
 export default function ProfileColumnist() {
-  const router = useRouter();
   const params = useParams();
 
   const { ListArticlesColumnists, listArticlesColumnists } =
     useContext(ArticleContext);
-  console.log("listArticlesColumnists", listArticlesColumnists);
 
   useEffect(() => {
     const titleColumn = Array.isArray(params.titleColumn)
