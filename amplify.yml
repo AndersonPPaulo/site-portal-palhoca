@@ -7,10 +7,17 @@ frontend:
     build:
       commands:
         - npm run build
+        - npm run export
   artifacts:
-    baseDirectory: .next
+    baseDirectory: out
     files:
       - '**/*'
   cache:
     paths:
       - node_modules/**/*
+
+  # Regras de redirect para SPA no Amplify
+  redirects:
+    - source: "</^[^.]+$|\\.(?!(css|js|png|jpg|svg|json)$)([^.]+$)/>"
+      target: "/index.html"
+      status: 200
