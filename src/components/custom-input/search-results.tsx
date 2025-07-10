@@ -10,6 +10,7 @@ import { ChevronLeft, ChevronRight, Calendar, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ArticleResponse } from "@/provider/article";
 import { formatDate } from "@/utils/formatDate";
+import default_image from "@/assets/default image.webp";
 
 interface SearchResultsProps {
   isVisible: boolean;
@@ -133,7 +134,7 @@ export default function SearchResults({
                 {/* Image com Link interno para melhor SEO */}
                 <div className="w-28 h-28 flex-shrink-0 rounded-md overflow-hidden bg-gray-100 group-hover:shadow-md transition-shadow">
                   <img
-                    src={article.thumbnail.url || "/placeholder.png"}
+                    src={article.thumbnail.url || default_image}
                     alt={
                       article.thumbnail.description ||
                       "imagem da noticia publicada"
