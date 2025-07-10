@@ -6,6 +6,7 @@ import { MapPin, Phone } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { useContext } from "react";
 import { CompanyAnalyticsContext } from "@/provider/analytics/company";
+import default_image from "@/assets/default image.webp";
 
 interface CardCompanyProps {
   name: string;
@@ -22,17 +23,24 @@ interface Props {
   section?: string; // Seção onde o card está sendo exibido
 }
 
-export function CardCompany({ company, className, gridIndex, section = "company-list" }: Props) {
+export function CardCompany({
+  company,
+  className,
+  gridIndex,
+  section = "company-list",
+}: Props) {
   const router = useRouter();
   const pathname = usePathname();
-  
+
   const companyAnalytics = useContext(CompanyAnalyticsContext);
-  
+
   // Verificação se o contexto está disponível
   if (!companyAnalytics) {
-    console.warn("CompanyAnalyticsContext não encontrado. Verifique se o provider está configurado.");
+    console.warn(
+      "CompanyAnalyticsContext não encontrado. Verifique se o provider está configurado."
+    );
   }
-  
+
   const { TrackCompanyClick } = companyAnalytics || {};
 
   // Função para processar categorias (string ou array)
@@ -105,8 +113,8 @@ export function CardCompany({ company, className, gridIndex, section = "company-
         onClick={() => handleViewDetails("image")}
       >
         <Image
-          src={company.image}
-          alt={company.name}
+          src={company && company.image ? company.image : default_image}
+          alt={company && company.name ? company.name : "Imagem da empresa"}
           fill
           className="object-cover"
         />

@@ -8,7 +8,7 @@ import PostBanner from "../banner/post-banner";
 import { useContext, useEffect } from "react";
 import { ArticleContext } from "@/provider/article";
 import { formatDate } from "@/utils/formatDate";
-import normalizeText from "@/utils/normalize-text";
+import normalizeText from "@/utils/normalize-text-to-slug";
 import { generateSlug } from "@/utils/string-utils";
 import SlugToText from "@/utils/slugToText";
 import default_image from "@/assets/default image.webp";

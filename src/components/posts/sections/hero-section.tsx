@@ -8,7 +8,7 @@ import { ArticleContext } from "@/provider/article";
 import { ArticleAnalyticsContext } from "@/provider/analytics/article";
 import { formatDate } from "@/utils/formatDate";
 import { useParams } from "next/navigation";
-import normalizeTextToslug from "@/utils/normalize-text";
+import normalizeTextToslug from "@/utils/normalize-text-to-slug";
 import default_image from "@/assets/default image.webp";
 
 export default function HeroSection() {

@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import { ArticleContext } from "@/provider/article";
 import { ArticleAnalyticsContext } from "@/provider/analytics/article";
 import { formatDate } from "@/utils/formatDate";
-import normalizeTextToslug from "@/utils/normalize-text";
+import normalizeTextToslug from "@/utils/normalize-text-to-slug";
 
 export default function PostTopGridSection() {
   const pathname = usePathname();
