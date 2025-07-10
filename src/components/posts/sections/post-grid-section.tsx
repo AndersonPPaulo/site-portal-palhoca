@@ -157,8 +157,16 @@ export default function PostGridSection() {
             >
               <div className="relative min-w-[300px] md:w-[405px] h-[310px] rounded-md overflow-hidden">
                 <Image
-                  src={post.thumbnail?.url || default_image}
-                  alt={post.title}
+                  src={
+                    post && post.thumbnail && post.thumbnail.url
+                      ? post.thumbnail.url
+                      : default_image
+                  }
+                  alt={
+                    post && post.title && post.title
+                      ? post.title
+                      : "Imagem do portal palhoça"
+                  }
                   fill
                   className="object-cover"
                 />

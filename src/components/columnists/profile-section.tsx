@@ -45,7 +45,13 @@ export default function ProfileColumnist() {
         {filteredCol && (
           <div className="flex gap-4 bg-secondary ms-2 items-center rounded-2xl p-2">
             <Image
-              src={filteredCol.creator.user_image?.url || default_image}
+              src={
+                filteredCol &&
+                filteredCol.creator &&
+                filteredCol.creator.user_image
+                  ? filteredCol.creator.user_image?.url
+                  : default_image
+              }
               width={140}
               height={140}
               alt="Imagem perfil do colunista"
@@ -84,8 +90,14 @@ export default function ProfileColumnist() {
               <div className="flex flex-col gap-3 rounded-xl p-2 transition">
                 <div className="relative min-w-[300px]  h-[310px] md:w-[264px] md:min-w-[260px] md:h-[200px] rounded-md overflow-hidden">
                   <Image
-                    src={post.thumbnail?.url || default_image}
-                    alt={post.title}
+                    src={
+                      post && post.thumbnail && post.thumbnail.url
+                        ? post.thumbnail.url
+                        : default_image
+                    }
+                    alt={post && post.title && post.title
+                        ? post.title
+                        : "Imagem do portal palhoça"}
                     fill
                     className="object-cover "
                   />
@@ -129,8 +141,12 @@ export default function ProfileColumnist() {
               <div className="flex gap-3 rounded-xl p-2 transition">
                 <div className="relative min-w-[151px] h-[110px] rounded-sm overflow-hidden">
                   <Image
-                    src={post.thumbnail?.url || default_image}
-                    alt={post.thumbnail?.description || "Imagem da notícia"}
+                    src={
+                      post && post.thumbnail && post.thumbnail.url
+                        ? post.thumbnail.url
+                        : default_image
+                    }
+                    alt={post.thumbnail?.description ?? "Imagem da notícia"}
                     fill
                     className="object-cover"
                   />

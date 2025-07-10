@@ -206,11 +206,11 @@ export default function HeroSection() {
           >
             <div className="relative md:min-w-[490px] max-w-[490px] min-h-[406px] max-h-[406px] rounded-xl overflow-hidden">
               <Image
-                src={mainPost?.thumbnail?.url || default_image}
+                src={mainPost?.thumbnail?.url ?? default_image}
                 alt={
-                  mainPost?.thumbnail.description ||
-                  mainPost?.title ||
-                  "Imagem do artigo"
+                  mainPost && mainPost.title && mainPost.title
+                    ? mainPost.title
+                    : "Imagem do portal palhoça"
                 }
                 fill
                 className="object-cover"
@@ -253,7 +253,11 @@ export default function HeroSection() {
               <div className="flex gap-3 rounded-xl p-2 transition">
                 <div className="relative min-w-[151px] h-[110px] rounded-sm overflow-hidden">
                   <Image
-                    src={post.thumbnail?.url || default_image}
+                    src={
+                      post && post.thumbnail && post.thumbnail.url
+                        ? post.thumbnail.url
+                        : default_image
+                    }
                     alt={post.title}
                     fill
                     className="object-cover"

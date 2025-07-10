@@ -134,10 +134,15 @@ export default function SearchResults({
                 {/* Image com Link interno para melhor SEO */}
                 <div className="w-28 h-28 flex-shrink-0 rounded-md overflow-hidden bg-gray-100 group-hover:shadow-md transition-shadow">
                   <img
-                    src={article.thumbnail.url || default_image}
+                    src={
+                      article && article.thumbnail && article.thumbnail.url
+                        ? article.thumbnail.url
+                        : default_image
+                    }
                     alt={
-                      article.thumbnail.description ||
-                      "imagem da noticia publicada"
+                      article && article.title && article.title
+                        ? article.title
+                        : "Imagem do portal palhoça"
                     }
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                     loading="lazy"

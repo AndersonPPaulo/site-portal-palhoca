@@ -164,9 +164,19 @@ export default function PostPage() {
               <div className="relative max-w-[340px] lg:max-w-[840px] h-[475px] rounded-md overflow-hidden">
                 {articleBySlug?.thumbnail?.url ? (
                   <Image
-                    src={articleBySlug.thumbnail.url || default_image}
+                    src={
+                      articleBySlug &&
+                      articleBySlug.thumbnail &&
+                      articleBySlug.thumbnail.url
+                        ? articleBySlug.thumbnail.url
+                        : default_image
+                    }
                     alt={
-                      articleBySlug.thumbnail.description || "Imagem do artigo"
+                      articleBySlug &&
+                      articleBySlug.title &&
+                      articleBySlug.title
+                        ? articleBySlug.title
+                        : "Imagem do portal palhoça"
                     }
                     fill
                     className="object-cover"
@@ -183,7 +193,11 @@ export default function PostPage() {
 
               <span className="text-xs text-[#757575]">
                 Foto:{" "}
-                {articleBySlug?.thumbnail?.description ? articleBySlug?.thumbnail?.description : !articleBySlug?.thumbnail?.url ? "Sem imagem cadastrada no momento" : "Imagem pertencente a noticia do Portal" }
+                {articleBySlug?.thumbnail?.description
+                  ? articleBySlug?.thumbnail?.description
+                  : !articleBySlug?.thumbnail?.url
+                  ? "Sem imagem cadastrada no momento"
+                  : "Imagem pertencente a noticia do Portal"}
               </span>
 
               {/* post banner */}

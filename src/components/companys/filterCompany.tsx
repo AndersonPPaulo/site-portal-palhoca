@@ -113,7 +113,7 @@ export default function FilteredCommerceList({
       address: apiCompany.address,
       category: allCategories.length === 1 ? allCategories[0] : allCategories,
       district: apiCompany.district,
-      image: apiCompany.company_image?.url || default_image,
+      image: apiCompany.company_image?.url ?? default_image,
       id: apiCompany.id,
     };
   };
