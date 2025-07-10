@@ -178,7 +178,7 @@ export default function ListArticlesByCategory() {
   return (
     <section
       ref={listSectionRef}
-      className="flex gap-6 max-w-[1272px] mx-auto py-4 justify-between"
+      className="flex flex-col lg:flex-row gap-6 max-w-[1272px] mx-auto py-4 justify-between"
     >
       <div className="flex flex-col gap-6 w-full max-w-[948px]">
         {articles.map((post, idx) => (
@@ -194,7 +194,7 @@ export default function ListArticlesByCategory() {
               ref={(el) => {
                 if (el) articlesRef.current[post.id] = el;
               }}
-              className="flex rounded-xl transition w-full hover:shadow-md hover:bg-gray-50"
+              className="flex flex-col md:flex-row rounded-xl transition w-full hover:shadow-md hover:bg-gray-50"
             >
               <div className="relative min-w-[300px] md:w-[328px] h-[310px] md:h-[227px] rounded-md overflow-hidden">
                 <Image

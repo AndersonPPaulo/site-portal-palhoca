@@ -6,15 +6,17 @@ import { getArticleBySlug } from "@/lib/getArticleBySlug";
 import default_image from "@/assets/default image.webp";
 
 import type { Metadata } from "next";
+import { Article } from "@/provider/article";
 
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: any };
+  params: Promise<{ name: string; slug: string }>;
 }): Promise<Metadata> {
-  const { slug } = params;
+  // Agora você precisa aguardar os params
+  const { slug } = await params;
 
-  const article = await getArticleBySlug(slug);
+  const article: Article = await getArticleBySlug(slug);
 
   if (!article) {
     return {
@@ -27,7 +29,6 @@ export async function generateMetadata({
   return {
     title: `${article.title} | Portal Palhoça`,
     description: article.resume_content,
-
     openGraph: {
       type: "article",
       siteName: "Portal Palhoça",
@@ -63,7 +64,6 @@ export async function generateMetadata({
     },
   };
 }
-
 export default function News() {
   return (
     <DefaultPage>

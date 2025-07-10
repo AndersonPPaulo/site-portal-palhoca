@@ -189,7 +189,11 @@ export default function HeroSection() {
   return (
     <section
       ref={heroSectionRef}
-      className="flex flex-col lg:flex-row w-full max-w-[360px] gap-6 py-4 lg:max-w-[1272px] mx-auto border-t border-[#e6e6e6]"
+      className={`${
+        !mainPost && !sidePosts
+          ? "hidden"
+          : "flex flex-col lg:flex-row w-full max-w-[360px] gap-6 py-4 lg:max-w-[1272px] mx-auto border-t border-[#e6e6e6]"
+      } `}
     >
       {/* Main Post */}
       {mainPost && (

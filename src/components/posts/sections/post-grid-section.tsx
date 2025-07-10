@@ -44,6 +44,7 @@ export default function PostGridSection() {
 
   const gridPosts =
     articlesByPortalHighlightPositionThree?.data.slice(0, 3) || [];
+  console.log("gridPosts", gridPosts);
 
   // Analytics: Registrar view inicial quando componente carrega
   useEffect(() => {
@@ -138,7 +139,11 @@ export default function PostGridSection() {
   return (
     <section
       ref={gridSectionRef}
-      className="flex gap-6 max-w-[1272px] mx-auto py-4 justify-between"
+      className={`${
+        !gridPosts
+          ? "hidden"
+          : "flex gap-6 max-w-[1272px] mx-auto py-4 justify-between"
+      }`}
     >
       <div className="flex flex-col lg:flex-row justify-between gap-7">
         {gridPosts.map((post, idx) => (
