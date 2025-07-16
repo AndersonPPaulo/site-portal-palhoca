@@ -73,7 +73,7 @@ export default function NewsCategoryMenu({ pathname }: { pathname: string | null
         {categories.map((category) => (
           <li
             key={category.name}
-            className={`px-2 ${
+            className={` px-2 ${
               activeCategory === category.name
                 ? "border-b-2 border-gray-300"
                 : ""
@@ -82,7 +82,7 @@ export default function NewsCategoryMenu({ pathname }: { pathname: string | null
             <Link
               href={category.path}
               onClick={() => handleCategoryClick(category.name)}
-              className={`flex flex-col items-center p-2 rounded-lg transition-colors ${
+              className={`flex gap-2 lg:flex lg:flex-col items-center p-2 rounded-lg transition-colors ${
                 activeCategory === category.name
                   ? "text-gray-600 font-medium"
                   : "text-gray-600 hover:text-gray-700"

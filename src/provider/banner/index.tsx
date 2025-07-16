@@ -116,7 +116,7 @@ export const BannerProvider = ({ children }: ICihldrenReact) => {
   const ListBannersTop = async ({
     page,
     limit,
-    onlyActive,
+    onlyActive = true,
     bannerStyle = "topo",
   }: IBannerMetadataProps): Promise<void> => {
     const config = {
@@ -147,7 +147,7 @@ export const BannerProvider = ({ children }: ICihldrenReact) => {
   const ListBannersNews = async ({
     page,
     limit,
-    onlyActive,
+    onlyActive = true,
     bannerStyle = "noticia",
   }: IBannerMetadataProps): Promise<void> => {
     const config = {
@@ -178,7 +178,7 @@ export const BannerProvider = ({ children }: ICihldrenReact) => {
   const ListBannersSidebar = async ({
     page,
     limit,
-    onlyActive,
+    onlyActive = true,
     bannerStyle = "sidebar",
   }: IBannerMetadataProps): Promise<void> => {
     const config = {

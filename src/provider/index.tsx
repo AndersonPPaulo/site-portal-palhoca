@@ -6,6 +6,7 @@ import { CompanyAnalyticsProvider } from "./analytics/company";
 import { ArticleProvider } from "./article";
 import { BannerProvider } from "./banner";
 import { PublicCompanyProvider } from "./company";
+import { PortalProvider } from "./portal";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -14,7 +15,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <CompanyAnalyticsProvider>
           <BannerProvider>
             <ArticleAnalyticsProvider>
-              <BannerAnalyticsProvider>{children}</BannerAnalyticsProvider>
+              <BannerAnalyticsProvider>
+                <PortalProvider>{children}</PortalProvider>
+              </BannerAnalyticsProvider>
             </ArticleAnalyticsProvider>
           </BannerProvider>
         </CompanyAnalyticsProvider>

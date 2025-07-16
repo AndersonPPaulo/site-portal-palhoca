@@ -8,7 +8,7 @@ export default function ColumnistPage() {
     <DefaultPage>
       <Header />
       <main>
-        <ProfileColumnist/>
+        <ProfileColumnist />
       </main>
       <footer>
         <Footer />

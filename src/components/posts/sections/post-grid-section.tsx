@@ -44,7 +44,6 @@ export default function PostGridSection() {
 
   const gridPosts =
     articlesByPortalHighlightPositionThree?.data.slice(0, 3) || [];
-  console.log("gridPosts", gridPosts);
 
   // Analytics: Registrar view inicial quando componente carrega
   useEffect(() => {

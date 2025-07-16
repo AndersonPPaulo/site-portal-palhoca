@@ -138,10 +138,19 @@ export default function PostPage() {
             <div className="flex flex-col gap-3 rounded-xl p-2 transition">
               {/* aqui está autor, breadcrumb, categoria e compartilhar */}
 
-              <div className="flex flex-col justify-between">
-                <h3 className="text-4xl max-w-[820px] font-[700] ">
+              <div className="flex flex-col gap-4 justify-between">
+                <h1 className="text-4xl max-w-[820px] font-[700] ">
                   {articleBySlug?.title}
-                </h3>
+                </h1>
+
+                <span
+                  className={`${
+                    articleBySlug?.resume_content ? "block" : "hidden"
+                  } max-w-[850px] text-sm text-[#363636] line-clamp-5`}
+                >
+                  {articleBySlug?.resume_content}
+                </span>
+
                 <div className="flex w-full justify-between">
                   <div className="flex items-center mt-2 gap-4">
                     <span className="w-min text-xs bg-secondary text-primary px-3 py-1 rounded-2xl">
@@ -205,7 +214,18 @@ export default function PostPage() {
 
               {/* conteudo */}
               <div
-                className="text-[16px] text-[#363636] max-w-[840px] mb-10"
+                className="
+    text-[16px] text-[#363636] max-w-[840px] mb-10
+    [&_h1]:text-4xl [&_h1]:font-bold [&_h1]:mb-4
+    [&_h2]:text-3xl [&_h2]:font-semibold [&_h2]:mb-3
+    [&_h3]:text-2xl [&_h3]:font-semibold [&_h3]:mb-2
+    [&_p]:mb-4
+    [&_a]:text-blue-600 [&_a]:underline
+    [&_strong]:font-bold
+    [&_em]:italic
+    [&_u]:underline
+    [&_br]:block
+  "
                 dangerouslySetInnerHTML={{
                   __html: articleBySlug?.content || "",
                 }}
