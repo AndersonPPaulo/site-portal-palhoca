@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect, useContext } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import DefaultPage from "@/components/default-page";
 import Header from "@/components/header";
 import FilteredCommerceList from "@/components/companys/filterCompany";
 import { usePublicCompany } from "@/provider/company";
 import { CompanyAnalyticsContext } from "@/provider/analytics/company";
+import SlugToText from "@/utils/slugToText";
 
 type TrackCompanyViewParams = {
   page: string;
@@ -38,10 +39,11 @@ declare global {
   }
 }
 
-export default function Comercio() {
+export default function ClientListArticlesByCategory() {
   const pathname = usePathname();
 
-  const categoryParams = pathname.split("/")[2];
+  const searchParams = useSearchParams();
+  const categoryQuery = searchParams.get("categoria");
 
   const { companies, loading } = usePublicCompany();
   const { TrackCompanyView } = useContext(CompanyAnalyticsContext);
@@ -74,7 +76,7 @@ export default function Comercio() {
             categories: (company.company_category?.map(
               (cat: { name: string }) => cat.name
             ) || []) as string[],
-            activeCategory: categoryParams ? categoryParams : "Todos",
+            activeCategory: categoryQuery ? categoryQuery : "Todos",
             selectedDistrict: selectedDistrict as string,
             showMapMode: showMap as boolean,
             gridIndex: index as number,
@@ -100,19 +102,24 @@ export default function Comercio() {
     }
   };
 
+  const capitalize = (text: string) => {
+    if (!text) return "";
+    return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+  };
+
   // Gerar título dinâmico
   const getPageTitle = () => {
     const activeCategory =
-      categoryParams === undefined ? "Todos" : categoryParams;
+      categoryQuery === undefined ? "Todos" : categoryQuery;
 
     if (activeCategory === "Todos") {
       return `Comércios em Palhoça${
         selectedDistrict ? ` - ${selectedDistrict}` : ""
       }`;
     }
-    return `${activeCategory} em Palhoça${
-      selectedDistrict ? ` - ${selectedDistrict}` : ""
-    }`;
+    return `${
+      activeCategory ? capitalize(SlugToText(activeCategory)) : "Comércios"
+    } em Palhoça${selectedDistrict ? ` - ${selectedDistrict}` : ""}`;
   };
 
   // Configurar mapa global
@@ -170,7 +177,7 @@ export default function Comercio() {
           {loading ? "Carregando comércios..." : getPageTitle()}
         </h1>
         <FilteredCommerceList
-          activeCategory={categoryParams ? categoryParams : "Todos"}
+          activeCategory={categoryQuery ? categoryQuery : "Todos"}
           showMap={showMap}
           onPageChange={handlePageChange}
         />

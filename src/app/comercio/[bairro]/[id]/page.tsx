@@ -84,11 +84,14 @@ export default function ComercioDetails() {
     const loadCompanyDetails = async () => {
       setIsLoading(true);
 
-      const companyId = params.id as string;
+      const companyName = params.id as string;
 
-      if (companyId) {
+      const companyNameReplace = companyName.replace(/-/g, " ");
+      console.log("companyNameReplace", companyNameReplace);
+
+      if (companyNameReplace) {
         try {
-          const apiCompany = await getCompanyById(companyId);
+          const apiCompany = await getCompanyById(companyNameReplace);
 
           // Extrair coordenadas do link do Google Maps
           const coordinates = extractCoordinatesFromMapsLink(
@@ -166,7 +169,6 @@ export default function ComercioDetails() {
         clickSource: "detail_page_button",
         timestamp: new Date().toISOString(),
       });
-
     }
 
     // Pequeno delay para garantir envio do evento antes de abrir link
@@ -192,7 +194,6 @@ export default function ComercioDetails() {
         clickSource: "detail_page_button",
         timestamp: new Date().toISOString(),
       });
-
     }
 
     // Pequeno delay para garantir envio do evento antes de abrir link
@@ -218,7 +219,6 @@ export default function ComercioDetails() {
         clickSource: "detail_page_button",
         timestamp: new Date().toISOString(),
       });
-
     }
 
     // Pequeno delay para garantir envio do evento antes de abrir link
@@ -265,7 +265,7 @@ export default function ComercioDetails() {
             <Button
               variant="default"
               className="bg-red-600 hover:bg-red-700 rounded-full"
-              onClick={() => router.push("/comercios")}
+              onClick={() => router.push("/comercio")}
             >
               Voltar para a lista
             </Button>
@@ -286,14 +286,14 @@ export default function ComercioDetails() {
           </Link>
           <span className="text-gray-400">›</span>
           <Link
-            href="/comercios"
+            href="/comercio"
             className="hover:text-red-600 transition-colors"
           >
             Comércios de Palhoça
           </Link>
           <span className="text-gray-400">›</span>
           <Link
-            href={`/comercios/${normalizeText(company.category)}`}
+            href={`/comercio?categoria=${normalizeText(company.category)}`}
             className="hover:text-red-600 transition-colors"
           >
             {company.category}

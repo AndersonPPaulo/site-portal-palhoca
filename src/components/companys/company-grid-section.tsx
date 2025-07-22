@@ -49,7 +49,7 @@ export function CompanyGridSection() {
           Comércios que são destaques em Palhoça!
         </h2>
         <Link
-          href="/comercios"
+          href="/comercio"
           className="flex items-center font-semibold gap-2 text-zinc-900 hover:text-red-500 transition-colors"
         >
           Veja mais

@@ -60,7 +60,7 @@ export default function CustomInput({ pathname }: { pathname: string | null }) {
   };
 
   // Função para verificar se é página de comércio (tanto /comercios quanto /comercios/categoria)
-  const isComercio = pathname?.startsWith("/comercios") || false;
+  const isComercio = pathname?.startsWith("/comercio") || false;
 
   return (
     <div className="w-full max-w-[628px] mx-auto -mb-4 md:mb-2 lg:mt-2">

@@ -16,7 +16,7 @@ export const TopBanner = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [randomBanner, setRandomBanner] = useState<BannerItem | null>(null);
   const pathname = usePathname();
-  const shouldDisplayBanner = !pathname?.startsWith("/comercios");
+  const shouldDisplayBanner = !pathname?.startsWith("/comercio");
 
   // Dados para tracking
   const trackingData = randomBanner

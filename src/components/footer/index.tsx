@@ -191,7 +191,7 @@ export function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link
-                  href="/comercios"
+                  href="/comercio"
                   className="text-gray-600 hover:text-green-500"
                 >
                   Buscador de comércios

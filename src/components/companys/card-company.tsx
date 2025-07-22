@@ -11,6 +11,7 @@ import default_image from "@/assets/default image.webp";
 interface CardCompanyProps {
   name: string;
   address: string;
+  district?: string;
   category: string | string[];
   image: StaticImageData | string;
   id?: string;
@@ -42,6 +43,11 @@ export function CardCompany({
   }
 
   const { TrackCompanyClick } = companyAnalytics || {};
+
+  console.log('company', company);
+
+  const districtActive = company.district || "Palhoça";
+  const nameCompanyActive = company.name || "Nome da Empresa";
 
   // Função para processar categorias (string ou array)
   const processCategories = () => {
@@ -84,7 +90,7 @@ export function CardCompany({
         gridIndex: gridIndex,
         address: company.address,
         clickType: clickType,
-        targetUrl: `/comercios/detalhes/${companyId}`,
+        targetUrl: `/comercio/${districtActive}/${nameCompanyActive}`,
         timestamp: new Date().toISOString(),
       });
     }
@@ -97,7 +103,7 @@ export function CardCompany({
 
     // Pequeno delay para garantir que o evento seja enviado
     setTimeout(() => {
-      router.push(`/comercios/detalhes/${companyId}`);
+      router.push(`/comercio/${generateSlug(districtActive)}/${generateSlug(nameCompanyActive)}`);
     }, 100);
   };
 

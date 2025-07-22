@@ -17,7 +17,7 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const isComercioPath =
-    pathname === "/comercios" || pathname?.startsWith("/comercios/");
+    pathname === "/comercio" || pathname?.startsWith("/comercio/");
   const isContatoPath = pathname === "/contato";
   const isHiddenMobileTabs =
     pathname?.startsWith("/colunista/") || pathname?.startsWith("/noticia/");
@@ -66,7 +66,7 @@ export default function Header() {
               Portal
             </Link>
             <Link
-              href="/comercios"
+              href="/comercio"
               className={`hover:text-red px-4 py-3 ${
                 isComercioPath
                   ? "text-red font-[700] border-b-2 border-red"
@@ -103,7 +103,7 @@ export default function Header() {
               Portal
             </Link>
             <Link
-              href="/comercios"
+              href="/comercio"
               onClick={() => setIsMenuOpen(false)}
               className={`block py-2 ${
                 isComercioPath ? "text-red font-[700]" : "text-[#363636]"
@@ -134,7 +134,7 @@ export default function Header() {
               Portal
             </Link>
             <Link
-              href="/comercios"
+              href="/comercio"
               className={`hover:text-red px-4 py-3 ${
                 isComercioPath
                   ? "text-red font-[700] border-b-2 border-red"
@@ -161,7 +161,7 @@ export default function Header() {
 
       {!isMenuOpen && !isContatoPath && (
         <>
-          {pathname?.startsWith("/comercios") && (
+          {pathname?.startsWith("/comercio") && (
             <CompanyCategorysMenu pathname={pathname} />
           )}
           {(pathname?.startsWith("/noticia") || pathname === "/") && (

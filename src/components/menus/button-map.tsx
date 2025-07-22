@@ -13,7 +13,7 @@ export default function ButtonMap({
   const pathname = usePathname();
   
   // Verifica se estamos na página de detalhes de um comércio
-  const isComercioDetailsPage = pathname?.startsWith('/comercios/detalhes/');
+  const isComercioDetailsPage = pathname?.startsWith('/comercio/detalhes/');
   
   // Se estiver na página de detalhes, não renderiza nada
   if (isComercioDetailsPage) {

@@ -72,10 +72,6 @@ export default function CompanyCategoryMenu({
   const [showRightArrow, setShowRightArrow] = useState(true);
   const [showMap, setShowMap] = useState(false);
 
-  // Check if we're on commerce related pages
-  const isComercioPath =
-    pathname === "/comercios" || pathname?.startsWith("/comercios/");
-
   const toggleMap = () => {
     const newMapState = !showMap;
     setShowMap(newMapState);
@@ -90,131 +86,151 @@ export default function CompanyCategoryMenu({
   };
 
   const categories = [
-    { name: "Todos", icon: todosIcon, path: "/comercios" },
-    { name: "Academias", icon: academiaIcon, path: "/comercios/academias" },
-    { name: "Advogados", icon: advogadosIcon, path: "/comercios/advogados" },
+    { name: "Todos", icon: todosIcon, path: "/comercio" },
+    {
+      name: "Academias",
+      icon: academiaIcon,
+      path: "/comercio?categoria=academias",
+    },
+    {
+      name: "Advogados",
+      icon: advogadosIcon,
+      path: "/comercio?categoria=advogados",
+    },
     {
       name: "Agência de viagem",
       icon: agenciaViagemIcon,
-      path: "/comercios/agencia-de-viagem",
+      path: "/comercio?categoria=agencia-de-viagem",
     },
     {
       name: "Alimentação",
       icon: alimentacaoIcon,
-      path: "/comercios/alimentacao",
+      path: "/comercio?categoria=alimentacao",
     },
-    { name: "Barbearia", icon: barbeariaIcon, path: "/comercios/barbearia" },
-    { name: "Bares", icon: baresIcon, path: "/comercios/bares" },
+    {
+      name: "Barbearia",
+      icon: barbeariaIcon,
+      path: "/comercio?categoria=barbearia",
+    },
+    { name: "Bares", icon: baresIcon, path: "/comercio?categoria=bares" },
     {
       name: "Casa e construção",
       icon: casaConstrucaoIcon,
-      path: "/comercios/casa-construcao",
+      path: "/comercio?categoria=casa-e-construcao",
     },
     {
       name: "Compras e Varejo",
       icon: comprasVariasIcon,
-      path: "/comercios/compras-e-varejo",
+      path: "/comercio?categoria=compras-e-varejo",
     },
     {
       name: "Distribuidoras",
       icon: beer,
-      path: "/comercios/distribuidoras",
+      path: "/comercio?categoria=distribuidoras",
     },
-    { name: "Eletrônico", icon: eletronico, path: "/comercios/eletronico" },
+    {
+      name: "Eletrônico",
+      icon: eletronico,
+      path: "/comercio?categoria=eletronico",
+    },
     {
       name: "Empresa médica",
       icon: empresa_medical,
-      path: "/comercios/empresa-medica",
+      path: "/comercio?categoria=empresa-medica",
     },
     {
       name: "Escolas e faculdades",
       icon: escola_faculdade,
-      path: "/comercios/escolas-e-faculdades",
+      path: "/comercio?categoria=escolas-e-faculdades",
     },
-    { name: "Farmácias", icon: farmacia, path: "/comercios/farmacias" },
+    {
+      name: "Farmácias",
+      icon: farmacia,
+      path: "/comercio?categoria=farmacias",
+    },
     {
       name: "Festas e eventos",
       icon: festa_eventos,
-      path: "/comercios/festas-eventos",
+      path: "/comercio?categoria=festas-e-eventos",
     },
     {
       name: "Floricultura",
       icon: floricultura,
-      path: "/comercios/floricultura",
+      path: "/comercio?categoria=floricultura",
     },
     {
       name: "Imobiliárias",
       icon: imobiliaria,
-      path: "/comercios/imobiliarias",
+      path: "/comercio?categoria=imobiliarias",
     },
     {
       name: "Internet e informática",
       icon: internet_informatica,
-      path: "/comercios/internet-informatica",
+      path: "/comercio?categoria=internet-e-informatica",
     },
     {
       name: "Limpeza e organização",
       icon: limpeza_organizacao,
-      path: "/comercios/limpeza-organizacao",
+      path: "/comercio?categoria=limpeza-e-organizacao",
     },
     {
       name: "Marketing e publicidade",
       icon: marketing_publicidade,
-      path: "/comercios/marketing-publicidade",
+      path: "/comercio?categoria=marketing-e-publicidade",
     },
     {
       name: "Oficina mecânica",
       icon: oficina_mecanica,
-      path: "/comercios/oficina-mecanica",
+      path: "/comercio?categoria=oficina-mecanica",
     },
-    { name: "Outra", icon: outras, path: "/comercios/outra" },
-    { name: "Pet shop", icon: pet_shop, path: "/comercios/pet-shop" },
+    { name: "Outra", icon: outras, path: "/comercio?categoria=outra" },
+    { name: "Pet shop", icon: pet_shop, path: "/comercio?categoria=pet-shop" },
     {
       name: "Posto de combustível",
       icon: posto_combustivel,
-      path: "/comercios/posto-combustivel",
+      path: "/comercio?categoria=posto-de-combustivel",
     },
     {
       name: "Produtos e serviços",
       icon: produto_servico,
-      path: "/comercios/produto-servico",
+      path: "/comercio?categoria=produto-servico",
     },
     {
       name: "Restaurante japonês",
       icon: rest_japones,
-      path: "/comercios/restaurante-japones",
+      path: "/comercio?categoria=restaurante-japones",
     },
     {
       name: "Revenda de carros",
       icon: revenda_carros,
-      path: "/comercios/revenda-carros",
+      path: "/comercio?categoria=revenda-carros",
     },
     {
       name: "Saúde e beleza",
       icon: saude_beleza,
-      path: "/comercios/saude-beleza",
+      path: "/comercio?categoria=saude-e-beleza",
     },
     {
       name: "Serviço público",
       icon: servico_publico,
-      path: "/comercios/servico-publico",
+      path: "/comercio?categoria=servico-publico",
     },
     {
       name: "Supermercados",
       icon: supermercado,
-      path: "/comercios/supermercado",
+      path: "/comercio?categoria=supermercado",
     },
     {
       name: "Viagem e transporte",
       icon: viagem_transportes,
-      path: "/comercios/viagem-transporte",
+      path: "/comercio?categoria=viagem-e-transporte",
     },
   ];
 
   useEffect(() => {
     // Only process if we're on a commerce route
-    if (pathname === "/comercios" || pathname?.startsWith("/comercios/")) {
-      if (pathname === "/comercios") {
+    if (pathname === "/comercio" || pathname?.startsWith("/comercio/")) {
+      if (pathname === "/comercio") {
         setActiveCategory("Todos");
       } else {
         const pathSegments = pathname.split("/");
@@ -281,13 +297,9 @@ export default function CompanyCategoryMenu({
   };
 
   // Only render this menu on commerce routes
-  if (!pathname?.startsWith("/comercios")) {
+  if (!pathname?.startsWith("/comercio")) {
     return null;
   }
-
-  // Check if we're on compoany details pages
-  const isDetailsPath =
-    pathname === "/comercios" || pathname?.startsWith("/comercios/detalhes");
 
   return (
     <nav className="flex justify-center w-full bg-white mx-auto mt-6 lg:overflow-x-hidden">
@@ -344,7 +356,7 @@ export default function CompanyCategoryMenu({
         {showRightArrow && (
           <div
             className={`absolute ${
-              pathname?.startsWith("/comercios/detalhes")
+              pathname?.startsWith("/comercio/detalhes")
                 ? "right-0"
                 : "right-33"
             } h-full hidden lg:flex items-center justify-center z-30`}
@@ -359,7 +371,7 @@ export default function CompanyCategoryMenu({
             <Button
               onClick={scrollRight}
               className={`absolute z-40 ${
-                pathname?.startsWith("/comercios/detalhes")
+                pathname?.startsWith("/comercio/detalhes")
                   ? "-right-0"
                   : "-right-2"
               } rounded-full py-5 bg-red-light shadow-md hover:bg-red-light/80 text-red-primary transition-colors`}

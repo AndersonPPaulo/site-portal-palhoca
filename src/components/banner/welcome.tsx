@@ -17,7 +17,7 @@ export const Banner = () => {
   const [randomBanner, setRandomBanner] = useState<BannerItem | null>(null);
   const [hasTrackedView, setHasTrackedView] = useState(false);
   const pathname = usePathname();
-  const shouldDisplayBanner = !pathname?.startsWith("/comercios");
+  const shouldDisplayBanner = !pathname?.startsWith("/comercio");
 
   // Requisição dos banners quando o componente carrega
   useEffect(() => {
