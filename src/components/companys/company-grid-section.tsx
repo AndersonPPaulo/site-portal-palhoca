@@ -40,6 +40,10 @@ export function CompanyGridSection() {
     }
   }, [companies]);
 
+  if (companies?.total === 0) {
+    return <></>;
+  }
+
   return (
     <section className="w-full py-12 max-w-[1272px] mx-auto px-4">
       <div className="w-[106px] h-2 bg-red-500 rounded-full mt-15" />
