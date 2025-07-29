@@ -12,7 +12,7 @@ export function Footer() {
           {/* Logo and description */}
           <div className="max-w-[380px]">
             <Link href="#" className="flex items-center">
-            <Image src={logo} alt="Portal Palhoça" width={200} height={50} />
+            <Image src={logo} alt="Portal Palhoça" width={200} height={50} unoptimized/>
             </Link>
             <p className="mt-4 text-black font-[400] text-md">
               Sua fonte completa de notícias e comércios em Palhoça

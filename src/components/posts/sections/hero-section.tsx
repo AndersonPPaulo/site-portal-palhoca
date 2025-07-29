@@ -217,6 +217,7 @@ export default function HeroSection() {
                     : "Imagem do portal palhoça"
                 }
                 fill
+                unoptimized
                 className="object-cover"
               />
             </div>
@@ -264,6 +265,7 @@ export default function HeroSection() {
                     }
                     alt={post.title}
                     fill
+                    unoptimized
                     className="object-cover"
                   />
                 </div>

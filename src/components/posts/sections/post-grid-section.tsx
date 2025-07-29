@@ -172,6 +172,7 @@ export default function PostGridSection() {
                       : "Imagem do portal palhoça"
                   }
                   fill
+                  unoptimized
                   className="object-cover"
                 />
               </div>

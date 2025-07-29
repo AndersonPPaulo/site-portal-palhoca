@@ -195,6 +195,7 @@ export default function PostGridWwithColumnistSection() {
                       : "Imagem do portal palhoça"
                   }
                   fill
+                  unoptimized
                   className="object-cover"
                 />
               </div>

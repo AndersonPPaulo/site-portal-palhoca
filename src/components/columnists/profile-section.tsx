@@ -55,6 +55,7 @@ export default function ProfileColumnist() {
               width={140}
               height={140}
               alt="Imagem perfil do colunista"
+              unoptimized
               className="w-[64px] h-[64px] md:w-[120px] md:h-[120px] rounded-lg"
             />
 
@@ -100,6 +101,7 @@ export default function ProfileColumnist() {
                         : "Imagem do portal palhoça"}
                     fill
                     className="object-cover "
+                    unoptimized
                   />
                 </div>
                 <div className="flex flex-col justify-between">
@@ -149,6 +151,7 @@ export default function ProfileColumnist() {
                     alt={post.thumbnail?.description ?? "Imagem da notícia"}
                     fill
                     className="object-cover"
+                    unoptimized
                   />
                 </div>
                 <div className="flex flex-col justify-between">

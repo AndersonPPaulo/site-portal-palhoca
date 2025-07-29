@@ -315,6 +315,7 @@ export default function ComercioDetails() {
                   fill
                   className="object-cover"
                   priority
+                  unoptimized
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.src = "/placeholder-business.jpg";

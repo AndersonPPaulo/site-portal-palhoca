@@ -344,6 +344,7 @@ export default function CompanyCategoryMenu({
                     src={category.icon}
                     alt={category.name}
                     fill
+                    unoptimized
                     style={{ objectFit: "contain" }}
                   />
                 </div>

@@ -173,6 +173,7 @@ export default function PostPage() {
               <div className="relative max-w-[340px] lg:max-w-[840px] h-[475px] rounded-md overflow-hidden">
                 {articleBySlug?.thumbnail?.url ? (
                   <Image
+                  unoptimized
                     src={
                       articleBySlug &&
                       articleBySlug.thumbnail &&
@@ -192,6 +193,7 @@ export default function PostPage() {
                   />
                 ) : (
                   <Image
+                  unoptimized
                     src={default_image}
                     alt={"Sem imagem cadastrada na noticia"}
                     fill
@@ -257,6 +259,7 @@ export default function PostPage() {
                           src={post.thumbnail.url}
                           alt={post.thumbnail.description || "Imagem do artigo"}
                           fill
+                          unoptimized
                           className="object-cover"
                         />
                       )}

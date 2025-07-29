@@ -92,6 +92,7 @@ export default function NewsCategoryMenu({ pathname }: { pathname: string | null
                 <Image
                   src={category.icon}
                   alt={category.name}
+                  unoptimized
                   width={24}
                   height={24}
                 />

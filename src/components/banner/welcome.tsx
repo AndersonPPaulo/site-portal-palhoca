@@ -156,6 +156,7 @@ export const Banner = () => {
               alt={randomBanner.name}
               className="h-[560px] w-[900px] object-cover"
               priority
+              unoptimized
             />
           </div>
 
@@ -168,6 +169,7 @@ export const Banner = () => {
               alt={randomBanner.name}
               className="h-[225px] w-[360px] object-cover"
               priority
+              unoptimized
             />
           </div>
 

@@ -123,6 +123,7 @@ export function CardCompany({
           alt={company && company.name ? company.name : "Imagem da empresa"}
           fill
           className="object-cover"
+          unoptimized
         />
       </div>
 

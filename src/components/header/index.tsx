@@ -50,7 +50,7 @@ export default function Header() {
 
           <div className="flex items-center lg:space-x-4 mx-auto lg:mx-0">
             <Link href="/" className="flex items-center">
-              <Image src={logo} alt="Logo" className="h-10 min-w-[159px]" />
+              <Image src={logo} alt="Logo" className="h-10 min-w-[159px]" unoptimized/>
             </Link>
           </div>
 

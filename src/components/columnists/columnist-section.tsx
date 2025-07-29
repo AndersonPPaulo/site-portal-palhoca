@@ -41,6 +41,7 @@ export const ColumnistsSection = () => {
                   alt="Imagem de perfil do colunista"
                   layout="fill"
                   className="rounded-full bg-[#d3d3d3]"
+                  unoptimized
                 />
               )}
             </div>
