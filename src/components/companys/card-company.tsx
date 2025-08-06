@@ -44,8 +44,6 @@ export function CardCompany({
 
   const { TrackCompanyClick } = companyAnalytics || {};
 
-  console.log('company', company);
-
   const districtActive = company.district || "Palhoça";
   const nameCompanyActive = company.name || "Nome da Empresa";
 
@@ -103,7 +101,11 @@ export function CardCompany({
 
     // Pequeno delay para garantir que o evento seja enviado
     setTimeout(() => {
-      router.push(`/comercio/${generateSlug(districtActive)}/${generateSlug(nameCompanyActive)}`);
+      router.push(
+        `/comercio/${generateSlug(districtActive)}/${generateSlug(
+          nameCompanyActive
+        )}`
+      );
     }, 100);
   };
 

@@ -32,7 +32,7 @@ export async function generateMetadata({
     openGraph: {
       type: "article",
       siteName: "Portal Palhoça",
-      title: article.title,
+      title: `${article.title} | Portal Palhoça`,
       description: article.resume_content,
       images: [
         {
@@ -51,7 +51,7 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: article.title,
+      title: `${article.title} | Portal Palhoça`,
       description:
         article && article.resume_content
           ? article.resume_content

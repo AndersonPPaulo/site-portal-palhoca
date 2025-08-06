@@ -11,19 +11,20 @@ export default function ButtonMap({
   isMapOpen = false,
 }: ButtonMapProps) {
   const pathname = usePathname();
-  
+
   // Verifica se estamos na página de detalhes de um comércio
-  const isComercioDetailsPage = pathname?.startsWith('/comercio/detalhes/');
-  
+  const isComercioDetailsPage =
+    pathname === "/comercio/" || pathname.startsWith("/comercio/?categoria=");
+
   // Se estiver na página de detalhes, não renderiza nada
-  if (isComercioDetailsPage) {
+  if (!isComercioDetailsPage) {
     return null;
   }
 
   return (
     <button
       onClick={onClick}
-      className="flex items-center cursor-pointer bg-red-600 py-2 px-4 text-white rounded-full shadow-lg hover:bg-red-700 transition duration-300 ease-in-out"
+      className="hidden lg:flex items-center cursor-pointer bg-red-600 py-2 px-4 text-white rounded-full shadow-lg hover:bg-red-700 transition duration-300 ease-in-out"
     >
       {isMapOpen ? (
         <>

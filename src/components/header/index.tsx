@@ -8,7 +8,7 @@ import { usePathname, useRouter } from "next/navigation";
 import CustomInput from "../custom-input/custom-input";
 import CompanyCategorysMenu from "../menus/company-categorys-menu";
 import NewsCategoryMenu from "../menus/news-categorys-menu";
-import { Menu, Search, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import TopBanner from "../banner/top";
 
 export default function Header() {
@@ -17,8 +17,12 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const isComercioPath =
-    pathname === "/comercio" || pathname?.startsWith("/comercio/");
+    pathname === "/comercio/" || pathname.startsWith("/comercio/?categoria=");
+
+  const isNoticiaPath = pathname?.startsWith("/noticia/") || pathname === "/";
+
   const isContatoPath = pathname === "/contato";
+
   const isHiddenMobileTabs =
     pathname?.startsWith("/colunista/") || pathname?.startsWith("/noticia/");
 
@@ -50,7 +54,12 @@ export default function Header() {
 
           <div className="flex items-center lg:space-x-4 mx-auto lg:mx-0">
             <Link href="/" className="flex items-center">
-              <Image src={logo} alt="Logo" className="h-10 min-w-[159px]" unoptimized/>
+              <Image
+                src={logo}
+                alt="Logo"
+                className="h-10 min-w-[159px]"
+                unoptimized
+              />
             </Link>
           </div>
 
@@ -149,13 +158,17 @@ export default function Header() {
 
       {/* 🌱 PARTE QUE NÃO É FIXA */}
       {!isMenuOpen && (
-        <div className={`${!isHiddenMobileTabs ? "mb-4 mt-[160px] lg:mt-0" : "mb-4 mt-[90px] lg:mt-0"}`}>
+        <div
+          className={`${
+            !isHiddenMobileTabs
+              ? "mb-4 mt-[160px] lg:mt-0"
+              : "mb-4 mt-[90px] lg:mt-0"
+          }`}
+        >
           {/* mt-[130px]: espaço para header fixo (ajuste conforme altura real do header fixo) */}
-          {isContatoPath ? (
-            <div className="text-center py-4"></div>
-          ) : (
+          {isComercioPath || isNoticiaPath ? (
             <CustomInput pathname={pathname} />
-          )}
+          ) : null}
         </div>
       )}
 

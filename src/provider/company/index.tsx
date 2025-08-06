@@ -15,6 +15,7 @@ export interface IPublicCompany {
   linkLocationMaps: string;
   linkLocationWaze: string;
   address: string;
+  city?: string;
   district?: string;
   status: "active" | "inactive" | "blocked";
   created_at: Date;

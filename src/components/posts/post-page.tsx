@@ -110,7 +110,7 @@ export default function PostPage() {
 
   return (
     <section className="flex flex-col gap-6 mx-auto max-w-[1272px] justify-between">
-      <Breadcrumb className="font-semibold">
+      <Breadcrumb className="hidden md:block font-semibold">
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink href="/">Portal</BreadcrumbLink>
@@ -127,7 +127,7 @@ export default function PostPage() {
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbPage className="capitalize text-primary font-semibold">
-              {slug.slug}
+              {articleBySlug?.title}
             </BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
@@ -161,10 +161,6 @@ export default function PostPage() {
                         {formatDate(articleBySlug.created_at)}
                       </p>
                     )}
-
-                    <span className="flex gap-1 items-center hover:underline hover:cursor-pointer">
-                      <Share2 className="h-3 w-3" /> Compartilhar
-                    </span>
                   </div>
                 </div>
               </div>
@@ -173,7 +169,7 @@ export default function PostPage() {
               <div className="relative max-w-[340px] lg:max-w-[840px] h-[475px] rounded-md overflow-hidden">
                 {articleBySlug?.thumbnail?.url ? (
                   <Image
-                  unoptimized
+                    unoptimized
                     src={
                       articleBySlug &&
                       articleBySlug.thumbnail &&
@@ -193,7 +189,7 @@ export default function PostPage() {
                   />
                 ) : (
                   <Image
-                  unoptimized
+                    unoptimized
                     src={default_image}
                     alt={"Sem imagem cadastrada na noticia"}
                     fill
