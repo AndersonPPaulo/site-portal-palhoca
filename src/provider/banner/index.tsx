@@ -86,7 +86,7 @@ export const BannerProvider = ({ children }: ICihldrenReact) => {
   const ListBannersWelcome = async ({
     page,
     limit,
-    onlyActive,
+    onlyActive = true,
     bannerStyle = "destaque",
   }: IBannerMetadataProps): Promise<void> => {
     const config = {
