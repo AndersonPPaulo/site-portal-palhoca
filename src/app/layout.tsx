@@ -4,6 +4,8 @@ import "./globals.css";
 import { Banner } from "@/components/banner/welcome";
 import { Providers } from "@/provider";
 import Script from "next/script";
+import FloatingAdsButton from "@/components/custom-button/floating-contact-button";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -59,6 +61,7 @@ export default function RootLayout({
       >
         <Providers>
           <Banner />
+          <FloatingAdsButton />
           {children}
         </Providers>
       </body>

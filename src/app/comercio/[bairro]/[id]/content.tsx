@@ -278,7 +278,7 @@ export default function ComercioDetails() {
       <Header />
       <div className="max-w-[1272px] mx-auto px-7 py-5">
         {/* Trilha de navegação */}
-        <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
+        <div className="hidden md:flex items-center gap-2 text-sm text-gray-500 mb-4">
           <Link href="/" className="hover:text-red-600 transition-colors">
             Início
           </Link>
