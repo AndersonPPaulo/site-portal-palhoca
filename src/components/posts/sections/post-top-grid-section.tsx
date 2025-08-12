@@ -8,8 +8,13 @@ import { ArticleContext } from "@/provider/article";
 import { ArticleAnalyticsContext } from "@/provider/analytics/article";
 import { formatDate } from "@/utils/formatDate";
 import normalizeTextToslug from "@/utils/normalize-text-to-slug";
+import default_image from "@/assets/default image.webp";
 
-export default function PostTopGridSection() {
+export default function PostTopGridSection({
+  currentPostId,
+}: {
+  currentPostId?: string;
+}) {
   const pathname = usePathname();
 
   const { GetPublishedArticles, publishedArticles } =
@@ -18,10 +23,7 @@ export default function PostTopGridSection() {
     ArticleAnalyticsContext
   );
 
-  // Estados para controle de analytics
   const [hasInitialView, setHasInitialView] = useState(false);
-
-  // Refs para Intersection Observer
   const topGridSectionRef = useRef<HTMLElement>(null);
   const postsRef = useRef<Record<string, HTMLDivElement | null>>({});
 
@@ -29,19 +31,25 @@ export default function PostTopGridSection() {
     GetPublishedArticles({});
   }, []);
 
-  const sortedPosts = publishedArticles?.data.slice(0, 9).sort((a, b) => {
-    const [dayA, monthA, yearA] = a.created_at.split("/").map(Number);
-    const [dayB, monthB, yearB] = b.created_at.split("/").map(Number);
+  // Filtra para remover o post atual antes de ordenar
+  const filteredPosts =
+    publishedArticles?.data.filter((post) => post.id !== currentPostId) || [];
 
-    const dateA = new Date(yearA, monthA - 1, dayA);
-    const dateB = new Date(yearB, monthB - 1, dayB);
+  const sortedPosts = filteredPosts
+    .sort((a, b) => {
+      const [dayA, monthA, yearA] = a.created_at.split("/").map(Number);
+      const [dayB, monthB, yearB] = b.created_at.split("/").map(Number);
 
-    return dateB.getTime() - dateA.getTime(); // ordem decrescente (mais recente primeiro)
-  });
+      const dateA = new Date(yearA, monthA - 1, dayA);
+      const dateB = new Date(yearB, monthB - 1, dayB);
 
-  const topPosts = sortedPosts?.slice(0, 9) || [];
+      return dateB.getTime() - dateA.getTime(); // Mais recentes primeiro
+    })
+    .slice(0, 9);
 
-  // Analytics: Registrar view inicial quando componente carrega
+  const topPosts = sortedPosts || [];
+
+  // View inicial
   useEffect(() => {
     if (!hasInitialView && topPosts.length > 0) {
       topPosts.forEach((post, index) => {
@@ -61,12 +69,11 @@ export default function PostTopGridSection() {
           timestamp: new Date().toISOString(),
         });
       });
-
       setHasInitialView(true);
     }
   }, [topPosts, hasInitialView, TrackArticleView, pathname]);
 
-  // Intersection Observer: Para detectar quando grid sai/volta à tela
+  // Intersection Observer
   useEffect(() => {
     if (!topGridSectionRef.current || !hasInitialView || topPosts.length === 0)
       return;
@@ -98,7 +105,6 @@ export default function PostTopGridSection() {
                   timestamp: new Date().toISOString(),
                 });
               });
-
               hasLeft = false;
             }
           } else {
@@ -119,7 +125,7 @@ export default function PostTopGridSection() {
     };
   }, [hasInitialView, topPosts, TrackArticleView, pathname]);
 
-  // Analytics: Função para registrar clique no post do top grid
+  // Clique no post
   const handleTopGridPostClick = (post: any, index: number) => {
     TrackArticleClick(post.id, {
       page: pathname,
@@ -148,8 +154,7 @@ export default function PostTopGridSection() {
     >
       <div className="w-[106px] h-2 bg-primary rounded-full" />
 
-      {/* Header */}
-      <div className="flex items-center justify-between ">
+      <div className="flex items-center justify-between">
         <h2 className="text-2xl font-semibold text-primary">
           Top Portal Palhoça
         </h2>
@@ -171,17 +176,31 @@ export default function PostTopGridSection() {
               className="flex flex-col rounded-xl transition hover:shadow-lg hover:transform hover:scale-105"
             >
               <div className="relative min-w-[300px] md:w-[405px] h-[310px] rounded-md overflow-hidden">
-                <Image
-                  src={post.thumbnail?.url}
-                  alt={
-                    post.title ||
-                    post.thumbnail.description ||
-                    "Imagem da noticia do portal"
-                  }
-                  fill
-                  unoptimized
-                  className="object-cover"
-                />
+                {post?.thumbnail?.url ? (
+                  <Image
+                    unoptimized
+                    src={
+                      post && post.thumbnail && post.thumbnail.url
+                        ? post.thumbnail.url
+                        : default_image
+                    }
+                    alt={
+                      post && post.title && post.title
+                        ? post.title
+                        : "Imagem do portal palhoça"
+                    }
+                    fill
+                    className="object-cover"
+                  />
+                ) : (
+                  <Image
+                    unoptimized
+                    src={default_image}
+                    alt={"Sem imagem cadastrada na noticia"}
+                    fill
+                    className="object-cover"
+                  />
+                )}
               </div>
               <div>
                 <h3 className="text-2xl mt-2 ml-1 font-semibold leading-tight line-clamp-3">

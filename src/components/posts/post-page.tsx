@@ -106,7 +106,9 @@ export default function PostPage() {
     }
   }, [slug]);
 
-  const sidePosts = publishedArticles?.data.slice(0, 5);
+  const sidePosts = publishedArticles?.data
+    ?.filter((post) => post.id !== articleBySlug?.id) // exclui o post atual
+    ?.slice(0, 5);
 
   return (
     <section className="flex flex-col gap-6 mx-auto max-w-[1272px] justify-between">
@@ -136,7 +138,7 @@ export default function PostPage() {
         <div className="flex flex-col lg:flex-row w-full gap-2 rounded-2xl">
           {
             <div className="flex flex-col gap-3 rounded-xl p-2 transition">
-              {/* aqui está autor, breadcrumb, categoria e compartilhar */}
+              {/* aqui está autor, breadcrumb, categoria */}
 
               <div className="flex flex-col gap-4 justify-between">
                 <h1 className="text-4xl max-w-[820px] font-[700] ">
@@ -250,12 +252,24 @@ export default function PostPage() {
                 >
                   <div className="flex gap-3 rounded-xl p-2 transition">
                     <div className="relative min-w-[151px] h-[110px] rounded-sm overflow-hidden">
-                      {post?.thumbnail?.url && (
+                      {post?.thumbnail?.url ? (
                         <Image
-                          src={post.thumbnail.url}
+                          src={
+                            post.thumbnail.url
+                              ? post.thumbnail.url
+                              : default_image
+                          }
                           alt={post.thumbnail.description || "Imagem do artigo"}
                           fill
                           unoptimized
+                          className="object-cover"
+                        />
+                      ) : (
+                        <Image
+                          unoptimized
+                          src={default_image}
+                          alt={"Sem imagem cadastrada na noticia"}
+                          fill
                           className="object-cover"
                         />
                       )}
@@ -282,7 +296,7 @@ export default function PostPage() {
         </div>
       </div>
       <CompanyGridSection />
-      <PostTopGridSection />
+      <PostTopGridSection currentPostId={articleBySlug?.id} />
     </section>
   );
 }
