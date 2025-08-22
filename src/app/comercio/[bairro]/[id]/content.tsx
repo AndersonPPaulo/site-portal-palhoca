@@ -366,7 +366,12 @@ export default function ComercioDetails() {
                 {/* Telefone */}
                 <div className="flex items-start gap-2">
                   <Phone className="#363636 w-5 h-5 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-600">{company.phone}</span>
+                  <a
+                    href={`tel:${company.phone}`}
+                    className="text-gray-600 underline"
+                  >
+                    {company.phone}
+                  </a>
                 </div>
 
                 {/* Endereço */}
