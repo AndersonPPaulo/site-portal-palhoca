@@ -328,7 +328,7 @@ export default function ComercioDetails() {
                 {company.name}
               </h1>
 
-              <div className="inline-block bg-red-100 text-red-500 px-3 py-1 rounded-full text-sm font-medium mb-4">
+              <div className="inline-block bg-red-100 text-red-500 px-3 py-1 rounded-full text-sm font-medium mb-10">
                 {company.category}
               </div>
 
@@ -341,17 +341,6 @@ export default function ComercioDetails() {
                   <span className="text-gray-600">{company.hours}</span>
                 </div>
 
-                {/* Telefone */}
-                <div className="flex items-start gap-2">
-                  <Phone className="#363636 w-5 h-5 mt-0.5 flex-shrink-0" />
-                  <a
-                    href={`tel:${company.phone}`}
-                    className="text-gray-600 underline"
-                  >
-                    {company.phone}
-                  </a>
-                </div>
-
                 {/* Endereço */}
                 <div className="flex items-start gap-2">
                   <MapPin className="#363636 w-5 h-5 mt-0.5 flex-shrink-0" />
@@ -362,7 +351,7 @@ export default function ComercioDetails() {
               {/* Botão WhatsApp com analytics */}
               {company.linkWhatsapp && (
                 <Button
-                  className="bg-green-200 hover:bg-green-100 cursor-pointer mt-6 rounded-4xl px-4 py-2 text-green-600 flex items-center gap-2"
+                  className="bg-green-200 hover:bg-green-100 cursor-pointer mt-10 rounded-4xl px-4 py-2 text-green-600 flex items-center gap-2"
                   variant="default"
                   onClick={handleWhatsAppClick}
                 >
