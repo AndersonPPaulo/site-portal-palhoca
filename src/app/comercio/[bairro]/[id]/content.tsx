@@ -320,28 +320,6 @@ export default function ComercioDetails() {
                   }}
                 />
               </div>
-
-              {/* Indicadores de slide diretamente abaixo da imagem */}
-              <div className="flex justify-center mt-2 gap-1">
-                <div
-                  className={`w-2 h-2 rounded-full cursor-pointer ${
-                    activeImage === 0 ? "bg-red-500" : "bg-gray-300"
-                  }`}
-                  onClick={() => setActiveImage(0)}
-                ></div>
-                <div
-                  className={`w-2 h-2 rounded-full cursor-pointer ${
-                    activeImage === 1 ? "bg-red-500" : "bg-gray-300"
-                  }`}
-                  onClick={() => setActiveImage(1)}
-                ></div>
-                <div
-                  className={`w-2 h-2 rounded-full cursor-pointer ${
-                    activeImage === 2 ? "bg-red-500" : "bg-gray-300"
-                  }`}
-                  onClick={() => setActiveImage(2)}
-                ></div>
-              </div>
             </div>
 
             {/* Detalhes do comércio */}
