@@ -14,6 +14,7 @@ export interface IPublicCompany {
   linkWhatsapp?: string;
   linkLocationMaps: string;
   linkLocationWaze: string;
+  highlight: boolean;
   address: string;
   city?: string;
   district?: string;
