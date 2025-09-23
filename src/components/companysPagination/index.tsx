@@ -91,7 +91,7 @@ export function CompanyPagination({
   return (
     <div className={`${className} space-y-4`}>
       {/* Navegação por páginas */}
-      <div className="flex justify-center  items-center gap-2">
+      <div className="flex justify-center  items-center">
         <Button
           variant="outline"
           size="icon"

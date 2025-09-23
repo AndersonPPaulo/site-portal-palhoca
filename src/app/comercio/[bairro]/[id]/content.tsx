@@ -11,6 +11,7 @@ import { Footer } from "@/components/footer";
 import Link from "next/link";
 import { usePublicCompany } from "@/provider/company";
 import { CompanyAnalyticsContext } from "@/provider/analytics/company";
+import DefaultImage from "../../../../assets/no-img.png"
 
 // Função para extrair coordenadas do link do Google Maps
 function extractCoordinatesFromMapsLink(
@@ -102,7 +103,7 @@ export default function ComercioDetails() {
             name: apiCompany.name,
             category: apiCompany.company_category?.[0]?.name || "Comércio",
             categories: apiCompany.company_category || [],
-            image: apiCompany.company_image?.url || "/placeholder-business.jpg",
+            image: apiCompany.company_image?.url || DefaultImage,
             phone: apiCompany.phone || "Não informado",
             description: apiCompany.description || "Descrição não disponível",
             hours: apiCompany.openingHours || "Horário não informado",
@@ -111,7 +112,7 @@ export default function ComercioDetails() {
             linkLocationMaps: apiCompany.linkLocationMaps,
             linkLocationWaze: apiCompany.linkLocationWaze,
             location: coordinates || {
-              lat: -27.64662, // Fallback para coordenadas padrão
+              lat: -27.64662, 
               lng: -48.667361,
             },
           };
@@ -314,10 +315,6 @@ export default function ComercioDetails() {
                   className="object-cover"
                   priority
                   unoptimized
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = "/placeholder-business.jpg";
-                  }}
                 />
               </div>
             </div>
@@ -328,11 +325,11 @@ export default function ComercioDetails() {
                 {company.name}
               </h1>
 
-              <div className="inline-block bg-red-100 text-red-500 px-3 py-1 rounded-full text-sm font-medium mb-10">
+              <div className="inline-block bg-red-100 text-red-500 px-3 py-1 rounded-full text-sm font-medium mb-5">
                 {company.category}
               </div>
 
-              <p className="text-gray-700 mb-4">{company.description}</p>
+              <p className="text-gray-700 mb-4 ">{company.description}</p>
 
               <div className="space-y-3">
                 {/* Horário */}
@@ -344,7 +341,7 @@ export default function ComercioDetails() {
                 {/* Endereço */}
                 <div className="flex items-start gap-2">
                   <MapPin className="#363636 w-5 h-5 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-600">{company.address}</span>
+                  <span className="text-gray-600 max-w-2xl">{company.address}</span>
                 </div>
               </div>
 
