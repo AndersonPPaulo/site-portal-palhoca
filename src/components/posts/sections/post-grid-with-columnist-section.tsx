@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ColumnistsSection } from "../../columnists/columnist-section";
 import { useContext, useEffect, useRef, useState } from "react";
 import { useParams, usePathname } from "next/navigation";
 import { ArticleContext } from "@/provider/article";
@@ -219,7 +218,6 @@ export default function PostGridWwithColumnistSection() {
         ))}
       </div>
 
-      {noSlug && <ColumnistsSection />}
     </section>
   );
 }

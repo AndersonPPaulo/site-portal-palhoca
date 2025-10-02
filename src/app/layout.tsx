@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "O Portal on-line da cidade da Palhoça - Portal Palhoça",
+  title: "O Portal on-line da cidade de Palhoça - Portal Palhoça",
   description: "Informações de contato dos comércios e notícias de Palhoça",
 };
 
