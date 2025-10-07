@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { CardCompany } from "./card-company";
-import { IPublicCompany, usePublicCompany } from "@/provider/company";
+import { usePublicCompany } from "@/provider/company";
 
 export function CompanyGridSection() {
   const { companies, loading, listCompanies } = usePublicCompany();
@@ -17,35 +17,13 @@ export function CompanyGridSection() {
     }
   }, []);
 
+  // Converter dados da API para o formato esperado pelo CardCompany
   useEffect(() => {
     if (companies?.data) {
-      // Filtrar apenas companies com highlight: true
-      const highlightedCompanies = companies.data.filter(
-        (company) => company.highlight === true
-      );
-
-      // Função para embaralhar array (Fisher-Yates shuffle)
-      const shuffleArray = (array: IPublicCompany[]) => {
-        const shuffled = [...array]; // Criar uma cópia para não modificar o original
-        for (let i = shuffled.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-        }
-        return shuffled;
-      };
-
-      // Embaralhar e pegar apenas 4
-      const randomizedCompanies = shuffleArray(highlightedCompanies).slice(
-        0,
-        4
-      );
-
-      const convertedCompanies = randomizedCompanies.map((company) => {
-        console.log("company", company);
-
+      const convertedCompanies = companies.data.slice(0, 4).map((company) => {
         // Extrair todas as categorias
         const allCategories = company.company_category?.map(
-          (cat: { name: any }) => cat.name
+          (cat) => cat.name
         ) || ["Comércio"];
 
         return {
@@ -58,7 +36,6 @@ export function CompanyGridSection() {
           id: company.id,
         };
       });
-
       setDisplayCompanies(convertedCompanies);
     }
   }, [companies]);
@@ -68,7 +45,7 @@ export function CompanyGridSection() {
   }
 
   return (
-    <section className="w-full mt-10 py-12 max-w-[1272px] mx-auto px-4">
+    <section className="w-full py-12 max-w-[1272px] mx-auto px-4">
       <div className="w-[106px] h-2 bg-red-500 rounded-full mt-15" />
 
       <div className="flex flex-col  md:flex-row items-start gap-3 md:items-center justify-between  ">
