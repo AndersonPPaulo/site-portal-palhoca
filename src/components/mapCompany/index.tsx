@@ -33,12 +33,18 @@ function extractCoordinatesFromMapsLink(
 
   return null;
 }
+interface ICompanyCategory {
+  id: string;
+  name: string;
+  created_at: string;
+  updated_at: string;
+}
 
 interface CommerceMapData {
   id: string;
   name: string;
   address: string;
-  category: string | string[];
+  company_category: ICompanyCategory[];
   image: string;
   lat: number;
   lng: number;
@@ -91,7 +97,7 @@ const CommercialMap: React.FC<CommercialMapProps> = ({
 
   // Processar dados das empresas
   useEffect(() => {
-    console.log('companies', companies)
+    console.log("companies", companies);
     if (!companies || !Array.isArray(companies) || companies.length === 0) {
       setMapData([]);
       return;
@@ -105,17 +111,11 @@ const CommercialMap: React.FC<CommercialMapProps> = ({
       );
 
       if (coordinates) {
-        // Extrair todas as categorias
-        const allCategories = company.company_category?.map(
-          (cat) => cat.name
-        ) || ["Comércio"];
-
         processedData.push({
           id: company.id,
           name: company.name,
           address: company.address,
-          category:
-            allCategories.length === 1 ? allCategories[0] : allCategories,
+          company_category: company.company_category || [], // Keep as array
           image: company.company_image?.url || "/placeholder-business.jpg",
           lat: coordinates.lat,
           lng: coordinates.lng,
@@ -179,7 +179,7 @@ const CommercialMap: React.FC<CommercialMapProps> = ({
                   company={{
                     name: commerce.name,
                     address: commerce.address,
-                    category: commerce.category,
+                    company_category: commerce.company_category,
                     image: commerce.image,
                     id: commerce.id,
                   }}
