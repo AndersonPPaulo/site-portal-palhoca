@@ -45,7 +45,7 @@ export function CompanyGridSection() {
   }
 
   return (
-    <section className="w-full py-12 max-w-[1272px] mx-auto px-4">
+    <section className="w-full mt-10 py-12 max-w-[1272px] mx-auto px-4">
       <div className="w-[106px] h-2 bg-red-500 rounded-full mt-15" />
 
       <div className="flex flex-col  md:flex-row items-start gap-3 md:items-center justify-between  ">
