@@ -8,6 +8,8 @@ import { MapPin } from "lucide-react";
 import ReactDOMServer from "react-dom/server";
 import { CardCompany } from "../companys/card-company";
 import { IPublicCompany } from "@/provider/company";
+import default_image from "@/assets/no-img.png";
+import { StaticImageData } from "next/image";
 
 function extractCoordinatesFromMapsLink(
   mapsLink: string
@@ -40,12 +42,24 @@ interface ICompanyCategory {
   updated_at: string;
 }
 
+// Interface para imagens da empresa
+interface ICompanyImage {
+  id: string;
+  key: string;
+  url: string;
+  original_name?: string;
+  mime_type?: string;
+  size?: number;
+  uploaded_at?: Date;
+  company_id: string;
+}
+
 interface CommerceMapData {
   id: string;
   name: string;
   address: string;
   company_category: ICompanyCategory[];
-  image: string;
+  company_image: ICompanyImage | StaticImageData;
   lat: number;
   lng: number;
 }
@@ -116,7 +130,9 @@ const CommercialMap: React.FC<CommercialMapProps> = ({
           name: company.name,
           address: company.address,
           company_category: company.company_category || [], // Keep as array
-          image: company.company_image?.url || "/placeholder-business.jpg",
+          company_image: company.company_image
+            ? company.company_image
+            : default_image,
           lat: coordinates.lat,
           lng: coordinates.lng,
         });
@@ -180,7 +196,11 @@ const CommercialMap: React.FC<CommercialMapProps> = ({
                     name: commerce.name,
                     address: commerce.address,
                     company_category: commerce.company_category,
-                    image: commerce.image,
+                    company_image:
+                      typeof commerce.company_image === "object" &&
+                      "id" in commerce.company_image
+                        ? commerce.company_image
+                        : undefined,
                     id: commerce.id,
                   }}
                 />
