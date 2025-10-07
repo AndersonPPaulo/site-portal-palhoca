@@ -89,7 +89,9 @@ const CommercialMap: React.FC<CommercialMapProps> = ({
   const [mapCenter, setMapCenter] = useState<[number, number]>(center);
   const [mapZoom, setMapZoom] = useState(zoom);
 
+  // Processar dados das empresas
   useEffect(() => {
+    console.log('companies', companies)
     if (!companies || !Array.isArray(companies) || companies.length === 0) {
       setMapData([]);
       return;

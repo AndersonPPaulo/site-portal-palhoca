@@ -117,7 +117,9 @@ export const CardCompany = memo(function CardCompany({
   variant = "default",
   onAnalyticsEvent,
 }: ICardCompanyProps) {
-  const company_category_response = company.company_category?.map(cat => cat.name)
+  const company_category_response = company.company_category?.map(
+    (cat) => cat.name
+  );
 
   const router = useRouter();
   const pathname = usePathname();

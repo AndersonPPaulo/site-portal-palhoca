@@ -6,13 +6,19 @@ import { ArrowRight, Loader2 } from "lucide-react";
 import { CardCompany } from "./card-company";
 import { usePublicCompany } from "@/provider/company";
 
+interface ICompanyCategory {
+  id: string;
+  name: string;
+  created_at: string;
+  updated_at: string;
+}
 // Interface para o formato esperado pelo CardCompany (alinhada com ICardCompanyData)
 interface IDisplayCompany {
   id: string;
   name: string;
   address: string;
   district?: string;
-  category: string | string[];
+  company_category: ICompanyCategory[];
   image?: string;
   phone?: string;
   highlight?: boolean;
@@ -45,7 +51,7 @@ export function CompanyGridSection() {
         name: company.name,
         address: company.address,
         district: company.district,
-        category: allCategories.length === 1 ? allCategories[0] : allCategories,
+        company_category: company.company_category || [],
         image:
           company.company_image?.url || company.company_image?.original_name,
         phone: company.phone,
@@ -151,7 +157,7 @@ export function CompanyGridSectionWithSkeleton() {
         name: company.name,
         address: company.address,
         district: company.district,
-        category: allCategories.length === 1 ? allCategories[0] : allCategories,
+        company_category: company.company_category || [],
         image:
           company.company_image?.url || company.company_image?.original_name,
         phone: company.phone,
