@@ -8,6 +8,9 @@ import FilteredCommerceList from "@/components/companys/filterCompany";
 import { usePublicCompany } from "@/provider/company";
 import { CompanyAnalyticsContext } from "@/provider/analytics/company";
 import SlugToText from "@/utils/slugToText";
+import FilteredCommerceListHighlight from "@/components/companys/filterCompanyHighlight";
+import dynamic from "next/dynamic";
+import { Loader2 } from "lucide-react";
 
 type TrackCompanyViewParams = {
   page: string;
@@ -39,13 +42,28 @@ declare global {
   }
 }
 
+// Lazy load do mapa
+const CommercialMap = dynamic(() => import("../../components/mapCompany"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-[408px] h-[1100px] bg-gray-100 animate-pulse rounded-lg flex items-center justify-center">
+      <Loader2 className="animate-spin text-gray-400" size={32} />
+    </div>
+  ),
+});
+
 export default function ClientListArticlesByCategory() {
   const pathname = usePathname();
 
   const searchParams = useSearchParams();
   const categoryQuery = searchParams.get("categoria");
 
-  const { companies, loading } = usePublicCompany();
+  const { companies, loading, listAllCompanies } = usePublicCompany();
+
+  useEffect(() => {
+    listAllCompanies(1, 1000);
+  }, [categoryQuery]);
+
   const { TrackCompanyView } = useContext(CompanyAnalyticsContext);
 
   const [showMap, setShowMap] = useState(false);
@@ -107,6 +125,7 @@ export default function ClientListArticlesByCategory() {
     return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
   };
 
+  console.log("categoryQuery", categoryQuery);
   // Gerar título dinâmico
   const getPageTitle = () => {
     const activeCategory =
@@ -176,11 +195,26 @@ export default function ClientListArticlesByCategory() {
         <h1 className="max-w-[756px] text-[29px] font-[600] text-red-600 mb-3">
           {loading ? "Carregando comércios..." : getPageTitle()}
         </h1>
-        <FilteredCommerceList
-          activeCategory={categoryQuery ? categoryQuery : "Todos"}
-          showMap={showMap}
-          onPageChange={handlePageChange}
-        />
+        <div className="flex flex-row gap-8">
+          <div className="flex flex-col gap-5 flex-1">
+            {!categoryQuery && <FilteredCommerceListHighlight />}
+            <FilteredCommerceList
+              activeCategory={categoryQuery ? categoryQuery : "Todos"}
+              showMap={showMap}
+              onPageChange={handlePageChange}
+            />
+          </div>
+
+          {/* Mapa lateral */}
+          {showMap && !loading && (
+            <CommercialMap
+              companies={companies?.data || []}
+              height="h-[1100px]"
+              width="w-[408px]"
+              currentPage={currentPage}
+            />
+          )}
+        </div>
       </div>
     </DefaultPage>
   );

@@ -89,9 +89,9 @@ export function CompanyPagination({
   const end = Math.min(currentPage * itemsPerPage, totalItems);
 
   return (
-    <div className={`${className} space-y-4`}>
+    <div className={`${className} space-y-4 `}>
       {/* Navegação por páginas */}
-      <div className="flex justify-center  items-center">
+      <div className="flex justify-center md:gap-2 items-center">
         <Button
           variant="outline"
           size="icon"
@@ -110,7 +110,7 @@ export function CompanyPagination({
               variant={currentPage === page ? "default" : "outline"}
               onClick={() => goToPage(page)}
               className={`h-10 w-10 rounded-full cursor-pointer ${
-                currentPage === page ? "bg-red-600 hover:bg-red-700" : ""
+                currentPage === page ? "text-white bg-red-600 hover:bg-red-700" : "hover:bg-gray-100"
               }`}
             >
               {page}

@@ -1,96 +1,103 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { CardCompany } from "@/components/companys/card-company";
 import { AlertCircle } from "lucide-react";
-
-import dynamic from "next/dynamic";
-
-const CommercialMap = dynamic(() => import("../mapCompany"), {
-  ssr: false,
-});
-
 import CompanyPagination from "../companysPagination";
 import { IPublicCompany, usePublicCompany } from "@/provider/company";
 import default_image from "@/assets/default image.webp";
 
-function normalizeText(text: string): string {
-  return text
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "") // remove acentos
-    .replace(/ç/g, "c") // transforma cedilha
-    .replace(/[^\w\s]/g, ""); // remove especiais
-}
-
-function normalizeDistrict(district: string): string {
-  return district
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .trim();
-}
-
 interface FilteredCommerceListProps {
   activeCategory: string;
   showMap: boolean;
+  showHighlightedOnly?: boolean; // Nova prop para controlar se mostra apenas destaques
   onPageChange?: (page: number) => void;
 }
 
+// ==================== FUNÇÕES AUXILIARES ====================
+const normalizeText = (text: string): string => {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/ç/g, "c")
+    .replace(/[^\w\s]/g, "")
+    .trim();
+};
+
+// ==================== COMPONENTE PRINCIPAL ====================
 export default function FilteredCommerceList({
   activeCategory,
   showMap,
+  showHighlightedOnly = false,
   onPageChange,
 }: FilteredCommerceListProps) {
-  const { companies, loading, error, listCompanies } = usePublicCompany();
+  // Hooks do contexto - usar funções apropriadas baseado em showHighlightedOnly
+  const {
+    highlightedCompanies,
+    normalCompanies,
+    loading,
+    error,
+    listNormalCompanies,
+  } = usePublicCompany();
 
+  // Estados locais
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedDistrict, setSelectedDistrict] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 9;
 
-  // Reset página ao mudar filtros
+  // Determinar qual conjunto de dados usar
+  const companies = useMemo(() => {
+    if (showHighlightedOnly) return highlightedCompanies;
+    return normalCompanies;
+  }, [showHighlightedOnly, highlightedCompanies, normalCompanies]);
+
+  // Reset página ao mudar filtros principais
   useEffect(() => {
     setCurrentPage(1);
-  }, [activeCategory, selectedDistrict, searchTerm]);
+  }, [activeCategory, selectedDistrict, searchTerm, showHighlightedOnly]);
 
-  // Buscar dados da API sempre que filtros mudarem
-  useEffect(() => {
-    const fetchCompanies = async () => {
-      try {
-        await listCompanies(currentPage, itemsPerPage, {
-          category:
-            activeCategory !== "Todos"
-              ? normalizeText(activeCategory)
-              : undefined,
-          district: selectedDistrict || undefined,
-          search: searchTerm || undefined,
-        });
-      } catch (error) {
-        console.error("Erro ao buscar empresas:", error);
-      }
-    };
+  // Função para buscar empresas com os filtros apropriados
+  const fetchCompanies = useCallback(async () => {
+    try {
+      const filters = {
+        category:
+          activeCategory !== "Todos"
+            ? normalizeText(activeCategory)
+            : undefined,
+        district: selectedDistrict || undefined,
+        search: searchTerm || undefined,
+      };
 
-    fetchCompanies();
-  }, [activeCategory, selectedDistrict, searchTerm, currentPage]);
-
-  // Atualizar total de páginas quando os dados mudarem
-  useEffect(() => {
-    if (companies?.total) {
-      setTotalPages(Math.ceil(companies.total / itemsPerPage));
+      await listNormalCompanies(currentPage, itemsPerPage, filters);
+    } catch (error) {
+      console.error("Erro ao buscar empresas:", error);
     }
-  }, [companies]);
+  }, [
+    activeCategory,
+    selectedDistrict,
+    searchTerm,
+    currentPage,
+    itemsPerPage,
+    showHighlightedOnly,
+    listNormalCompanies,
+  ]);
 
-  // Event listeners
+  // Buscar dados quando filtros mudarem
+  useEffect(() => {
+    fetchCompanies();
+  }, [fetchCompanies]);
+
+  // Event listeners para comunicação entre componentes
   useEffect(() => {
     const handleDistrictSelected = (event: Event) => {
-      const customEvent = event as CustomEvent;
+      const customEvent = event as CustomEvent<string>;
       setSelectedDistrict(customEvent.detail);
     };
 
     const handleCompanyNameSearch = (event: Event) => {
-      const customEvent = event as CustomEvent;
+      const customEvent = event as CustomEvent<string>;
       setSearchTerm(customEvent.detail);
     };
 
@@ -103,50 +110,42 @@ export default function FilteredCommerceList({
     };
   }, []);
 
-  const convertApiDataToCompany = (apiCompany: IPublicCompany) => {
-    const allCategories = apiCompany.company_category?.map(
-      (cat) => cat.name
-    ) || ["Comércio"];
 
+  // Converter dados da API para formato do componente
+  const convertApiDataToCompany = useCallback((apiCompany: IPublicCompany) => {
     return {
+      id: apiCompany.id,
       name: apiCompany.name,
       address: apiCompany.address,
-      category: allCategories.length === 1 ? allCategories[0] : allCategories,
+      company_category: apiCompany.company_category,
       district: apiCompany.district,
-      image: apiCompany.company_image?.url ?? default_image,
-      id: apiCompany.id,
+      image: apiCompany.company_image?.url || default_image.src,
     };
-  };
+  }, []);
 
-  const paginatedCompanies =
-    companies?.data?.map(convertApiDataToCompany) || [];
+  // Dados paginados e convertidos
+  const paginatedCompanies = useMemo(() => {
+    return companies?.data?.map(convertApiDataToCompany) || [];
+  }, [companies?.data, convertApiDataToCompany]);
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    if (onPageChange) onPageChange(page);
-  };
+  // Total de páginas
+  const totalPages = useMemo(() => {
+    return companies?.totalPages || 1;
+  }, [companies?.totalPages]);
 
-  const CategoryNotFoundMessage = () => (
-    <div className="w-full py-12 text-center bg-red-50 rounded-lg border border-red-200 px-4">
-      <div className="inline-flex items-center justify-center w-12 h-12 bg-red-100 rounded-full mb-4">
-        <AlertCircle className="h-6 w-6 text-red-500" />
-      </div>
-      <h3 className="text-xl font-semibold text-red-600 mb-2">
-        Categoria não encontrada
-      </h3>
-      <p className="text-gray-600 max-w-md mx-auto">
-        A categoria <strong>"{activeCategory}"</strong> não existe em nosso
-        sistema.
-      </p>
-      <div className="mt-6">
-        <a
-          href="/comercio"
-          className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
-        >
-          Ver todas as categorias
-        </a>
-      </div>
-    </div>
+  // Handler para mudança de página
+  const handlePageChange = useCallback(
+    (page: number) => {
+      setCurrentPage(page);
+      onPageChange?.(page);
+
+      // Scroll suave para o topo da lista
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    },
+    [onPageChange]
   );
 
   const NoCompanyMessage = () => {
@@ -155,8 +154,10 @@ export default function FilteredCommerceList({
       filters.push(`categoria "${activeCategory}"`);
     if (selectedDistrict) filters.push(`bairro "${selectedDistrict}"`);
     if (searchTerm) filters.push(`nome "${searchTerm}"`);
+    if (showHighlightedOnly) filters.push("apenas destaques");
 
-    const filterText = filters.length ? `com ${filters.join(", ")}` : "";
+    const filterText = filters.length ? ` com ${filters.join(", ")}` : "";
+
     return (
       <div className="w-full py-12 text-center bg-red-50 rounded-lg border border-red-200 px-4">
         <div className="inline-flex items-center justify-center w-12 h-12 bg-red-100 rounded-full mb-4">
@@ -166,24 +167,53 @@ export default function FilteredCommerceList({
           Nenhum comércio encontrado
         </h3>
         <p className="text-gray-600 max-w-md mx-auto">
-          Não encontramos comércios cadastrados {filterText}.
+          Não encontramos comércios cadastrados{filterText}.
         </p>
-        <div className="mt-6">
-          <a
-            href="/comercio"
+        <div className="mt-6 space-x-3">
+          {(selectedDistrict || searchTerm) && (
+            <button
+              onClick={() => {
+                setSelectedDistrict("");
+                setSearchTerm("");
+              }}
+              className="px-4 py-2 bg-gray-600 text-white rounded-full hover:bg-gray-700 transition-colors"
+            >
+              Limpar filtros
+            </button>
+          )}
+          <button
+            onClick={() => (window.location.href = "/comercio")}
             className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
           >
-            Ver todas as categorias
-          </a>
+            Ver todos os comércios
+          </button>
         </div>
       </div>
     );
   };
 
+  const ErrorMessage = () => (
+    <div className="w-full py-12 text-center bg-red-50 rounded-lg border border-red-200 px-4">
+      <div className="inline-flex items-center justify-center w-12 h-12 bg-red-100 rounded-full mb-4">
+        <AlertCircle className="h-6 w-6 text-red-500" />
+      </div>
+      <h3 className="text-xl font-semibold text-red-600 mb-2">
+        Erro ao carregar comércios
+      </h3>
+      <p className="text-gray-600 max-w-md mx-auto mb-4">{error}</p>
+      <button
+        onClick={fetchCompanies}
+        className="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
+      >
+        Tentar novamente
+      </button>
+    </div>
+  );
+
   const SkeletonCompanyCards = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-      {[...Array(itemsPerPage)].map((_, index) => (
-        <div key={index} className="w-full">
+      {Array.from({ length: itemsPerPage }).map((_, index) => (
+        <div key={`skeleton-${index}`} className="w-full">
           <div className="overflow-hidden rounded-3xl shadow-lg h-full w-full animate-pulse">
             <div className="h-[156px] w-full bg-gray-300"></div>
             <div className="p-4 lg:p-6">
@@ -204,6 +234,7 @@ export default function FilteredCommerceList({
     </div>
   );
 
+  // ==================== RENDERIZAÇÃO ====================
   return (
     <div className="flex flex-col lg:flex-row gap-6">
       <div
@@ -211,42 +242,42 @@ export default function FilteredCommerceList({
           showMap ? "flex-1" : "w-full"
         } transition-all duration-300`}
       >
-        {loading ? (
-          <SkeletonCompanyCards />
-        ) : paginatedCompanies.length > 0 ? (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {paginatedCompanies.map((company) => (
-                <div className="w-full" key={company.id}>
-                  <CardCompany company={company} />
-                </div>
-              ))}
-            </div>
+        {/* Estado de erro */}
+        {error && !loading && <ErrorMessage />}
 
-            <CompanyPagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              totalItems={companies?.total || 0}
-              itemsPerPage={itemsPerPage}
-              onPageChange={handlePageChange}
-              className="mt-8"
-            />
+        {/* Estado de carregamento */}
+        {loading && !error && <SkeletonCompanyCards />}
+
+        {/* Conteúdo principal */}
+        {!loading && !error && (
+          <>
+            {paginatedCompanies.length > 0 ? (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                  {paginatedCompanies.map((company) => (
+                    <div className="w-full" key={company.id}>
+                      <CardCompany company={company} />
+                    </div>
+                  ))}
+                </div>
+
+                {totalPages > 1 && (
+                  <CompanyPagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    totalItems={companies?.total || 0}
+                    itemsPerPage={itemsPerPage}
+                    onPageChange={handlePageChange}
+                    className="mt-8"
+                  />
+                )}
+              </>
+            ) : (
+              <NoCompanyMessage />
+            )}
           </>
-        ) : activeCategory !== "Todos" ? (
-          <CategoryNotFoundMessage />
-        ) : (
-          <NoCompanyMessage />
         )}
       </div>
-
-      {showMap && (
-        <CommercialMap
-          companies={companies?.data || []}
-          height="h-[1100px]"
-          width="w-[408px]"
-          currentPage={currentPage}
-        />
-      )}
     </div>
   );
 }

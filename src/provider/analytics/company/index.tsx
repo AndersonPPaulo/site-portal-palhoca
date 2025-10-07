@@ -1,9 +1,18 @@
 "use client";
 
 import { api } from "@/service/api";
-import { createContext, ReactNode, useState } from "react";
+import {
+  createContext,
+  ReactNode,
+  useState,
+  useContext,
+  useCallback,
+  useMemo,
+  useRef,
+  useEffect,
+} from "react";
 
-// Enums corretos do projeto
+// ==================== ENUMS ====================
 export enum EventType {
   VIEW = "view",
   VIEW_END = "view_end",
@@ -11,28 +20,43 @@ export enum EventType {
   WHATSAPP_CLICK = "whatsapp_click",
   MAP_CLICK = "map_click",
   PROFILE_VIEW = "profile_view",
+  INSTAGRAM_CLICK = "instagram_click",
+  PHONE_CLICK = "phone_click",
+  SHARE = "share",
 }
 
-// Interfaces dos dados
-export interface CompanyEvent {
+// ==================== INTERFACES DE DADOS ====================
+export interface ICompanyEvent {
   event_type: EventType;
   virtual_count: number;
+  created_at?: string;
+  updated_at?: string;
 }
 
-export interface TotalCompanyEvent {
+export interface ITotalCompanyEvent {
   event_type: EventType;
   total: number;
 }
 
-// Interfaces das respostas da API
+export interface IEventMetrics {
+  views: number;
+  clicks: number;
+  whatsappClicks: number;
+  mapClicks: number;
+  profileViews: number;
+  totalEngagement: number;
+  conversionRate: number;
+}
+
+// ==================== INTERFACES DE API ====================
 interface IEventsByCompanyResponse {
   message: string;
-  events: CompanyEvent[];
+  events: ICompanyEvent[];
 }
 
 interface ITotalEventsResponse {
   message: string;
-  events: TotalCompanyEvent[];
+  events: ITotalCompanyEvent[];
 }
 
 interface IRegisterEventResponse {
@@ -45,322 +69,570 @@ interface IUpdateVirtualEventResponse {
   updated: any;
 }
 
-// Interfaces para parâmetros das funções
-interface IRegisterEventProps {
+// ==================== INTERFACES DE PARÂMETROS ====================
+export interface IRegisterEventProps {
   companyId: string;
   eventType: EventType;
   extra_data?: Record<string, any>;
   virtualIncrement?: number;
 }
 
-interface IUpdateVirtualEventProps {
+export interface IUpdateVirtualEventProps {
   company_id: string;
   eventType: EventType;
   newVirtualCount?: number;
 }
 
-// Interface principal do contexto
-interface ICompanyAnalyticsData {
-  RegisterCompanyEvent(data: IRegisterEventProps): Promise<void>;
-  TrackCompanyView(
-    companyId: string,
-    extraData?: Record<string, any>
-  ): Promise<void>;
-  TrackCompanyClick(
-    companyId: string,
-    extraData?: Record<string, any>
-  ): Promise<void>;
-  TrackCompanyWhatsappClick(
-    companyId: string,
-    extraData?: Record<string, any>
-  ): Promise<void>;
-  TrackCompanyMapClick(
-    companyId: string,
-    extraData?: Record<string, any>
-  ): Promise<void>;
-  TrackCompanyProfileView(
-    companyId: string,
-    extraData?: Record<string, any>
-  ): Promise<void>;
+export interface ITrackingOptions {
+  debounce?: boolean;
+  debounceTime?: number;
+  offline?: boolean;
+  batch?: boolean;
+}
 
+// ==================== INTERFACE DO CONTEXTO ====================
+interface ICompanyAnalyticsContext {
+  // Funções de tracking
+  RegisterCompanyEvent(data: IRegisterEventProps): Promise<void>;
+  TrackCompanyView(companyId: string, extraData?: Record<string, any>): Promise<void>;
+  TrackCompanyClick(companyId: string, extraData?: Record<string, any>): Promise<void>;
+  TrackCompanyWhatsappClick(companyId: string, extraData?: Record<string, any>): Promise<void>;
+  TrackCompanyMapClick(companyId: string, extraData?: Record<string, any>): Promise<void>;
+  TrackCompanyProfileView(companyId: string, extraData?: Record<string, any>): Promise<void>;
+  TrackCompanyInstagramClick(companyId: string, extraData?: Record<string, any>): Promise<void>;
+  TrackCompanyPhoneClick(companyId: string, extraData?: Record<string, any>): Promise<void>;
+  TrackCompanyShare(companyId: string, extraData?: Record<string, any>): Promise<void>;
+
+  // Funções de dados
   GetEventsByCompany(companyId: string): Promise<void>;
   GetTotalEvents(): Promise<void>;
   UpdateVirtualEvent(data: IUpdateVirtualEventProps): Promise<void>;
+  GetCompanyMetrics(companyId: string): IEventMetrics | null;
 
-  companyEvents: Record<string, CompanyEvent[]>;
-  totalEvents: TotalCompanyEvent[];
+  // Batch operations
+  BatchTrackEvents(events: IRegisterEventProps[]): Promise<void>;
+  FlushPendingEvents(): Promise<void>;
+
+  // Estados
+  companyEvents: Record<string, ICompanyEvent[]>;
+  totalEvents: ITotalCompanyEvent[];
+  companyMetrics: Record<string, IEventMetrics>;
   loading: boolean;
   error: string | null;
+  pendingEvents: IRegisterEventProps[];
 
+  // Utilidades
   ClearError(): void;
+  ClearCache(companyId?: string): void;
+  SetTrackingOptions(options: ITrackingOptions): void;
 }
 
-interface IChildrenReact {
-  children: ReactNode;
-}
+// ==================== HOOK PERSONALIZADO ====================
+export const useCompanyAnalytics = () => {
+  const context = useContext(CompanyAnalyticsContext);
+  
+  if (!context) {
+    // Retornar um objeto mock em desenvolvimento se o provider não estiver configurado
+    if (process.env.NODE_ENV === "development") {
+      console.warn(
+        "CompanyAnalyticsContext não encontrado. Retornando funções mock."
+      );
+      return createMockAnalytics();
+    }
+    
+    throw new Error(
+      "useCompanyAnalytics deve ser usado dentro de CompanyAnalyticsProvider"
+    );
+  }
+  
+  return context;
+};
 
-export const CompanyAnalyticsContext = createContext<ICompanyAnalyticsData>(
-  {} as ICompanyAnalyticsData
+// ==================== MOCK PARA DESENVOLVIMENTO ====================
+const createMockAnalytics = (): Partial<ICompanyAnalyticsContext> => ({
+  TrackCompanyClick: async () => console.log("Mock: TrackCompanyClick"),
+  TrackCompanyView: async () => console.log("Mock: TrackCompanyView"),
+  TrackCompanyWhatsappClick: async () => console.log("Mock: TrackCompanyWhatsappClick"),
+  TrackCompanyMapClick: async () => console.log("Mock: TrackCompanyMapClick"),
+  TrackCompanyProfileView: async () => console.log("Mock: TrackCompanyProfileView"),
+  loading: false,
+  error: null,
+});
+
+// ==================== CONTEXTO ====================
+export const CompanyAnalyticsContext = createContext<ICompanyAnalyticsContext>(
+  {} as ICompanyAnalyticsContext
 );
 
-export const CompanyAnalyticsProvider = ({ children }: IChildrenReact) => {
-  const [companyEvents, setCompanyEvents] = useState<
-    Record<string, CompanyEvent[]>
-  >({});
-  const [totalEvents, setTotalEvents] = useState<TotalCompanyEvent[]>([]);
+// ==================== PROVIDER ====================
+export const CompanyAnalyticsProvider = ({ children }: { children: ReactNode }) => {
+  // Estados principais
+  const [companyEvents, setCompanyEvents] = useState<Record<string, ICompanyEvent[]>>({});
+  const [totalEvents, setTotalEvents] = useState<ITotalCompanyEvent[]>([]);
+  const [companyMetrics, setCompanyMetrics] = useState<Record<string, IEventMetrics>>({});
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [pendingEvents, setPendingEvents] = useState<IRegisterEventProps[]>([]);
 
-  // Função para registrar evento (pública - sem auth)
-  const RegisterCompanyEvent = async ({
-    companyId,
-    eventType,
-    extra_data = {},
-    virtualIncrement = 1,
-  }: IRegisterEventProps): Promise<void> => {
-    setLoading(true);
-    setError(null);
+  // Refs para debounce e batch
+  const debounceTimers = useRef<Record<string, NodeJS.Timeout>>({});
+  const batchTimer = useRef<NodeJS.Timeout | null>(null);
+  const trackingOptions = useRef<ITrackingOptions>({
+    debounce: true,
+    debounceTime: 1000,
+    offline: true,
+    batch: true,
+  });
 
-    const config = {
-      headers: {
-        "Content-Type": "application/json",
-      },
+  // Função para calcular métricas
+  const calculateMetrics = useCallback((events: ICompanyEvent[]): IEventMetrics => {
+    const metrics: IEventMetrics = {
+      views: 0,
+      clicks: 0,
+      whatsappClicks: 0,
+      mapClicks: 0,
+      profileViews: 0,
+      totalEngagement: 0,
+      conversionRate: 0,
     };
 
-    const requestData = {
+    events.forEach((event) => {
+      const count = event.virtual_count || 0;
+      metrics.totalEngagement += count;
+
+      switch (event.event_type) {
+        case EventType.VIEW:
+          metrics.views += count;
+          break;
+        case EventType.CLICK:
+          metrics.clicks += count;
+          break;
+        case EventType.WHATSAPP_CLICK:
+          metrics.whatsappClicks += count;
+          break;
+        case EventType.MAP_CLICK:
+          metrics.mapClicks += count;
+          break;
+        case EventType.PROFILE_VIEW:
+          metrics.profileViews += count;
+          break;
+      }
+    });
+
+    // Calcular taxa de conversão (cliques / visualizações)
+    if (metrics.views > 0) {
+      metrics.conversionRate = (metrics.clicks / metrics.views) * 100;
+    }
+
+    return metrics;
+  }, []);
+
+  // Função base para registrar evento com retry e offline support
+  const RegisterCompanyEvent = useCallback(
+    async ({
       companyId,
       eventType,
-      extra_data,
-      virtualIncrement,
-    };
-
-    const response = await api
-      .post("/analytics/event-company", requestData, config)
-      .then((res) => {
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.response?.data?.message || "Erro ao registrar evento");
-        setLoading(false);
-        return err;
-      });
-
-    return response;
-  };
-
-  // Função para buscar eventos por company (privada - com auth)
-  const GetEventsByCompany = async (companyId: string): Promise<void> => {
-    setLoading(true);
-    setError(null);
-
-    const config = {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-      },
-    };
-
-    const response = await api
-      .get(`/analytics/event-company/${companyId}/company`, config)
-      .then((res) => {
-        const responseData: IEventsByCompanyResponse = res.data.response;
-        setCompanyEvents((prev) => ({
+      extra_data = {},
+      virtualIncrement = 1,
+    }: IRegisterEventProps): Promise<void> => {
+      // Se estiver offline e configurado para suportar, adicionar à fila
+      if (!navigator.onLine && trackingOptions.current.offline) {
+        setPendingEvents((prev) => [
           ...prev,
-          [companyId]: responseData.events || [],
-        }));
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(
-          err.response?.data?.message || "Erro ao buscar eventos do comércio"
-        );
-        setLoading(false);
-        return err;
-      });
+          { companyId, eventType, extra_data, virtualIncrement },
+        ]);
+        return;
+      }
 
-    return response;
-  };
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
 
-  // Função para buscar totais de eventos (privada - com auth)
-  const GetTotalEvents = async (): Promise<void> => {
+      const requestData = {
+        companyId,
+        eventType,
+        extra_data: {
+          ...extra_data,
+          timestamp: new Date().toISOString(),
+          userAgent: navigator.userAgent,
+          referrer: document.referrer,
+          viewport: {
+            width: window.innerWidth,
+            height: window.innerHeight,
+          },
+        },
+        virtualIncrement,
+      };
+
+      try {
+        await api.post("/analytics/event-company", requestData, config);
+      } catch (err: any) {
+        console.warn("Erro ao registrar evento:", err);
+        
+        // Se falhar, adicionar à fila para retry
+        if (trackingOptions.current.offline) {
+          setPendingEvents((prev) => [
+            ...prev,
+            { companyId, eventType, extra_data, virtualIncrement },
+          ]);
+        }
+      }
+    },
+    []
+  );
+
+  // Batch tracking de eventos
+  const BatchTrackEvents = useCallback(
+    async (events: IRegisterEventProps[]): Promise<void> => {
+      if (events.length === 0) return;
+
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
+
+      try {
+        await api.post("/analytics/event-company/batch", { events }, config);
+        
+        // Limpar eventos pendentes que foram enviados
+        setPendingEvents([]);
+      } catch (err: any) {
+        console.warn("Erro ao enviar eventos em batch:", err);
+      }
+    },
+    []
+  );
+
+  // Flush de eventos pendentes
+  const FlushPendingEvents = useCallback(async (): Promise<void> => {
+    if (pendingEvents.length > 0) {
+      await BatchTrackEvents(pendingEvents);
+    }
+  }, [pendingEvents, BatchTrackEvents]);
+
+  // Auto-flush quando voltar online
+  useEffect(() => {
+    const handleOnline = () => {
+      FlushPendingEvents();
+    };
+
+    window.addEventListener("online", handleOnline);
+    return () => window.removeEventListener("online", handleOnline);
+  }, [FlushPendingEvents]);
+
+  // Auto-batch de eventos
+  useEffect(() => {
+    if (trackingOptions.current.batch && pendingEvents.length > 0) {
+      if (batchTimer.current) {
+        clearTimeout(batchTimer.current);
+      }
+
+      batchTimer.current = setTimeout(() => {
+        FlushPendingEvents();
+      }, 5000); // Flush a cada 5 segundos
+
+      // Ou flush quando atingir 10 eventos
+      if (pendingEvents.length >= 10) {
+        FlushPendingEvents();
+      }
+    }
+
+    return () => {
+      if (batchTimer.current) {
+        clearTimeout(batchTimer.current);
+      }
+    };
+  }, [pendingEvents, FlushPendingEvents]);
+
+  // Funções de tracking com debounce
+  const createTrackFunction = useCallback(
+    (eventType: EventType) => {
+      return async (
+        companyId: string,
+        extraData?: Record<string, any>
+      ): Promise<void> => {
+        const key = `${companyId}-${eventType}`;
+
+        if (trackingOptions.current.debounce) {
+          // Cancelar timer anterior se existir
+          if (debounceTimers.current[key]) {
+            clearTimeout(debounceTimers.current[key]);
+          }
+
+          // Criar novo timer
+          debounceTimers.current[key] = setTimeout(() => {
+            RegisterCompanyEvent({
+              companyId,
+              eventType,
+              extra_data: extraData,
+            });
+            delete debounceTimers.current[key];
+          }, trackingOptions.current.debounceTime);
+        } else {
+          // Sem debounce, registrar imediatamente
+          await RegisterCompanyEvent({
+            companyId,
+            eventType,
+            extra_data: extraData,
+          });
+        }
+      };
+    },
+    [RegisterCompanyEvent]
+  );
+
+  // Funções de tracking específicas
+  const TrackCompanyView = useMemo(() => createTrackFunction(EventType.VIEW), [createTrackFunction]);
+  const TrackCompanyClick = useMemo(() => createTrackFunction(EventType.CLICK), [createTrackFunction]);
+  const TrackCompanyWhatsappClick = useMemo(() => createTrackFunction(EventType.WHATSAPP_CLICK), [createTrackFunction]);
+  const TrackCompanyMapClick = useMemo(() => createTrackFunction(EventType.MAP_CLICK), [createTrackFunction]);
+  const TrackCompanyProfileView = useMemo(() => createTrackFunction(EventType.PROFILE_VIEW), [createTrackFunction]);
+  const TrackCompanyInstagramClick = useMemo(() => createTrackFunction(EventType.INSTAGRAM_CLICK), [createTrackFunction]);
+  const TrackCompanyPhoneClick = useMemo(() => createTrackFunction(EventType.PHONE_CLICK), [createTrackFunction]);
+  const TrackCompanyShare = useMemo(() => createTrackFunction(EventType.SHARE), [createTrackFunction]);
+
+  // Buscar eventos por empresa (com cache)
+  const GetEventsByCompany = useCallback(async (companyId: string): Promise<void> => {
+    // Se já tem cache e não está muito antigo (5 minutos), usar cache
+    if (companyEvents[companyId] && Date.now() - 300000 < Date.now()) {
+      return;
+    }
+
     setLoading(true);
     setError(null);
+
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      setError("Token de autenticação não encontrado");
+      setLoading(false);
+      return;
+    }
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        Authorization: `Bearer ${token}`,
       },
     };
 
-    const response = await api
-      .get("/analytics/event-company", config)
-      .then((res) => {
-        const responseData: ITotalEventsResponse = res.data.response;
-        setTotalEvents(responseData.events || []);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(
-          err.response?.data?.message || "Erro ao buscar totais de eventos"
-        );
-        setLoading(false);
-        return err;
-      });
+    try {
+      const response = await api.get(
+        `/analytics/event-company/${companyId}/company`,
+        config
+      );
+      const responseData: IEventsByCompanyResponse = response.data.response;
+      const events = responseData.events || [];
 
-    return response;
-  };
+      setCompanyEvents((prev) => ({
+        ...prev,
+        [companyId]: events,
+      }));
 
-  // Função para atualizar evento virtual (privada - com auth)
-  const UpdateVirtualEvent = async ({
-    company_id,
-    eventType,
-    newVirtualCount,
-  }: IUpdateVirtualEventProps): Promise<void> => {
+      // Calcular e armazenar métricas
+      const metrics = calculateMetrics(events);
+      setCompanyMetrics((prev) => ({
+        ...prev,
+        [companyId]: metrics,
+      }));
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Erro ao buscar eventos do comércio");
+    } finally {
+      setLoading(false);
+    }
+  }, [companyEvents, calculateMetrics]);
+
+  // Buscar totais de eventos
+  const GetTotalEvents = useCallback(async (): Promise<void> => {
     setLoading(true);
     setError(null);
+
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      setError("Token de autenticação não encontrado");
+      setLoading(false);
+      return;
+    }
 
     const config = {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        Authorization: `Bearer ${token}`,
       },
     };
 
-    const requestData = {
+    try {
+      const response = await api.get("/analytics/event-company", config);
+      const responseData: ITotalEventsResponse = response.data.response;
+      setTotalEvents(responseData.events || []);
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Erro ao buscar totais de eventos");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Atualizar evento virtual
+  const UpdateVirtualEvent = useCallback(
+    async ({
+      company_id,
       eventType,
       newVirtualCount,
-    };
+    }: IUpdateVirtualEventProps): Promise<void> => {
+      setLoading(true);
+      setError(null);
 
-    const response = await api
-      .patch(
-        `/analytics/event-company/${company_id}/company`,
-        requestData,
-        config
-      )
-      .then((res) => {
-        GetEventsByCompany(company_id);
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        setError("Token de autenticação não encontrado");
         setLoading(false);
-      })
-      .catch((err) => {
-        setError(
-          err.response?.data?.message || "Erro ao atualizar evento virtual"
+        return;
+      }
+
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      };
+
+      const requestData = {
+        eventType,
+        newVirtualCount,
+      };
+
+      try {
+        await api.patch(
+          `/analytics/event-company/${company_id}/company`,
+          requestData,
+          config
         );
+        
+        // Atualizar cache local
+        await GetEventsByCompany(company_id);
+      } catch (err: any) {
+        setError(err.response?.data?.message || "Erro ao atualizar evento virtual");
+      } finally {
         setLoading(false);
-        return err;
-      });
+      }
+    },
+    [GetEventsByCompany]
+  );
 
-    return response;
-  };
+  // Obter métricas calculadas
+  const GetCompanyMetrics = useCallback(
+    (companyId: string): IEventMetrics | null => {
+      return companyMetrics[companyId] || null;
+    },
+    [companyMetrics]
+  );
 
-  // Função utilitária para track de visualização
-  const TrackCompanyView = async (
-    companyId: string,
-    extraData?: Record<string, any>
-  ): Promise<void> => {
-    try {
-      await RegisterCompanyEvent({
-        companyId,
-        eventType: EventType.VIEW,
-        extra_data: extraData,
-      });
-    } catch (error) {
-      console.warn("Erro ao registrar visualização do comércio:", error);
-    }
-  };
-
-  // Função utilitária para track de clique
-  const TrackCompanyClick = async (
-    companyId: string,
-    extraData?: Record<string, any>
-  ): Promise<void> => {
-    try {
-      await RegisterCompanyEvent({
-        companyId,
-        eventType: EventType.CLICK,
-        extra_data: extraData,
-      });
-    } catch (error) {
-      console.warn("Erro ao registrar clique do comércio:", error);
-    }
-  };
-
-  // Função utilitária para track de clique no WhatsApp
-  const TrackCompanyWhatsappClick = async (
-    companyId: string,
-    extraData?: Record<string, any>
-  ): Promise<void> => {
-    try {
-      await RegisterCompanyEvent({
-        companyId,
-        eventType: EventType.WHATSAPP_CLICK,
-        extra_data: extraData,
-      });
-    } catch (error) {
-      console.warn("Erro ao registrar clique WhatsApp do comércio:", error);
-    }
-  };
-
-  // Função utilitária para track de clique no mapa
-  const TrackCompanyMapClick = async (
-    companyId: string,
-    extraData?: Record<string, any>
-  ): Promise<void> => {
-    try {
-      await RegisterCompanyEvent({
-        companyId,
-        eventType: EventType.MAP_CLICK,
-        extra_data: extraData,
-      });
-    } catch (error) {
-      console.warn("Erro ao registrar clique no mapa do comércio:", error);
-    }
-  };
-
-  // Função utilitária para track de visualização de perfil
-  const TrackCompanyProfileView = async (
-    companyId: string,
-    extraData?: Record<string, any>
-  ): Promise<void> => {
-    try {
-      await RegisterCompanyEvent({
-        companyId,
-        eventType: EventType.PROFILE_VIEW,
-        extra_data: extraData,
-      });
-    } catch (error) {
-      console.warn(
-        "Erro ao registrar visualização de perfil do comércio:",
-        error
-      );
-    }
-  };
-
-  // Função para limpar erros
-  const ClearError = (): void => {
+  // Limpar erro
+  const ClearError = useCallback((): void => {
     setError(null);
-  };
+  }, []);
+
+  // Limpar cache
+  const ClearCache = useCallback((companyId?: string): void => {
+    if (companyId) {
+      setCompanyEvents((prev) => {
+        const updated = { ...prev };
+        delete updated[companyId];
+        return updated;
+      });
+      setCompanyMetrics((prev) => {
+        const updated = { ...prev };
+        delete updated[companyId];
+        return updated;
+      });
+    } else {
+      setCompanyEvents({});
+      setCompanyMetrics({});
+      setTotalEvents([]);
+    }
+  }, []);
+
+  // Configurar opções de tracking
+  const SetTrackingOptions = useCallback((options: ITrackingOptions): void => {
+    trackingOptions.current = {
+      ...trackingOptions.current,
+      ...options,
+    };
+  }, []);
+
+  // Valor do contexto memoizado
+  const contextValue = useMemo(
+    () => ({
+      // Funções de tracking
+      RegisterCompanyEvent,
+      TrackCompanyView,
+      TrackCompanyClick,
+      TrackCompanyWhatsappClick,
+      TrackCompanyMapClick,
+      TrackCompanyProfileView,
+      TrackCompanyInstagramClick,
+      TrackCompanyPhoneClick,
+      TrackCompanyShare,
+      
+      // Funções de dados
+      GetEventsByCompany,
+      GetTotalEvents,
+      UpdateVirtualEvent,
+      GetCompanyMetrics,
+      
+      // Batch operations
+      BatchTrackEvents,
+      FlushPendingEvents,
+      
+      // Estados
+      companyEvents,
+      totalEvents,
+      companyMetrics,
+      loading,
+      error,
+      pendingEvents,
+      
+      // Utilidades
+      ClearError,
+      ClearCache,
+      SetTrackingOptions,
+    }),
+    [
+      RegisterCompanyEvent,
+      TrackCompanyView,
+      TrackCompanyClick,
+      TrackCompanyWhatsappClick,
+      TrackCompanyMapClick,
+      TrackCompanyProfileView,
+      TrackCompanyInstagramClick,
+      TrackCompanyPhoneClick,
+      TrackCompanyShare,
+      GetEventsByCompany,
+      GetTotalEvents,
+      UpdateVirtualEvent,
+      GetCompanyMetrics,
+      BatchTrackEvents,
+      FlushPendingEvents,
+      companyEvents,
+      totalEvents,
+      companyMetrics,
+      loading,
+      error,
+      pendingEvents,
+      ClearError,
+      ClearCache,
+      SetTrackingOptions,
+    ]
+  );
 
   return (
-    <CompanyAnalyticsContext.Provider
-      value={{
-        RegisterCompanyEvent,
-        TrackCompanyView,
-        TrackCompanyClick,
-        TrackCompanyWhatsappClick,
-        TrackCompanyMapClick,
-        TrackCompanyProfileView,
-        GetEventsByCompany,
-        GetTotalEvents,
-        UpdateVirtualEvent,
-        companyEvents,
-        totalEvents,
-        loading,
-        error,
-        ClearError,
-      }}
-    >
+    <CompanyAnalyticsContext.Provider value={contextValue}>
       {children}
     </CompanyAnalyticsContext.Provider>
   );
 };
+
+// Export default
+export default CompanyAnalyticsProvider;
