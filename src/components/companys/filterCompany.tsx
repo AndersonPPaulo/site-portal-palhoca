@@ -119,7 +119,14 @@ export default function FilteredCommerceList({
       address: apiCompany.address,
       company_category: apiCompany.company_category,
       district: apiCompany.district,
-      image: apiCompany.company_image?.url || default_image.src,
+      company_image: apiCompany.company_image
+        ? apiCompany.company_image
+        : {
+            id: "default",
+            key: "default",
+            company_id: apiCompany.id,
+            url: default_image.src,
+          },
     };
   }, []);
 

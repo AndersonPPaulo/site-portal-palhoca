@@ -9,7 +9,16 @@ import { useCompanyAnalytics } from "@/provider/analytics/company";
 import default_image from "@/assets/default image.webp";
 
 // ==================== INTERFACES ====================
-// Interface para categorias da empresa
+interface ICompanyImage {
+  id: string;
+  key: string;
+  url: string;
+  original_name?: string;
+  mime_type?: string;
+  size?: number;
+  uploaded_at?: Date;
+  company_id: string;
+}
 interface ICompanyCategory {
   id: string;
   name: string;
@@ -23,7 +32,7 @@ export interface ICardCompanyData {
   address: string;
   district?: string;
   company_category: ICompanyCategory[];
-  image?: StaticImageData | string;
+  company_image?: ICompanyImage;
   phone?: string;
   highlight?: boolean;
 }
@@ -274,7 +283,7 @@ export const CardCompany = memo(function CardCompany({
         aria-label={`Ver detalhes de ${company.name}`}
       >
         <Image
-          src={company.image || default_image}
+          src={company.company_image?.url || default_image}
           alt={`Imagem de ${company.name}`}
           fill
           className="object-cover group-hover:scale-110 transition-transform duration-300"

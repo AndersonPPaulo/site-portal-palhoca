@@ -12,6 +12,18 @@ interface ICompanyCategory {
   created_at: string;
   updated_at: string;
 }
+
+interface ICompanyImage {
+  id: string;
+  key: string;
+  url: string;
+  original_name?: string;
+  mime_type?: string;
+  size?: number;
+  uploaded_at?: Date;
+  company_id: string;
+}
+
 // Interface para o formato esperado pelo CardCompany (alinhada com ICardCompanyData)
 interface IDisplayCompany {
   id: string;
@@ -19,7 +31,7 @@ interface IDisplayCompany {
   address: string;
   district?: string;
   company_category: ICompanyCategory[];
-  image?: string;
+  company_image?: ICompanyImage;
   phone?: string;
   highlight?: boolean;
 }
@@ -52,8 +64,7 @@ export function CompanyGridSection() {
         address: company.address,
         district: company.district,
         company_category: company.company_category || [],
-        image:
-          company.company_image?.url || company.company_image?.original_name,
+        company_image: company.company_image || undefined,
         phone: company.phone,
         highlight: company.highlight, // Sempre true para highlightedCompanies
       };
