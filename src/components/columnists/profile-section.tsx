@@ -11,7 +11,7 @@ import { formatDate } from "@/utils/formatDate";
 import normalizeText from "@/utils/normalize-text-to-slug";
 import { generateSlug } from "@/utils/string-utils";
 import SlugToText from "@/utils/slugToText";
-import default_image from "@/assets/default image.webp";
+import default_image from "@/assets/no-img.png";
 
 export default function ProfileColumnist() {
   const params = useParams();

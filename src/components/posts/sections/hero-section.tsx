@@ -9,7 +9,7 @@ import { ArticleAnalyticsContext } from "@/provider/analytics/article";
 import { formatDate } from "@/utils/formatDate";
 import { useParams } from "next/navigation";
 import normalizeTextToslug from "@/utils/normalize-text-to-slug";
-import default_image from "@/assets/default image.webp";
+import default_image from "@/assets/no-img.png";
 
 export default function HeroSection() {
   const slug = useParams();

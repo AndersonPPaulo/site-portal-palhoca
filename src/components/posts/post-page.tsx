@@ -21,7 +21,7 @@ import { useContext, useEffect, useRef } from "react";
 import { ArticleContext } from "@/provider/article";
 import { formatDate } from "@/utils/formatDate";
 import { ArticleAnalyticsContext } from "@/provider/analytics/article";
-import default_image from "@/assets/default image.webp";
+import default_image from "@/assets/no-img.png";
 
 function normalizeText(text: string): string {
   return text

@@ -5,7 +5,7 @@ import { CardCompany } from "@/components/companys/card-company";
 import { AlertCircle } from "lucide-react";
 import CompanyPagination from "../companysPagination";
 import { IPublicCompany, usePublicCompany } from "@/provider/company";
-import default_image from "@/assets/default image.webp";
+import default_image from "@/assets/no-img.png";
 
 interface FilteredCommerceListProps {
   activeCategory: string;

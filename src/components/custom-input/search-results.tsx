@@ -10,7 +10,7 @@ import { ChevronLeft, ChevronRight, Calendar, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ArticleResponse } from "@/provider/article";
 import { formatDate } from "@/utils/formatDate";
-import default_image from "@/assets/default image.webp";
+import default_image from "@/assets/no-img.png";
 
 interface SearchResultsProps {
   isVisible: boolean;

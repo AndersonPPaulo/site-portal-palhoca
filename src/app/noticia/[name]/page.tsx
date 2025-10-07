@@ -8,7 +8,7 @@ import PostGridWwithColumnistSection from "@/components/posts/sections/post-grid
 
 import type { Metadata } from "next";
 import group from "@/assets/Group.png";
-import default_image from "@/assets/default image.webp";
+import default_image from "@/assets/no-img.png";
 
 export async function generateMetadata({
   params,

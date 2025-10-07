@@ -3,7 +3,7 @@ import { Footer } from "@/components/footer";
 import Header from "@/components/header";
 import PostPage from "@/components/posts/post-page";
 import { getArticleBySlug } from "@/lib/getArticleBySlug";
-import default_image from "@/assets/default image.webp";
+import default_image from "@/assets/no-img.png";
 
 import type { Metadata } from "next";
 import { Article } from "@/provider/article";
