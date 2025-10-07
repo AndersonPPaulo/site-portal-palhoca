@@ -72,6 +72,7 @@ interface ListCompanyFilters {
   search?: string;
   district?: string;
   portalReferer?: string;
+  highlight?: boolean;
 }
 
 interface IPublicCompanyContext {
@@ -125,6 +126,7 @@ export const PublicCompanyProvider = ({ children }: IChildrenReact) => {
         limit,
         ...(filters.search && { name: filters.search }),
         ...(filters.category && { category: filters.category }),
+        ...(filters.highlight !== undefined && { highlight: filters.highlight }),
         ...(filters.district && { district: filters.district }),
         ...{ portalReferer: window.location.hostname },
       };
