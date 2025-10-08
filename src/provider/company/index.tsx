@@ -50,6 +50,8 @@ export interface IPublicCompany {
   update_at: Date;
   company_image?: ICompanyImage;
   company_category: ICompanyCategory[];
+  lat: number;
+  long: number;
 }
 
 // Interface para resposta paginada

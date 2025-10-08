@@ -54,21 +54,55 @@ const CommercialMap = dynamic(() => import("../../components/mapCompany"), {
 
 export default function ClientListArticlesByCategory() {
   const pathname = usePathname();
-
   const searchParams = useSearchParams();
   const categoryQuery = searchParams.get("categoria");
 
-  const { companies, loading, listAllCompanies } = usePublicCompany();
-
-  useEffect(() => {
-    listAllCompanies(1, 1000);
-  }, [categoryQuery]);
+  const {
+    companies,
+    highlightedCompanies,
+    normalCompanies,
+    loading,
+    listAllCompanies,
+    clearSelectedCompany,
+  } = usePublicCompany();
 
   const { TrackCompanyView } = useContext(CompanyAnalyticsContext);
 
   const [showMap, setShowMap] = useState(false);
   const [selectedDistrict, setSelectedDistrict] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
+
+  // Reset estados quando a página/categoria mudar
+  useEffect(() => {
+    // Resetar página para 1
+    setCurrentPage(1);
+
+    // Resetar empresa selecionada
+    if (clearSelectedCompany) {
+      clearSelectedCompany();
+    }
+
+    // Buscar novos dados
+    listAllCompanies(1, 1000);
+
+    // Limpar filtros de bairro e busca quando mudar de categoria
+    if (categoryQuery) {
+      window.dispatchEvent(new CustomEvent("districtSelected", { detail: "" }));
+      window.dispatchEvent(
+        new CustomEvent("companyNameSearch", { detail: "" })
+      );
+      setSelectedDistrict("");
+    }
+  }, [categoryQuery, pathname, listAllCompanies, clearSelectedCompany]);
+
+  // Disparar evento de categoria
+  useEffect(() => {
+    window.dispatchEvent(
+      new CustomEvent("categorySelected", {
+        detail: categoryQuery || "Todos",
+      })
+    );
+  }, [categoryQuery]);
 
   const trackCompanyViews = (
     companies: any[],
@@ -125,7 +159,6 @@ export default function ClientListArticlesByCategory() {
     return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
   };
 
-  console.log("categoryQuery", categoryQuery);
   // Gerar título dinâmico
   const getPageTitle = () => {
     const activeCategory =
@@ -188,6 +221,12 @@ export default function ClientListArticlesByCategory() {
       window.removeEventListener("districtSelected", handleDistrictChange);
   }, [companies?.data]);
 
+  // Combinar empresas destacadas e normais para o mapa
+  const allCompaniesForMap = [
+    ...(highlightedCompanies?.data || []),
+    ...(companies?.data || []),
+  ];
+
   return (
     <DefaultPage>
       <Header />
@@ -197,7 +236,7 @@ export default function ClientListArticlesByCategory() {
         </h1>
         <div className="flex flex-row gap-8">
           <div className="flex flex-col gap-5 flex-1">
-            {!categoryQuery && <FilteredCommerceListHighlight />}
+            <FilteredCommerceListHighlight />
             <FilteredCommerceList
               activeCategory={categoryQuery ? categoryQuery : "Todos"}
               showMap={showMap}
@@ -208,7 +247,7 @@ export default function ClientListArticlesByCategory() {
           {/* Mapa lateral */}
           {showMap && !loading && (
             <CommercialMap
-              companies={companies?.data || []}
+              companies={allCompaniesForMap}
               height="h-[1100px]"
               width="w-[408px]"
               currentPage={currentPage}

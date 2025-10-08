@@ -11,30 +11,6 @@ import { IPublicCompany } from "@/provider/company";
 import default_image from "@/assets/no-img.png";
 import { StaticImageData } from "next/image";
 
-function extractCoordinatesFromMapsLink(
-  mapsLink: string
-): { lat: number; lng: number } | null {
-  if (!mapsLink) return null;
-
-  try {
-    const url = new URL(mapsLink);
-    const qParam = url.searchParams.get("q");
-
-    if (qParam && qParam.includes(",")) {
-      const [lat, lng] = qParam.split(",");
-      const latitude = parseFloat(lat.trim());
-      const longitude = parseFloat(lng.trim());
-
-      if (!isNaN(latitude) && !isNaN(longitude)) {
-        return { lat: latitude, lng: longitude };
-      }
-    }
-  } catch (error) {
-    console.error("Erro ao extrair coordenadas do link:", error);
-  }
-
-  return null;
-}
 interface ICompanyCategory {
   id: string;
   name: string;
@@ -120,22 +96,31 @@ const CommercialMap: React.FC<CommercialMapProps> = ({
     const processedData: CommerceMapData[] = [];
 
     companies.forEach((company) => {
-      const coordinates = extractCoordinatesFromMapsLink(
-        company.linkLocationMaps
-      );
+      // Verificar se temos coordenadas válidas (lat e long)
+      const hasValidCoordinates =
+        company.lat &&
+        company.long &&
+        !isNaN(company.lat) &&
+        !isNaN(company.long) &&
+        company.lat !== 0 &&
+        company.long !== 0;
 
-      if (coordinates) {
+      if (hasValidCoordinates) {
         processedData.push({
           id: company.id,
           name: company.name,
           address: company.address,
-          company_category: company.company_category || [], // Keep as array
+          company_category: company.company_category || [],
           company_image: company.company_image
             ? company.company_image
             : default_image,
-          lat: coordinates.lat,
-          lng: coordinates.lng,
+          lat: company.lat,
+          lng: company.long, // Converter 'long' para 'lng' para usar no Leaflet
         });
+      } else {
+        console.warn(
+          `Empresa "${company.name}" (ID: ${company.id}) não possui coordenadas válidas`
+        );
       }
     });
 
@@ -145,8 +130,13 @@ const CommercialMap: React.FC<CommercialMapProps> = ({
     if (singleCompany && processedData.length === 1) {
       setMapCenter([processedData[0].lat, processedData[0].lng]);
       setMapZoom(16); // Zoom mais próximo para empresa única
+    } else if (processedData.length > 0) {
+      // Para múltiplas empresas, calcular centro médio se necessário
+      // ou usar o centro padrão
+      setMapCenter(center);
+      setMapZoom(zoom);
     } else {
-      // Para múltiplas empresas ou mudança de página, resetar para posição inicial
+      // Se não há empresas com coordenadas válidas, usar centro padrão
       setMapCenter(center);
       setMapZoom(zoom);
     }
@@ -161,6 +151,9 @@ const CommercialMap: React.FC<CommercialMapProps> = ({
         <div className="text-center text-gray-500">
           <MapPin size={48} className="mx-auto mb-2 text-gray-400" />
           <p>Localização não disponível</p>
+          <p className="text-xs mt-2">
+            Nenhuma empresa com coordenadas válidas foi encontrada
+          </p>
         </div>
       </div>
     );
@@ -175,7 +168,7 @@ const CommercialMap: React.FC<CommercialMapProps> = ({
         zoom={mapZoom}
         style={{ height: "100%", width: "100%" }}
         scrollWheelZoom={true}
-        key={`${mapCenter[0]}-${mapCenter[1]}-${mapZoom}-${currentPage}`} // Force re-render when page changes
+        key={`${mapCenter[0]}-${mapCenter[1]}-${mapZoom}-${currentPage}`}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
