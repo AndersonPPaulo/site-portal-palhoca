@@ -77,7 +77,6 @@ export default function ComercioDetails() {
 
   const [company, setCompany] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeImage, setActiveImage] = useState(0);
   const [hasTrackedInitialView, setHasTrackedInitialView] = useState(false);
 
   useEffect(() => {
@@ -277,7 +276,7 @@ export default function ComercioDetails() {
   return (
     <DefaultPage>
       <Header />
-      <div className="min-w-72 max-w-[1272px] mx-auto py-5">
+      <div className="max-w-[1272px] mx-auto py-5">
         {/* Trilha de navegação */}
         <div className="hidden md:flex items-center gap-2 text-sm text-gray-500 mb-4">
           <Link href="/" className="hover:text-red-600 transition-colors">
@@ -305,18 +304,16 @@ export default function ComercioDetails() {
         <div className="rounded-lg mb-8">
           <div className="flex flex-col lg:flex-row gap-6 items-start">
             {/* Coluna da esquerda com imagem e indicadores */}
-            <div className="relative w-full lg:w-5/12">
-              {/* Imagem principal */}
-              <div className="relative w-[408] h-[355px] rounded-lg overflow-hidden">
-                <Image
-                  src={company.image}
-                  alt={company.name}
-                  fill
-                  className="object-cover"
-                  priority
-                  unoptimized
-                />
-              </div>
+            {/* Imagem principal */}
+            <div className="relative w-[335px] lg:w-[480px] lg:min-w-[480px] h-[355px] rounded-lg overflow-hidden">
+              <Image
+                src={company.image}
+                alt={company.name}
+                fill
+                className="object-cover"
+                priority
+                unoptimized
+              />
             </div>
 
             {/* Detalhes do comércio */}
