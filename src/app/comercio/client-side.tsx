@@ -1,16 +1,15 @@
 "use client";
 
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useMemo } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import DefaultPage from "@/components/default-page";
 import Header from "@/components/header";
-import FilteredCommerceList from "@/components/companys/filterCompany";
 import { usePublicCompany } from "@/provider/company";
 import { CompanyAnalyticsContext } from "@/provider/analytics/company";
 import SlugToText from "@/utils/slugToText";
-import FilteredCommerceListHighlight from "@/components/companys/filterCompanyHighlight";
 import dynamic from "next/dynamic";
-import { Loader2 } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
+import CompanySkeleton from "@/components/companys/companySkeleton";
 
 type TrackCompanyViewParams = {
   page: string;
@@ -71,6 +70,13 @@ export default function ClientListArticlesByCategory() {
   const [showMap, setShowMap] = useState(false);
   const [selectedDistrict, setSelectedDistrict] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
+
+  // ✅ Verificar se não há empresas em NENHUM dos conjuntos
+  const hasNoCompanies = useMemo(() => {
+    const hasNormalCompanies = normalCompanies?.data && normalCompanies.data.length > 0;
+    const hasHighlightedCompanies = highlightedCompanies?.data && highlightedCompanies.data.length > 0;
+    return !hasNormalCompanies && !hasHighlightedCompanies;
+  }, [normalCompanies, highlightedCompanies]);
 
   // Reset estados quando a página/categoria mudar
   useEffect(() => {
@@ -227,6 +233,8 @@ export default function ClientListArticlesByCategory() {
     ...(companies?.data || []),
   ];
 
+ 
+
   return (
     <DefaultPage>
       <Header />
@@ -234,10 +242,10 @@ export default function ClientListArticlesByCategory() {
         <h1 className="max-w-[756px] text-[29px] font-[600] text-red-600 mb-3">
           {loading ? "Carregando comércios..." : getPageTitle()}
         </h1>
+
         <div className="flex flex-row gap-8">
-          <div className="flex flex-col gap-5 flex-1">
-            <FilteredCommerceListHighlight />
-            <FilteredCommerceList
+          <div className="flex-1">
+            <CompanySkeleton
               activeCategory={categoryQuery ? categoryQuery : "Todos"}
               showMap={showMap}
               onPageChange={handlePageChange}
