@@ -73,8 +73,10 @@ export default function ClientListArticlesByCategory() {
 
   // ✅ Verificar se não há empresas em NENHUM dos conjuntos
   const hasNoCompanies = useMemo(() => {
-    const hasNormalCompanies = normalCompanies?.data && normalCompanies.data.length > 0;
-    const hasHighlightedCompanies = highlightedCompanies?.data && highlightedCompanies.data.length > 0;
+    const hasNormalCompanies =
+      normalCompanies?.data && normalCompanies.data.length > 0;
+    const hasHighlightedCompanies =
+      highlightedCompanies?.data && highlightedCompanies.data.length > 0;
     return !hasNormalCompanies && !hasHighlightedCompanies;
   }, [normalCompanies, highlightedCompanies]);
 
@@ -227,13 +229,38 @@ export default function ClientListArticlesByCategory() {
       window.removeEventListener("districtSelected", handleDistrictChange);
   }, [companies?.data]);
 
-  // Combinar empresas destacadas e normais para o mapa
-  const allCompaniesForMap = [
-    ...(highlightedCompanies?.data || []),
-    ...(companies?.data || []),
-  ];
+  // ✅ NOVO: Combinar apenas empresas da página atual com status ACTIVE
+  const currentPageCompaniesForMap = useMemo(() => {
+    const companies: any[] = [];
 
- 
+    // ✅ Sempre incluir as destacadas (aparecem na primeira página) - APENAS ACTIVE
+    if (currentPage === 1 && highlightedCompanies?.data) {
+      const activeHighlighted = highlightedCompanies.data.filter(
+        (company) => company.status === "active"
+      );
+      companies.push(...activeHighlighted);
+      console.log(
+        `Destacadas ACTIVE: ${activeHighlighted.length} de ${highlightedCompanies.data.length}`
+      );
+    }
+
+    // ✅ Incluir as empresas normais da página atual - APENAS ACTIVE
+    if (normalCompanies?.data) {
+      const activeNormal = normalCompanies.data.filter(
+        (company) => company.status === "active"
+      );
+      companies.push(...activeNormal);
+      console.log(
+        `Normais ACTIVE: ${activeNormal.length} de ${normalCompanies.data.length}`
+      );
+    }
+
+    console.log(
+      `Total empresas ACTIVE no mapa (Página ${currentPage}):`,
+      companies.length
+    );
+    return companies;
+  }, [highlightedCompanies?.data, normalCompanies?.data, currentPage]);
 
   return (
     <DefaultPage>
@@ -252,10 +279,10 @@ export default function ClientListArticlesByCategory() {
             />
           </div>
 
-          {/* Mapa lateral */}
+          {/* ✅ Mapa lateral - mostra apenas empresas da página atual */}
           {showMap && !loading && (
             <CommercialMap
-              companies={allCompaniesForMap}
+              companies={currentPageCompaniesForMap}
               height="h-[1100px]"
               width="w-[408px]"
               currentPage={currentPage}
