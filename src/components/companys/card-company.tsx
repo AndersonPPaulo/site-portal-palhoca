@@ -293,7 +293,7 @@ export const CardCompany = memo(function CardCompany({
 
         {/* Badge de destaque (opcional) */}
         {company.highlight && (
-          <div className="absolute top-2 right-2 bg-green-800 text-amber-50 px-2 py-1 rounded-full text-xs font-bold shadow-lg">
+          <div className="absolute top-2 right-2 bg-primary text-amber-50 px-2 py-1 rounded-full text-xs font-bold shadow-lg">
             Destaque
           </div>
         )}
