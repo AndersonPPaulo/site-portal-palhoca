@@ -69,7 +69,8 @@ export default function ComercioDetails() {
             lat: apiCompany.lat || -27.64662,
             lng: apiCompany.long || -48.667361,
           };
-
+          const wazeLink = `https://waze.com/ul?ll=${apiCompany.lat},${apiCompany.long}&navigate=yes`;
+          const mapsLink = `https://maps.google.com/maps?q=${apiCompany.lat},${apiCompany.long}`;
           // Adaptar dados da API para o formato esperado pelo componente
           const adaptedCompany = {
             id: apiCompany.id,
@@ -82,8 +83,8 @@ export default function ComercioDetails() {
             hours: apiCompany.openingHours || "Horário não informado",
             address: apiCompany.address || "Endereço não informado",
             linkWhatsapp: apiCompany.linkWhatsapp,
-            linkLocationMaps: apiCompany.linkLocationMaps,
-            linkLocationWaze: apiCompany.linkLocationWaze,
+            linkLocationMaps: mapsLink,
+            linkLocationWaze: wazeLink,
             location: coordinates,
           };
 
