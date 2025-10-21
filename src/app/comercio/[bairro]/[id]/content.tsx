@@ -3,7 +3,7 @@
 import { useState, useEffect, useContext } from "react";
 import { useParams, useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
-import { Clock, MapPin, Phone } from "lucide-react";
+import { Clock, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import DefaultPage from "@/components/default-page";
 import Header from "@/components/header";
