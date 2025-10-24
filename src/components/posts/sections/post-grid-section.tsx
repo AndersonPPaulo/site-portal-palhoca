@@ -2,7 +2,7 @@
 
 import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect } from "react";
 import { useParams, usePathname } from "next/navigation";
 import { ArticleContext } from "@/provider/article";
 import { ArticleAnalyticsContext } from "@/provider/analytics/article";
@@ -19,16 +19,7 @@ export default function PostGridSection() {
     articlesByPortalHighlightPositionThree,
   } = useContext(ArticleContext);
 
-  const { TrackArticleView, TrackArticleClick } = useContext(
-    ArticleAnalyticsContext
-  );
-
-  // Estados para controle de analytics
-  const [hasInitialView, setHasInitialView] = useState(false);
-
-  // Refs para Intersection Observer
-  const gridSectionRef = useRef<HTMLElement>(null);
-  const postsRef = useRef<Record<string, HTMLDivElement | null>>({});
+  const { TrackArticleClick } = useContext(ArticleAnalyticsContext);
 
   useEffect(() => {
     const fetchArticles = async () => {
@@ -44,77 +35,6 @@ export default function PostGridSection() {
 
   const gridPosts =
     articlesByPortalHighlightPositionThree?.data.slice(0, 3) || [];
-
-  // Analytics: Registrar view inicial quando componente carrega
-  useEffect(() => {
-    if (!hasInitialView && gridPosts.length > 0) {
-      gridPosts.forEach((post, index) => {
-        TrackArticleView(post.id, {
-          page: pathname,
-          section: "post-grid",
-          position: "grid-item",
-          categoryName: post.category.name,
-          articleTitle: post.title,
-          gridIndex: index,
-          highlightPosition: 3,
-          gridSize: gridPosts.length,
-          viewType: "initial",
-          timestamp: new Date().toISOString(),
-        });
-      });
-
-      setHasInitialView(true);
-    }
-  }, [gridPosts, hasInitialView, TrackArticleView, pathname]);
-
-  // Intersection Observer: Para detectar quando grid sai/volta à tela
-  useEffect(() => {
-    if (!gridSectionRef.current || !hasInitialView || gridPosts.length === 0)
-      return;
-
-    let hasLeft = false;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            if (hasLeft) {
-              // Registra reappear para todos os posts do grid
-              gridPosts.forEach((post, index) => {
-                TrackArticleView(post.id, {
-                  page: pathname,
-                  section: "post-grid",
-                  position: "grid-item",
-                  categoryName: post.category.name,
-                  articleTitle: post.title,
-                  gridIndex: index,
-                  highlightPosition: 3,
-                  gridSize: gridPosts.length,
-                  viewType: "reappear",
-                  intersectionRatio: entry.intersectionRatio,
-                  timestamp: new Date().toISOString(),
-                });
-              });
-
-              hasLeft = false;
-            }
-          } else {
-            hasLeft = true;
-          }
-        });
-      },
-      {
-        threshold: 0.3,
-        rootMargin: "0px",
-      }
-    );
-
-    observer.observe(gridSectionRef.current);
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [hasInitialView, gridPosts, TrackArticleView, pathname]);
 
   // Analytics: Função para registrar clique no post do grid
   const handleGridPostClick = (post: any, index: number) => {
@@ -137,7 +57,6 @@ export default function PostGridSection() {
 
   return (
     <section
-      ref={gridSectionRef}
       className={`${
         !gridPosts
           ? "hidden"
@@ -153,12 +72,7 @@ export default function PostGridSection() {
             }`}
             onClick={() => handleGridPostClick(post, idx)}
           >
-            <div
-              ref={(el) => {
-                if (el) postsRef.current[post.id] = el;
-              }}
-              className="flex flex-col rounded-xl transition max-w-[405px]  hover:transform hover:scale-105"
-            >
+            <div className="flex flex-col rounded-xl transition max-w-[405px]  hover:transform hover:scale-105">
               <div className="relative min-w-[300px] md:w-[405px] h-[310px] rounded-md overflow-hidden">
                 <Image
                   src={
