@@ -136,7 +136,7 @@ export default function ContactForm() {
       {/* Header */}
       <div className="flex flex-col gap-2">
         <h1 className="text-2xl font-semibold text-primary">
-          Anúncie sua marca no Portal Palhoça
+          Anuncie sua marca no Portal Palhoça
         </h1>
         <p className="text-gray-600 max-w-2xl">
           Faça parte do maior portal de notícias e comércios de Palhoça.
