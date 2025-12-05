@@ -6,7 +6,6 @@ import { useParams } from "next/navigation";
 import PostBanner from "../banner/post-banner";
 import { CompanyGridSection } from "../companys/company-grid-section";
 import ButtonCTAWhatsAppButton from "../custom-button/cta-whatsapp-group-button";
-import { Share2 } from "lucide-react";
 import SideBanner from "../banner/side";
 import Link from "next/link";
 import {
@@ -168,7 +167,7 @@ export default function PostPage() {
               </div>
 
               {/* imagem */}
-              <div className="relative max-w-[340px] lg:max-w-[840px] h-[475px] rounded-md overflow-hidden">
+              <div className="relative max-w-[340px] lg:max-w-[840px] h-[250px] md:h-[475px] rounded-md overflow-hidden">
                 {articleBySlug?.thumbnail?.url ? (
                   <Image
                     unoptimized
@@ -187,7 +186,7 @@ export default function PostPage() {
                         : "Imagem do portal palhoça"
                     }
                     fill
-                    className="object-cover"
+                    className="object-contain"
                   />
                 ) : (
                   <Image
