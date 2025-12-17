@@ -37,28 +37,43 @@ interface IDisplayCompany {
   highlight?: boolean;
 }
 
-export function CompanyGridSection() {
+// Componente Skeleton reutilizável
+const CompanySkeleton = () => (
+  <div className="overflow-hidden rounded-3xl shadow-lg h-full w-full animate-pulse">
+    <div className="h-[156px] w-full bg-gray-200"></div>
+    <div className="p-4 lg:p-6">
+      <div className="flex gap-1 mb-3">
+        <div className="h-6 w-20 bg-gray-200 rounded-full"></div>
+        <div className="h-6 w-16 bg-gray-200 rounded-full"></div>
+      </div>
+      <div className="h-6 w-3/4 bg-gray-200 rounded mb-2"></div>
+      <div className="flex items-center gap-2 mb-4">
+        <div className="h-4 w-4 bg-gray-200 rounded"></div>
+        <div className="h-4 w-full bg-gray-200 rounded"></div>
+      </div>
+      <div className="h-10 w-full bg-gray-200 rounded-full"></div>
+    </div>
+  </div>
+);
+
+// Hook customizado para lógica compartilhada
+const useCompanyData = () => {
   const pathname = usePathname();
   const { highlightedCompanies, loading, error, listHighlightedCompanies } =
     usePublicCompany();
-
-  // Estado para garantir que só carregamos uma vez
   const [hasLoaded, setHasLoaded] = useState(false);
 
-  // Verificar se está na página de comércios
   const isComercioPage =
     pathname === "/comercio" || pathname?.startsWith("/comercio");
+  const isArticlePage =
+    pathname === "/noticia" || pathname?.startsWith("/noticia");
 
-  // Carregar empresas em destaque na inicialização - SEMPRE 4 itens fora de /comercio
+  // Carregar empresas em destaque - SEMPRE 4 itens fora de /comercio
   useEffect(() => {
-    // Se estiver na página de comércios, não carregar aqui (deixa o outro componente carregar)
-    if (isComercioPage) {
-      return;
-    }
+    if (isComercioPage) return;
 
-    // Carregar apenas uma vez ou se não tiver dados
     if (!hasLoaded || !highlightedCompanies) {
-      listHighlightedCompanies(1, 4); // SEMPRE 4 empresas
+      listHighlightedCompanies(1, 4);
       setHasLoaded(true);
     }
   }, [
@@ -75,26 +90,40 @@ export function CompanyGridSection() {
     }
   }, [isComercioPage]);
 
-  // Converter e memoizar dados da API - LIMITAR A 4 EMPRESAS
+  // Converter e memoizar dados - LIMITAR A 4 EMPRESAS
   const displayCompanies = useMemo<IDisplayCompany[]>(() => {
     if (!highlightedCompanies?.data) return [];
 
-    // GARANTIR que sempre retorna no máximo 4 empresas
-    const limitedData = highlightedCompanies.data.slice(0, 4);
-
-    return limitedData.map((company) => {
-      return {
-        id: company.id,
-        name: company.name,
-        address: company.address,
-        district: company.district,
-        company_category: company.company_category || [],
-        company_image: company.company_image || undefined,
-        phone: company.phone,
-        highlight: company.highlight,
-      };
-    });
+    return highlightedCompanies.data.slice(0, 4).map((company) => ({
+      id: company.id,
+      name: company.name,
+      address: company.address,
+      district: company.district,
+      company_category: company.company_category || [],
+      company_image: company.company_image || undefined,
+      phone: company.phone,
+      highlight: company.highlight,
+    }));
   }, [highlightedCompanies]);
+
+  return {
+    displayCompanies,
+    loading,
+    error,
+    isArticlePage,
+    listHighlightedCompanies,
+    highlightedCompanies,
+  };
+};
+
+export function CompanyGridSection() {
+  const {
+    displayCompanies,
+    loading,
+    error,
+    highlightedCompanies,
+    isArticlePage,
+  } = useCompanyData();
 
   // Estados de carregamento e erro
   if (loading && !highlightedCompanies) {
@@ -107,7 +136,6 @@ export function CompanyGridSection() {
     );
   }
 
-  // Se houver erro
   if (error) {
     return (
       <section className="w-full py-12 max-w-[1272px] mx-auto px-4">
@@ -120,17 +148,18 @@ export function CompanyGridSection() {
     );
   }
 
-  // Se não houver empresas em destaque
   if (!displayCompanies.length) {
     return null;
   }
 
   return (
-    <section className="w-full mt-32 py-12 max-w-[1272px] mx-auto px-4">
-      {/* Linha decorativa */}
+    <section
+      className={`w-full max-w-[1272px] mx-auto px-4 ${
+        !isArticlePage ? "mt-40 py-2" : ""
+      }`}
+    >
       <div className="w-[106px] h-2 bg-red-500 rounded-full" />
 
-      {/* Cabeçalho da seção */}
       <div className="flex flex-col md:flex-row items-start gap-3 md:items-center justify-between">
         <h2 className="text-2xl font-semibold text-red-500 py-6">
           Comércios que são destaques em Palhoça!
@@ -148,7 +177,6 @@ export function CompanyGridSection() {
         </Link>
       </div>
 
-      {/* Grid de empresas - SEMPRE 4 */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {displayCompanies.map((company, index) => (
           <CardCompany
@@ -164,79 +192,16 @@ export function CompanyGridSection() {
   );
 }
 
-// VERSÃO ALTERNATIVA COM SKELETON LOADING
+// VERSÃO COM SKELETON LOADING
 export function CompanyGridSectionWithSkeleton() {
-  const pathname = usePathname();
-  const { highlightedCompanies, loading, error, listHighlightedCompanies } =
-    usePublicCompany();
-
-  const [hasLoaded, setHasLoaded] = useState(false);
-  const isComercioPage =
-    pathname === "/comercio" || pathname?.startsWith("/comercio");
-
-  // Carregar empresas - SEMPRE 4 fora de /comercio
-  useEffect(() => {
-    if (isComercioPage) {
-      return;
-    }
-
-    if (!hasLoaded || !highlightedCompanies) {
-      listHighlightedCompanies(1, 4); // SEMPRE 4 empresas
-      setHasLoaded(true);
-    }
-  }, [
-    isComercioPage,
-    hasLoaded,
-    highlightedCompanies,
+  const {
+    displayCompanies,
+    loading,
+    error,
     listHighlightedCompanies,
-  ]);
+    highlightedCompanies,
+  } = useCompanyData();
 
-  // Reset quando sair de /comercio
-  useEffect(() => {
-    if (!isComercioPage) {
-      setHasLoaded(false);
-    }
-  }, [isComercioPage]);
-
-  // Converter dados - LIMITAR A 4
-  const displayCompanies = useMemo<IDisplayCompany[]>(() => {
-    if (!highlightedCompanies?.data) return [];
-
-    // GARANTIR máximo de 4 empresas
-    const limitedData = highlightedCompanies.data.slice(0, 4);
-
-    return limitedData.map((company) => ({
-      id: company.id,
-      name: company.name,
-      address: company.address,
-      district: company.district,
-      company_category: company.company_category || [],
-      company_image: company.company_image || undefined,
-      phone: company.phone,
-      highlight: company.highlight,
-    }));
-  }, [highlightedCompanies]);
-
-  // Componente Skeleton
-  const CompanySkeleton = () => (
-    <div className="overflow-hidden rounded-3xl shadow-lg h-full w-full animate-pulse">
-      <div className="h-[156px] w-full bg-gray-200"></div>
-      <div className="p-4 lg:p-6">
-        <div className="flex gap-1 mb-3">
-          <div className="h-6 w-20 bg-gray-200 rounded-full"></div>
-          <div className="h-6 w-16 bg-gray-200 rounded-full"></div>
-        </div>
-        <div className="h-6 w-3/4 bg-gray-200 rounded mb-2"></div>
-        <div className="flex items-center gap-2 mb-4">
-          <div className="h-4 w-4 bg-gray-200 rounded"></div>
-          <div className="h-4 w-full bg-gray-200 rounded"></div>
-        </div>
-        <div className="h-10 w-full bg-gray-200 rounded-full"></div>
-      </div>
-    </div>
-  );
-
-  // Se houver erro
   if (error) {
     return (
       <section className="w-full mt-32 py-12 max-w-[1272px] mx-auto px-4">
@@ -255,7 +220,6 @@ export function CompanyGridSectionWithSkeleton() {
     );
   }
 
-  // Se não houver empresas e não estiver carregando
   if (!loading && !displayCompanies.length) {
     return null;
   }
@@ -283,12 +247,10 @@ export function CompanyGridSectionWithSkeleton() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {loading && !highlightedCompanies
-          ? // Mostrar 4 skeletons
-            Array.from({ length: 4 }).map((_, index) => (
+          ? Array.from({ length: 4 }).map((_, index) => (
               <CompanySkeleton key={`skeleton-${index}`} />
             ))
-          : // Mostrar no máximo 4 empresas
-            displayCompanies.map((company, index) => (
+          : displayCompanies.map((company, index) => (
               <CardCompany
                 key={company.id}
                 company={company}

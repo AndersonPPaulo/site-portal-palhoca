@@ -289,6 +289,7 @@ export const CardCompany = memo(function CardCompany({
           className="object-cover group-hover:scale-110 transition-transform duration-300"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           priority={gridIndex !== undefined && gridIndex < 4}
+          unoptimized
         />
 
         {/* Badge de destaque (opcional) */}

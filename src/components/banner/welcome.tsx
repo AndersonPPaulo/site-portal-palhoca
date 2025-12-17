@@ -62,7 +62,7 @@ export const Banner = () => {
     bannersWelcome?.data?.length,
   ]);
 
-  // Analytics: Função para registrar clique no banner
+  // Analytics: Função para registrar clique NO BANNER (não no botão de fechar)
   const handleBannerClick = () => {
     if (randomBanner) {
       TrackBannerClick(randomBanner.id, {
@@ -79,39 +79,16 @@ export const Banner = () => {
     }
   };
 
-  // Analytics: Função para registrar fechamento do modal
+  // ✅ Função para fechar o modal SEM registrar click
   const handleCloseModal = () => {
-    if (randomBanner) {
-      TrackBannerClick(randomBanner.id, {
-        page: pathname,
-        section: "welcome-banner",
-        bannerStyle: randomBanner.banner_style,
-        bannerName: randomBanner.name,
-        company: randomBanner.company?.name,
-        clickPosition: "close-button",
-        modalType: "welcome-overlay",
-        action: "modal-close",
-        timestamp: new Date().toISOString(),
-      });
-    }
     setIsVisible(false);
+    // Se você quiser rastrear o fechamento como um evento separado (não como click), faça assim:
+    // TrackBannerClose(randomBanner.id, { ... });
   };
 
+  // ✅ Fechar ao clicar fora SEM registrar click
   const handleOutsideClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
-      if (randomBanner) {
-        TrackBannerClick(randomBanner.id, {
-          page: pathname,
-          section: "welcome-banner",
-          bannerStyle: randomBanner.banner_style,
-          bannerName: randomBanner.name,
-          company: randomBanner.company?.name,
-          clickPosition: "outside-click",
-          modalType: "welcome-overlay",
-          action: "modal-close",
-          timestamp: new Date().toISOString(),
-        });
-      }
       setIsVisible(false);
     }
   };

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { ArticleContext } from "@/provider/article";
 import { ArticleAnalyticsContext } from "@/provider/analytics/article";
@@ -22,17 +22,7 @@ export default function HeroSection() {
     GetArticlesByPortalHighlightPositionTwo,
   } = useContext(ArticleContext);
 
-  const { TrackArticleView, TrackArticleClick } = useContext(
-    ArticleAnalyticsContext
-  );
-
-  // Estados para controle de analytics
-  const [hasInitialView, setHasInitialView] = useState(false);
-
-  // Refs para Intersection Observer
-  const heroSectionRef = useRef<HTMLElement>(null);
-  const mainPostRef = useRef<HTMLDivElement>(null);
-  const sidePostsRef = useRef<HTMLDivElement>(null);
+  const { TrackArticleClick } = useContext(ArticleAnalyticsContext);
 
   useEffect(() => {
     const fetchArticles = async () => {
@@ -54,100 +44,6 @@ export default function HeroSection() {
 
   const mainPost = articlesByPortalHighlightPositionOne?.data[0];
   const sidePosts = articlesByPortalHighlightPositionTwo?.data.slice(0, 3);
-
-  // Analytics: Registrar view inicial quando componente carrega
-  useEffect(() => {
-    if (!hasInitialView && (mainPost || (sidePosts?.length ?? 0) > 0)) {
-      if (mainPost) {
-        TrackArticleView(mainPost.id, {
-          page: pathname,
-          section: "hero-section",
-          position: "main-article",
-          categoryName: mainPost.category.name,
-          articleTitle: mainPost.title,
-          highlightPosition: 1,
-          viewType: "initial",
-          timestamp: new Date().toISOString(),
-        });
-      }
-
-      // Registra view dos artigos laterais
-      sidePosts?.forEach((post, index) => {
-        TrackArticleView(post.id, {
-          page: pathname,
-          section: "hero-section",
-          position: "side-article",
-          categoryName: post.category.name,
-          articleTitle: post.title,
-          highlightPosition: 2,
-          sidePostIndex: index,
-          viewType: "initial",
-          timestamp: new Date().toISOString(),
-        });
-      });
-
-      setHasInitialView(true);
-    }
-  }, [mainPost, sidePosts, hasInitialView, TrackArticleView, pathname]);
-
-  // Intersection Observer: Para detectar quando hero section sai/volta à tela
-  useEffect(() => {
-    if (!heroSectionRef.current || !hasInitialView) return;
-
-    let hasLeft = false;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            if (hasLeft) {
-              if (mainPost) {
-                TrackArticleView(mainPost.id, {
-                  page: pathname,
-                  section: "hero-section",
-                  position: "main-article",
-                  categoryName: mainPost.category.name,
-                  articleTitle: mainPost.title,
-                  viewType: "reappear",
-                  intersectionRatio: entry.intersectionRatio,
-                  timestamp: new Date().toISOString(),
-                });
-              }
-
-              // Registra reappear para artigos laterais
-              sidePosts?.forEach((post, index) => {
-                TrackArticleView(post.id, {
-                  page: pathname,
-                  section: "hero-section",
-                  position: "side-article",
-                  categoryName: post.category.name,
-                  articleTitle: post.title,
-                  sidePostIndex: index,
-                  viewType: "reappear",
-                  intersectionRatio: entry.intersectionRatio,
-                  timestamp: new Date().toISOString(),
-                });
-              });
-
-              hasLeft = false;
-            }
-          } else {
-            hasLeft = true;
-          }
-        });
-      },
-      {
-        threshold: 0.3,
-        rootMargin: "0px",
-      }
-    );
-
-    observer.observe(heroSectionRef.current);
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [hasInitialView, mainPost, sidePosts, TrackArticleView, pathname]);
 
   // Analytics: Função para registrar clique no artigo principal
   const handleMainPostClick = () => {
@@ -188,7 +84,6 @@ export default function HeroSection() {
 
   return (
     <section
-      ref={heroSectionRef}
       className={`${
         !mainPost && !sidePosts
           ? "hidden"
@@ -204,10 +99,7 @@ export default function HeroSection() {
           }`}
           onClick={handleMainPostClick}
         >
-          <div
-            ref={mainPostRef}
-            className="flex flex-col lg:flex-row gap-6 rounded-xl"
-          >
+          <div className="flex flex-col lg:flex-row gap-6 rounded-xl">
             <div className="relative md:min-w-[490px] max-w-[490px] min-h-[406px] max-h-[406px] rounded-xl overflow-hidden">
               <Image
                 src={mainPost?.thumbnail?.url ?? default_image}
@@ -243,10 +135,7 @@ export default function HeroSection() {
 
       {/* Side Posts */}
       {sidePosts?.length !== 0 && (
-        <div
-          ref={sidePostsRef}
-          className="flex flex-col gap-4 shadow-md p-4 rounded-2xl min-w-[300px] md:min-w-[415px] max-w-[415px]"
-        >
+        <div className="flex flex-col gap-4 shadow-md p-4 rounded-2xl min-w-[300px] md:min-w-[415px] max-w-[415px]">
           {sidePosts?.map((post, idx) => (
             <Link
               key={idx}

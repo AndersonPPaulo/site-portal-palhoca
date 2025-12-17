@@ -44,7 +44,7 @@ export default function RootLayout({
           `}
         </Script>
 
-        {/* Microsoft Clarity */}
+        {/* Clarity */}
         <Script id="clarity-script" strategy="afterInteractive">
           {`
             (function(c,l,a,r,i,t,y){

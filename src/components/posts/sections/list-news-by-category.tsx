@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useContext, useEffect, useRef } from "react";
 import {
   useParams,
   useRouter,
@@ -27,16 +27,7 @@ export default function ListArticlesByCategory() {
 
   const { GetPublishedArticles, publishedArticles } =
     useContext(ArticleContext);
-  const { TrackArticleView, TrackArticleClick } = useContext(
-    ArticleAnalyticsContext
-  );
-
-  // Estados para controle de analytics
-  const [hasInitialView, setHasInitialView] = useState(false);
-
-  // Refs para Intersection Observer
-  const listSectionRef = useRef<HTMLElement>(null);
-  const articlesRef = useRef<Record<string, HTMLDivElement | null>>({});
+  const { TrackArticleClick } = useContext(ArticleAnalyticsContext);
 
   useEffect(() => {
     GetPublishedArticles({
@@ -49,88 +40,6 @@ export default function ListArticlesByCategory() {
 
   const totalPages = publishedArticles?.meta?.totalPages || 1;
   const articles = publishedArticles?.data || [];
-
-  // Analytics: Registrar view inicial quando componente carrega
-  useEffect(() => {
-    if (!hasInitialView && articles.length > 0) {
-      articles.forEach((article, index) => {
-        TrackArticleView(article.id, {
-          page: pathname,
-          section: "article-list",
-          position: "list-item",
-          categoryName: article.category.name,
-          articleTitle: article.title,
-          listIndex: index,
-          currentPage: currentPage,
-          totalPages: totalPages,
-          viewType: "initial",
-          timestamp: new Date().toISOString(),
-        });
-      });
-
-      setHasInitialView(true);
-    }
-  }, [
-    articles,
-    hasInitialView,
-    TrackArticleView,
-    pathname,
-    currentPage,
-    totalPages,
-  ]);
-
-  // Reset hasInitialView quando mudar de página
-  useEffect(() => {
-    setHasInitialView(false);
-  }, [currentPage]);
-
-  // Intersection Observer: Para detectar quando lista sai/volta à tela
-  useEffect(() => {
-    if (!listSectionRef.current || !hasInitialView || articles.length === 0)
-      return;
-
-    let hasLeft = false;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            if (hasLeft) {
-              // Registra reappear para todos os artigos da lista
-              articles.forEach((article, index) => {
-                TrackArticleView(article.id, {
-                  page: pathname,
-                  section: "article-list",
-                  position: "list-item",
-                  categoryName: article.category.name,
-                  articleTitle: article.title,
-                  listIndex: index,
-                  currentPage: currentPage,
-                  viewType: "reappear",
-                  intersectionRatio: entry.intersectionRatio,
-                  timestamp: new Date().toISOString(),
-                });
-              });
-
-              hasLeft = false;
-            }
-          } else {
-            hasLeft = true;
-          }
-        });
-      },
-      {
-        threshold: 0.3,
-        rootMargin: "0px",
-      }
-    );
-
-    observer.observe(listSectionRef.current);
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [hasInitialView, articles, TrackArticleView, pathname, currentPage]);
 
   // Analytics: Função para registrar clique no artigo
   const handleArticleClick = (article: any, index: number) => {
@@ -176,10 +85,7 @@ export default function ListArticlesByCategory() {
   };
 
   return (
-    <section
-      ref={listSectionRef}
-      className="flex flex-col lg:flex-row gap-6 max-w-[1272px] mx-auto py-4 justify-between"
-    >
+    <section className="flex flex-col lg:flex-row gap-6 max-w-[1272px] mx-auto py-4 justify-between">
       <div className="flex flex-col gap-6 w-full max-w-[948px]">
         {articles.map((post, idx) => (
           <Link
@@ -190,12 +96,7 @@ export default function ListArticlesByCategory() {
             className="w-full"
             onClick={() => handleArticleClick(post, idx)}
           >
-            <div
-              ref={(el) => {
-                if (el) articlesRef.current[post.id] = el;
-              }}
-              className="flex flex-col md:flex-row rounded-xl transition w-full hover:shadow-md hover:bg-gray-50"
-            >
+            <div className="flex flex-col md:flex-row rounded-xl transition w-full hover:shadow-md hover:bg-gray-50">
               <div className="relative min-w-[300px] md:w-[328px] h-[310px] md:h-[227px] rounded-md overflow-hidden">
                 <Image
                   src={
@@ -255,7 +156,7 @@ export default function ListArticlesByCategory() {
               </span>
             ) : (
               <button
-                key={`page-${page}`} // Agora sempre é único
+                key={`page-${page}`}
                 onClick={() => handlePageChange(page as number)}
                 className={`px-4 py-2 rounded-md hover:bg-gray-100 ${
                   currentPage === page

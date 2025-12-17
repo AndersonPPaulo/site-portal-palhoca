@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import PostTopGridSection from "./sections/post-top-grid-section";
-import { useParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import PostBanner from "../banner/post-banner";
 import { CompanyGridSection } from "../companys/company-grid-section";
 import ButtonCTAWhatsAppButton from "../custom-button/cta-whatsapp-group-button";
@@ -16,7 +16,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "../ui/breadcrumb";
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef, useState, useMemo } from "react";
 import { ArticleContext } from "@/provider/article";
 import { formatDate } from "@/utils/formatDate";
 import { ArticleAnalyticsContext } from "@/provider/analytics/article";
@@ -39,75 +39,171 @@ export default function PostPage() {
     publishedArticles,
   } = useContext(ArticleContext);
 
-  const { TrackArticleViewEnd } = useContext(ArticleAnalyticsContext);
+  const { TrackArticleViewEnd, TrackArticleView, TrackArticleClick } =
+    useContext(ArticleAnalyticsContext);
 
   const slug = useParams();
+  const pathname = usePathname();
   const whatsappButtonRef = useRef<HTMLDivElement>(null);
-  const viewEndTrackedRef = useRef(false); // Para evitar múltiplos disparos
+  const viewEndTrackedRef = useRef(false);
+  const [hasTrackedInitialView, setHasTrackedInitialView] = useState(false);
+  const lastTrackedArticleId = useRef<string | null>(null);
+  const currentSlugRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (slug.slug?.toString()) {
+      console.log("🔄 [RESET] Trocando para novo artigo:", slug.slug);
+
+      // Atualiza o slug atual
+      currentSlugRef.current = slug.slug.toString();
+
+      // Reset do tracking ANTES de carregar novo artigo
+      setHasTrackedInitialView(false);
+      viewEndTrackedRef.current = false;
+      lastTrackedArticleId.current = null;
+
+      console.log("🔄 [RESET] Estados resetados");
+
       Promise.all([
         GetArticleBySlug(slug.slug?.toString()),
         GetPublishedArticles({ category_name: slug.name?.toString() }),
       ]);
     }
-  }, [slug]);
+  }, [slug.slug, slug.name]);
+
+  // Tracking de view inicial quando o artigo é carregado
+  useEffect(() => {
+    console.log("🔍 [TRACK DEBUG] Verificando condições:", {
+      articleId: articleBySlug?.id,
+      articleSlug: articleBySlug?.slug,
+      currentSlug: currentSlugRef.current,
+      slugsMatch: articleBySlug?.slug === currentSlugRef.current,
+      hasTrackedInitialView,
+      lastTrackedArticleId: lastTrackedArticleId.current,
+      shouldTrack:
+        articleBySlug?.id &&
+        articleBySlug?.slug === currentSlugRef.current &&
+        !hasTrackedInitialView &&
+        lastTrackedArticleId.current !== articleBySlug.id,
+    });
+
+    // CRÍTICO: Só rastreia se o artigo carregado corresponde ao slug atual
+    if (
+      articleBySlug?.id &&
+      articleBySlug?.slug === currentSlugRef.current &&
+      !hasTrackedInitialView &&
+      lastTrackedArticleId.current !== articleBySlug.id
+    ) {
+      console.log(
+        "✅ [TRACK] Disparando view para artigo:",
+        articleBySlug.title
+      );
+
+      TrackArticleView(articleBySlug.id, {
+        page: window.location.pathname,
+        section: "post-page",
+        position: "main-article",
+        categoryName: articleBySlug.category.name,
+        articleTitle: articleBySlug.title,
+        viewType: "page_open",
+        timestamp: new Date().toISOString(),
+      });
+
+      setHasTrackedInitialView(true);
+      lastTrackedArticleId.current = articleBySlug.id;
+
+      console.log("✅ [TRACK] View registrado. Estado atualizado.");
+    } else if (articleBySlug?.slug !== currentSlugRef.current) {
+      console.log(
+        "⚠️ [TRACK] Ignorando artigo antigo:",
+        articleBySlug?.title,
+        "(slug não corresponde)"
+      );
+    }
+  }, [articleBySlug?.id, articleBySlug?.slug]);
 
   // Observer para detectar quando o usuário passa pelo botão WhatsApp
   useEffect(() => {
     if (
       !whatsappButtonRef.current ||
       !articleBySlug?.id ||
-      viewEndTrackedRef.current
+      viewEndTrackedRef.current ||
+      articleBySlug?.slug !== currentSlugRef.current // Só observa se for o artigo atual
     )
       return;
+
+    const currentRef = whatsappButtonRef.current;
+    const currentArticleId = articleBySlug.id;
+    const currentArticleSlug = articleBySlug.slug;
+
+    console.log(
+      "👁️ [OBSERVER] Iniciando observer para artigo:",
+      articleBySlug.title
+    );
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting && !viewEndTrackedRef.current) {
-            // Dispara o view_end quando o botão entra na viewport
-            TrackArticleViewEnd(articleBySlug.id, {
+          console.log("👁️ [OBSERVER] Entry:", {
+            isIntersecting: entry.isIntersecting,
+            currentArticleId,
+            currentArticleSlug,
+            articleBySlugId: articleBySlug?.id,
+            articleBySlugSlug: articleBySlug?.slug,
+            currentSlug: currentSlugRef.current,
+            viewEndTracked: viewEndTrackedRef.current,
+            isSameArticle:
+              articleBySlug?.id === currentArticleId &&
+              articleBySlug?.slug === currentArticleSlug,
+            slugMatches: currentArticleSlug === currentSlugRef.current,
+          });
+
+          // CRÍTICO: Verifica se ainda é o mesmo artigo E se o slug corresponde
+          if (
+            entry.isIntersecting &&
+            !viewEndTrackedRef.current &&
+            articleBySlug?.id === currentArticleId &&
+            articleBySlug?.slug === currentArticleSlug &&
+            currentArticleSlug === currentSlugRef.current
+          ) {
+            console.log(
+              "✅ [OBSERVER] Disparando view_end para:",
+              articleBySlug.title
+            );
+
+            TrackArticleViewEnd(currentArticleId, {
               article_title: articleBySlug.title,
               trigger: "scroll_to_whatsapp_button",
               timestamp: new Date().toISOString(),
             });
 
-            viewEndTrackedRef.current = true; // Marca como já disparado
+            viewEndTrackedRef.current = true;
+            console.log("✅ [OBSERVER] view_end registrado");
+          } else if (currentArticleSlug !== currentSlugRef.current) {
+            console.log("⚠️ [OBSERVER] Ignorando evento de artigo antigo");
           }
         });
       },
       {
-        threshold: 0.5, // Dispara quando 50% do botão está visível
-        rootMargin: "0px 0px -10% 0px", // Margem para garantir que o usuário realmente chegou lá
+        threshold: 0.5,
+        rootMargin: "0px 0px -10% 0px",
       }
     );
 
-    observer.observe(whatsappButtonRef.current);
+    observer.observe(currentRef);
 
+    // Cleanup: desconectar observer ao desmontar ou trocar de artigo
     return () => {
+      console.log("🧹 [OBSERVER] Desconectando observer");
       observer.disconnect();
     };
-  }, [articleBySlug?.id, TrackArticleViewEnd]);
+  }, [articleBySlug?.id, articleBySlug?.slug, articleBySlug?.title]);
 
-  // Reset do tracking quando mudar de artigo
-  useEffect(() => {
-    viewEndTrackedRef.current = false;
-  }, [articleBySlug?.id]);
-
-  useEffect(() => {
-    if (slug.slug?.toString()) {
-      Promise.all([
-        GetArticleBySlug(slug.slug?.toString()),
-        GetPublishedArticles({ category_name: slug.name?.toString() }),
-      ]);
-    }
-  }, [slug]);
-
-  const sidePosts = publishedArticles?.data
-    ?.filter((post) => post.id !== articleBySlug?.id) // exclui o post atual
-    ?.slice(0, 5);
+  const sidePosts = useMemo(() => {
+    return publishedArticles?.data
+      ?.filter((post) => post.id !== articleBySlug?.id)
+      ?.slice(0, 5);
+  }, [publishedArticles?.data, articleBySlug?.id]);
 
   return (
     <section className="flex flex-col gap-6 mx-auto max-w-[1272px] justify-between">
@@ -209,7 +305,9 @@ export default function PostPage() {
               </span>
 
               {/* post banner */}
-              <PostBanner />
+              <div className="my-4">
+                <PostBanner />
+              </div>
 
               {/* conteudo */}
               <div
@@ -244,10 +342,26 @@ export default function PostPage() {
             {sidePosts &&
               sidePosts.map((post, idx) => (
                 <Link
-                  key={idx}
+                  key={post.id}
                   href={`/noticia/${normalizeText(post.category.name)}/${
                     post.slug
                   }`}
+                  onClick={() => {
+                    TrackArticleClick(post.id, {
+                      page: pathname,
+                      section: "side-posts",
+                      position: "sidebar",
+                      categoryName: post.category.name,
+                      articleTitle: post.title,
+                      targetUrl: `/noticia/${normalizeText(
+                        post.category.name
+                      )}/${post.slug}`,
+                      clickPosition: "side-post-item",
+                      sidePostIndex: idx,
+                      currentPostId: articleBySlug?.id,
+                      timestamp: new Date().toISOString(),
+                    });
+                  }}
                 >
                   <div className="flex gap-3 rounded-xl p-2 transition">
                     <div className="relative min-w-[151px] h-[110px] rounded-sm overflow-hidden">
@@ -294,6 +408,7 @@ export default function PostPage() {
           <SideBanner />
         </div>
       </div>
+
       <CompanyGridSection />
       <PostTopGridSection currentPostId={articleBySlug?.id} />
     </section>
