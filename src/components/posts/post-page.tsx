@@ -322,6 +322,7 @@ export default function PostPage() {
     [&_em]:italic
     [&_u]:underline
     [&_br]:block
+    [&_img]:w-full [&_img]:h-auto [&_img]:my-4 [&_img]:rounded-md
   "
                 dangerouslySetInnerHTML={{
                   __html: articleBySlug?.content || "",
