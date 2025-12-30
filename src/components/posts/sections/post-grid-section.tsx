@@ -9,6 +9,84 @@ import { ArticleAnalyticsContext } from "@/provider/analytics/article";
 import { formatDate } from "@/utils/formatDate";
 import normalizeTextToslug from "@/utils/normalize-text-to-slug";
 import default_image from "@/assets/no-img.png";
+import { useArticleViewTracking } from "@/hooks/useIntersectionObserverArticle";
+
+// Componente wrapper para grid post com tracking de view
+function GridPostItem({
+  post,
+  index,
+  pathname,
+  handleGridPostClick,
+  TrackArticleView,
+  gridSize,
+}: any) {
+  const trackingData = {
+    page: pathname,
+    section: "post-grid",
+    position: "grid-item",
+    categoryName: post.category.name,
+    articleTitle: post.title,
+    gridIndex: index,
+    highlightPosition: 3,
+    gridSize: gridSize,
+  };
+
+  const { ref: gridPostRef, registerInitialView } = useArticleViewTracking(
+    post.id,
+    trackingData,
+    TrackArticleView
+  );
+
+  useEffect(() => {
+    registerInitialView();
+  }, [registerInitialView]);
+
+  return (
+    <Link
+      key={post.id}
+      href={`/noticia/${normalizeTextToslug(post.category.name)}/${post.slug}`}
+      onClick={() => handleGridPostClick(post, index)}
+    >
+      <div
+        ref={gridPostRef}
+        className="flex flex-col rounded-xl transition max-w-[405px]  hover:transform hover:scale-105"
+      >
+        <div className="relative min-w-[300px] md:w-[405px] h-[310px] rounded-md overflow-hidden">
+          <Image
+            src={
+              post && post.thumbnail && post.thumbnail.url
+                ? post.thumbnail.url
+                : default_image
+            }
+            alt={
+              post && post.title && post.title
+                ? post.title
+                : "Imagem do portal palhoça"
+            }
+            fill
+            unoptimized
+            className="object-cover"
+          />
+        </div>
+        <div>
+          <h3 className="text-2xl mt-2 ml-1 font-semibold leading-tight line-clamp-3">
+            {post.title}
+          </h3>
+          <div className="flex w-full justify-between">
+            <div className="flex items-center mt-2 gap-4">
+              <span className="w-min text-xs bg-secondary text-primary px-3 py-1 rounded-2xl">
+                {post.category.name}
+              </span>
+              <p className="text-xs text-gray-500">
+                {formatDate(post.created_at)}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
+}
 
 export default function PostGridSection() {
   const slug = useParams();
@@ -19,7 +97,9 @@ export default function PostGridSection() {
     articlesByPortalHighlightPositionThree,
   } = useContext(ArticleContext);
 
-  const { TrackArticleClick } = useContext(ArticleAnalyticsContext);
+  const { TrackArticleClick, TrackArticleView } = useContext(
+    ArticleAnalyticsContext
+  );
 
   useEffect(() => {
     const fetchArticles = async () => {
@@ -65,48 +145,15 @@ export default function PostGridSection() {
     >
       <div className="flex flex-col lg:flex-row justify-between gap-7">
         {gridPosts.map((post, idx) => (
-          <Link
+          <GridPostItem
             key={post.id}
-            href={`/noticia/${normalizeTextToslug(post.category.name)}/${
-              post.slug
-            }`}
-            onClick={() => handleGridPostClick(post, idx)}
-          >
-            <div className="flex flex-col rounded-xl transition max-w-[405px]  hover:transform hover:scale-105">
-              <div className="relative min-w-[300px] md:w-[405px] h-[310px] rounded-md overflow-hidden">
-                <Image
-                  src={
-                    post && post.thumbnail && post.thumbnail.url
-                      ? post.thumbnail.url
-                      : default_image
-                  }
-                  alt={
-                    post && post.title && post.title
-                      ? post.title
-                      : "Imagem do portal palhoça"
-                  }
-                  fill
-                  unoptimized
-                  className="object-cover"
-                />
-              </div>
-              <div>
-                <h3 className="text-2xl mt-2 ml-1 font-semibold leading-tight line-clamp-3">
-                  {post.title}
-                </h3>
-                <div className="flex w-full justify-between">
-                  <div className="flex items-center mt-2 gap-4">
-                    <span className="w-min text-xs bg-secondary text-primary px-3 py-1 rounded-2xl">
-                      {post.category.name}
-                    </span>
-                    <p className="text-xs text-gray-500">
-                      {formatDate(post.created_at)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Link>
+            post={post}
+            index={idx}
+            pathname={pathname}
+            handleGridPostClick={handleGridPostClick}
+            TrackArticleView={TrackArticleView}
+            gridSize={gridPosts.length}
+          />
         ))}
       </div>
     </section>

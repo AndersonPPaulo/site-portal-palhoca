@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useCallback, useMemo } from "react";
+import { memo, useCallback, useMemo, useEffect, useRef, useState } from "react";
 import Image, { StaticImageData } from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -136,6 +136,12 @@ export const CardCompany = memo(function CardCompany({
   // Hook de analytics com fallback
   const analytics = useCompanyAnalytics();
   const TrackCompanyClick = analytics?.TrackCompanyClick;
+  const TrackCompanyView = analytics?.TrackCompanyView;
+
+  // Refs e states para Intersection Observer
+  const cardRef = useRef<HTMLElement>(null);
+  const [hasTrackedView, setHasTrackedView] = useState(false);
+  const hasLeftRef = useRef(false);
 
   // Dados processados e memoizados
   const processedData = useMemo(() => {
@@ -161,6 +167,84 @@ export const CardCompany = memo(function CardCompany({
       formattedAddress,
     };
   }, [company]);
+
+  // Intersection Observer para tracking de views
+  useEffect(() => {
+    const element = cardRef.current;
+    if (!element || !TrackCompanyView || !processedData.companyId) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Registrar view inicial
+            if (!hasTrackedView) {
+              const viewData = {
+                page: pathname,
+                section,
+                position: "company-card",
+                companyName: company.name,
+                primaryCategory: processedData.primaryCategory,
+                allCategories: processedData.categories,
+                hasMultipleCategories: processedData.hasMultipleCategories,
+                gridIndex,
+                address: company.address,
+                viewType: "initial",
+                timestamp: new Date().toISOString(),
+                isHighlight: company.highlight,
+              };
+
+              TrackCompanyView(processedData.companyId, viewData);
+              setHasTrackedView(true);
+            }
+            // Registrar reappear se já saiu antes
+            else if (hasLeftRef.current) {
+              const viewData = {
+                page: pathname,
+                section,
+                position: "company-card",
+                companyName: company.name,
+                primaryCategory: processedData.primaryCategory,
+                viewType: "reappear",
+                timestamp: new Date().toISOString(),
+              };
+
+              TrackCompanyView(processedData.companyId, viewData);
+              hasLeftRef.current = false;
+            }
+          } else {
+            // Marca que o card saiu da tela
+            if (hasTrackedView) {
+              hasLeftRef.current = true;
+            }
+          }
+        });
+      },
+      {
+        threshold: 0.5, // 50% do card visível
+        rootMargin: "0px",
+      }
+    );
+
+    observer.observe(element);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [
+    hasTrackedView,
+    TrackCompanyView,
+    processedData.companyId,
+    pathname,
+    section,
+    company.name,
+    processedData.primaryCategory,
+    processedData.categories,
+    processedData.hasMultipleCategories,
+    gridIndex,
+    company.address,
+    company.highlight,
+  ]);
 
   // Função para registrar analytics
   const trackAnalytics = useCallback(
@@ -262,6 +346,7 @@ export const CardCompany = memo(function CardCompany({
 
   return (
     <article
+      ref={cardRef}
       data-company-id={processedData.companyId}
       data-company-name={company.name}
       data-company-category={processedData.primaryCategory}

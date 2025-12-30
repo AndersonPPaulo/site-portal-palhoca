@@ -9,6 +9,97 @@ import { ArticleAnalyticsContext } from "@/provider/analytics/article";
 import { formatDate } from "@/utils/formatDate";
 import normalizeTextToslug from "@/utils/normalize-text-to-slug";
 import default_image from "@/assets/no-img.png";
+import { useArticleViewTracking } from "@/hooks/useIntersectionObserverArticle";
+
+// Componente wrapper para top post com tracking de view
+function TopPostItem({
+  post,
+  index,
+  pathname,
+  handleTopGridPostClick,
+  TrackArticleView,
+  topPostsLength,
+}: any) {
+  const trackingData = {
+    page: pathname,
+    section: "top-portal-grid",
+    position: "grid-item",
+    categoryName: post.category.name,
+    articleTitle: post.title,
+    gridIndex: index,
+    gridPosition: `${Math.floor(index / 3) + 1}-${(index % 3) + 1}`,
+    gridSize: topPostsLength,
+    gridRows: Math.ceil(topPostsLength / 3),
+    gridCols: 3,
+    sortOrder: "newest_first",
+  };
+
+  const { ref: topPostRef, registerInitialView } = useArticleViewTracking(
+    post.id,
+    trackingData,
+    TrackArticleView
+  );
+
+  useEffect(() => {
+    registerInitialView();
+  }, [registerInitialView]);
+
+  return (
+    <Link
+      key={post.id}
+      href={`/noticia/${normalizeTextToslug(post.category.name)}/${post.slug}`}
+      onClick={() => handleTopGridPostClick(post, index)}
+    >
+      <div
+        ref={topPostRef}
+        className="flex flex-col rounded-xl transition hover:shadow-lg hover:transform hover:scale-105"
+      >
+        <div className="relative min-w-[300px] md:w-[405px] h-[310px] rounded-md overflow-hidden">
+          {post?.thumbnail?.url ? (
+            <Image
+              unoptimized
+              src={
+                post && post.thumbnail && post.thumbnail.url
+                  ? post.thumbnail.url
+                  : default_image
+              }
+              alt={
+                post && post.title && post.title
+                  ? post.title
+                  : "Imagem do portal palhoça"
+              }
+              fill
+              className="object-cover"
+            />
+          ) : (
+            <Image
+              unoptimized
+              src={default_image}
+              alt={"Sem imagem cadastrada na noticia"}
+              fill
+              className="object-cover"
+            />
+          )}
+        </div>
+        <div>
+          <h3 className="text-2xl mt-2 ml-1 font-semibold leading-tight line-clamp-3">
+            {post.title}
+          </h3>
+          <div className="flex w-full justify-between">
+            <div className="flex items-center mt-2 gap-4">
+              <span className="w-min text-xs bg-secondary text-primary px-3 py-1 rounded-2xl">
+                {post.category.name}
+              </span>
+              <p className="text-xs text-gray-500">
+                {formatDate(post.created_at)}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
+}
 
 export default function PostTopGridSection({
   currentPostId,
@@ -19,7 +110,9 @@ export default function PostTopGridSection({
 
   const { GetPublishedArticles, publishedArticles } =
     useContext(ArticleContext);
-  const { TrackArticleClick } = useContext(ArticleAnalyticsContext);
+  const { TrackArticleClick, TrackArticleView } = useContext(
+    ArticleAnalyticsContext
+  );
 
   useEffect(() => {
     GetPublishedArticles({});
@@ -77,58 +170,15 @@ export default function PostTopGridSection({
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 justify-between gap-7">
         {topPosts.map((post, idx) => (
-          <Link
+          <TopPostItem
             key={post.id}
-            href={`/noticia/${normalizeTextToslug(post.category.name)}/${
-              post.slug
-            }`}
-            onClick={() => handleTopGridPostClick(post, idx)}
-          >
-            <div className="flex flex-col rounded-xl transition hover:shadow-lg hover:transform hover:scale-105">
-              <div className="relative min-w-[300px] md:w-[405px] h-[310px] rounded-md overflow-hidden">
-                {post?.thumbnail?.url ? (
-                  <Image
-                    unoptimized
-                    src={
-                      post && post.thumbnail && post.thumbnail.url
-                        ? post.thumbnail.url
-                        : default_image
-                    }
-                    alt={
-                      post && post.title && post.title
-                        ? post.title
-                        : "Imagem do portal palhoça"
-                    }
-                    fill
-                    className="object-cover"
-                  />
-                ) : (
-                  <Image
-                    unoptimized
-                    src={default_image}
-                    alt={"Sem imagem cadastrada na noticia"}
-                    fill
-                    className="object-cover"
-                  />
-                )}
-              </div>
-              <div>
-                <h3 className="text-2xl mt-2 ml-1 font-semibold leading-tight line-clamp-3">
-                  {post.title}
-                </h3>
-                <div className="flex w-full justify-between">
-                  <div className="flex items-center mt-2 gap-4">
-                    <span className="w-min text-xs bg-secondary text-primary px-3 py-1 rounded-2xl">
-                      {post.category.name}
-                    </span>
-                    <p className="text-xs text-gray-500">
-                      {formatDate(post.created_at)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Link>
+            post={post}
+            index={idx}
+            pathname={pathname}
+            handleTopGridPostClick={handleTopGridPostClick}
+            TrackArticleView={TrackArticleView}
+            topPostsLength={topPosts.length}
+          />
         ))}
       </div>
     </section>
