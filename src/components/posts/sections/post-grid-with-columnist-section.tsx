@@ -10,6 +10,7 @@ import { formatDate } from "@/utils/formatDate";
 import normalizeTextToslug from "@/utils/normalize-text-to-slug";
 import default_image from "@/assets/no-img.png";
 import { useArticleViewTracking } from "@/hooks/useIntersectionObserverArticle";
+import ColumnistCardWidget from "@/components/columnists/columnist-card-widget";
 
 // Componente wrapper para columnist post com tracking de view
 function ColumnistPostItem({
@@ -129,7 +130,7 @@ export default function PostGridWwithColumnistSection() {
   }, []);
 
   const gridPosts =
-    articlesByPortalHighlightPositionFour?.data.slice(0, 4) || [];
+    articlesByPortalHighlightPositionFour?.data.slice(0, 3) || [];
 
   // Analytics: Função para registrar clique no post do grid
   const handleGridPostClick = (post: any, index: number) => {
@@ -171,6 +172,8 @@ export default function PostGridWwithColumnistSection() {
             gridSize={gridPosts.length}
           />
         ))}
+
+        <ColumnistCardWidget noSlug={noSlug} />
       </div>
     </section>
   );
