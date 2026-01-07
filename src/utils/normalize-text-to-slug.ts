@@ -7,5 +7,3 @@ export default function normalizeTextToslug(text: string): string {
     .split(" ")
     .join("-");
 }
-
-
