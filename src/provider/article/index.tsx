@@ -53,6 +53,7 @@ export interface Article {
   };
   resume_content: string;
   content: string;
+  gallery?: string;
   clicks_view: string;
   highlight: boolean;
   created_at: string;

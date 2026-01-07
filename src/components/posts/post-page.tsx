@@ -329,6 +329,57 @@ export default function PostPage() {
                 }}
               />
 
+              {/* Galeria de fotos */}
+              {articleBySlug?.gallery &&
+                (() => {
+                  try {
+                    const gallery = JSON.parse(articleBySlug.gallery);
+                    return Array.isArray(gallery) && gallery.length > 0 ? (
+                      <div className="max-w-[800px] lg:max-w-[1200px] mb-10">
+                        <h3 className="text-2xl font-semibold mb-4">
+                          Galeria de Fotos
+                        </h3>
+                        <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
+                          {gallery.map((image: any, index: number) => (
+                            <div
+                              key={index}
+                              className="relative flex-shrink-0 w-[320px] h-[240px] rounded-md overflow-hidden snap-start"
+                            >
+                              <Image
+                                unoptimized
+                                src={image.url || image}
+                                alt={
+                                  image.description ||
+                                  `Imagem da galeria ${index + 1}`
+                                }
+                                fill
+                                className="object-cover"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                        {gallery.some((img: any) => img.description) && (
+                          <div className="mt-2">
+                            {gallery.map((image: any, index: number) =>
+                              image.description ? (
+                                <p
+                                  key={index}
+                                  className="text-xs text-[#757575] mb-1"
+                                >
+                                  Foto {index + 1}: {image.description}
+                                </p>
+                              ) : null
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ) : null;
+                  } catch (e) {
+                    console.error("Erro ao parsear galeria:", e);
+                    return null;
+                  }
+                })()}
+
               {/* Botão CTA com observer para view_end */}
               <div ref={whatsappButtonRef}>
                 <ButtonCTAWhatsAppButton />
