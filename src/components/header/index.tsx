@@ -128,32 +128,6 @@ export default function Header() {
             </Button>
           </div>
         )}
-
-        {/* Mobile nav tabs */}
-        {!isHiddenMobileTabs && (
-          <nav className="lg:hidden space-x-4 flex justify-center items-center p-4">
-            <Link
-              href="/"
-              className={`hover:text-primary px-4 py-3 ${
-                !isComercioPath
-                  ? "text-primary font-[700] border-b-2 border-primary"
-                  : "text-[#363636]"
-              }`}
-            >
-              Portal
-            </Link>
-            <Link
-              href="/comercio"
-              className={`hover:text-red px-4 py-3 ${
-                isComercioPath
-                  ? "text-red font-[700] border-b-2 border-red"
-                  : "text-[#363636]"
-              }`}
-            >
-              Buscar Comércio
-            </Link>
-          </nav>
-        )}
       </header>
 
       {/* 🌱 PARTE QUE NÃO É FIXA */}
@@ -161,7 +135,7 @@ export default function Header() {
         <div
           className={`${
             !isHiddenMobileTabs
-              ? "mb-4 mt-[160px] lg:mt-0"
+              ? "mb-4 mt-[50px] lg:mt-0"
               : "mb-4 mt-[90px] lg:mt-0"
           }`}
         >
