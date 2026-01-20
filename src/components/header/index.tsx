@@ -132,13 +132,7 @@ export default function Header() {
 
       {/* 🌱 PARTE QUE NÃO É FIXA */}
       {!isMenuOpen && (
-        <div
-          className={`${
-            !isHiddenMobileTabs
-              ? "mb-4 mt-[50px] lg:mt-0"
-              : "mb-4 mt-[90px] lg:mt-0"
-          }`}
-        >
+        <div className="mb-4 mt-22.5 lg:mt-0">
           {/* mt-[130px]: espaço para header fixo (ajuste conforme altura real do header fixo) */}
           {isComercioPath || isNoticiaPath ? (
             <CustomInput pathname={pathname} />
