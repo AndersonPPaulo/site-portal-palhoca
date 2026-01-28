@@ -73,19 +73,19 @@ export default function PostPage() {
 
   // Tracking de view inicial quando o artigo é carregado
   useEffect(() => {
-    console.log("🔍 [TRACK DEBUG] Verificando condições:", {
-      articleId: articleBySlug?.id,
-      articleSlug: articleBySlug?.slug,
-      currentSlug: currentSlugRef.current,
-      slugsMatch: articleBySlug?.slug === currentSlugRef.current,
-      hasTrackedInitialView,
-      lastTrackedArticleId: lastTrackedArticleId.current,
-      shouldTrack:
-        articleBySlug?.id &&
-        articleBySlug?.slug === currentSlugRef.current &&
-        !hasTrackedInitialView &&
-        lastTrackedArticleId.current !== articleBySlug.id,
-    });
+    // console.log("🔍 [TRACK DEBUG] Verificando condições:", {
+    //   articleId: articleBySlug?.id,
+    //   articleSlug: articleBySlug?.slug,
+    //   currentSlug: currentSlugRef.current,
+    //   slugsMatch: articleBySlug?.slug === currentSlugRef.current,
+    //   hasTrackedInitialView,
+    //   lastTrackedArticleId: lastTrackedArticleId.current,
+    //   shouldTrack:
+    //     articleBySlug?.id &&
+    //     articleBySlug?.slug === currentSlugRef.current &&
+    //     !hasTrackedInitialView &&
+    //     lastTrackedArticleId.current !== articleBySlug.id,
+    // });
 
     // CRÍTICO: Só rastreia se o artigo carregado corresponde ao slug atual
     if (
@@ -94,10 +94,10 @@ export default function PostPage() {
       !hasTrackedInitialView &&
       lastTrackedArticleId.current !== articleBySlug.id
     ) {
-      console.log(
-        "✅ [TRACK] Disparando view para artigo:",
-        articleBySlug.title
-      );
+      // console.log(
+      //   "✅ [TRACK] Disparando view para artigo:",
+      //   articleBySlug.title,
+      // );
 
       TrackArticleView(articleBySlug.id, {
         page: window.location.pathname,
@@ -117,7 +117,7 @@ export default function PostPage() {
       console.log(
         "⚠️ [TRACK] Ignorando artigo antigo:",
         articleBySlug?.title,
-        "(slug não corresponde)"
+        "(slug não corresponde)",
       );
     }
   }, [articleBySlug?.id, articleBySlug?.slug]);
@@ -136,27 +136,27 @@ export default function PostPage() {
     const currentArticleId = articleBySlug.id;
     const currentArticleSlug = articleBySlug.slug;
 
-    console.log(
-      "👁️ [OBSERVER] Iniciando observer para artigo:",
-      articleBySlug.title
-    );
+    // console.log(
+    //   "👁️ [OBSERVER] Iniciando observer para artigo:",
+    //   articleBySlug.title,
+    // );
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          console.log("👁️ [OBSERVER] Entry:", {
-            isIntersecting: entry.isIntersecting,
-            currentArticleId,
-            currentArticleSlug,
-            articleBySlugId: articleBySlug?.id,
-            articleBySlugSlug: articleBySlug?.slug,
-            currentSlug: currentSlugRef.current,
-            viewEndTracked: viewEndTrackedRef.current,
-            isSameArticle:
-              articleBySlug?.id === currentArticleId &&
-              articleBySlug?.slug === currentArticleSlug,
-            slugMatches: currentArticleSlug === currentSlugRef.current,
-          });
+          // console.log("👁️ [OBSERVER] Entry:", {
+          //   isIntersecting: entry.isIntersecting,
+          //   currentArticleId,
+          //   currentArticleSlug,
+          //   articleBySlugId: articleBySlug?.id,
+          //   articleBySlugSlug: articleBySlug?.slug,
+          //   currentSlug: currentSlugRef.current,
+          //   viewEndTracked: viewEndTrackedRef.current,
+          //   isSameArticle:
+          //     articleBySlug?.id === currentArticleId &&
+          //     articleBySlug?.slug === currentArticleSlug,
+          //   slugMatches: currentArticleSlug === currentSlugRef.current,
+          // });
 
           // CRÍTICO: Verifica se ainda é o mesmo artigo E se o slug corresponde
           if (
@@ -166,11 +166,6 @@ export default function PostPage() {
             articleBySlug?.slug === currentArticleSlug &&
             currentArticleSlug === currentSlugRef.current
           ) {
-            console.log(
-              "✅ [OBSERVER] Disparando view_end para:",
-              articleBySlug.title
-            );
-
             TrackArticleViewEnd(currentArticleId, {
               article_title: articleBySlug.title,
               trigger: "scroll_to_whatsapp_button",
@@ -187,14 +182,14 @@ export default function PostPage() {
       {
         threshold: 0.5,
         rootMargin: "0px 0px -10% 0px",
-      }
+      },
     );
 
     observer.observe(currentRef);
 
     // Cleanup: desconectar observer ao desmontar ou trocar de artigo
     return () => {
-      console.log("🧹 [OBSERVER] Desconectando observer");
+      // console.log("🧹 [OBSERVER] Desconectando observer");
       observer.disconnect();
     };
   }, [articleBySlug?.id, articleBySlug?.slug, articleBySlug?.title]);
@@ -300,8 +295,8 @@ export default function PostPage() {
                 {articleBySlug?.thumbnail?.description
                   ? articleBySlug?.thumbnail?.description
                   : !articleBySlug?.thumbnail?.url
-                  ? "Sem imagem cadastrada no momento"
-                  : "Imagem pertencente a noticia do Portal"}
+                    ? "Sem imagem cadastrada no momento"
+                    : "Imagem pertencente a noticia do Portal"}
               </span>
 
               {/* post banner */}
@@ -368,7 +363,7 @@ export default function PostPage() {
                                 >
                                   Foto {index + 1}: {image.description}
                                 </p>
-                              ) : null
+                              ) : null,
                             )}
                           </div>
                         )}
@@ -406,7 +401,7 @@ export default function PostPage() {
                       categoryName: post.category.name,
                       articleTitle: post.title,
                       targetUrl: `/noticia/${normalizeText(
-                        post.category.name
+                        post.category.name,
                       )}/${post.slug}`,
                       clickPosition: "side-post-item",
                       sidePostIndex: idx,

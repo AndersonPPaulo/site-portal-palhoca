@@ -105,19 +105,19 @@ interface IPublicCompanyContext {
   listHighlightedCompanies(
     page?: number,
     limit?: number,
-    filters?: IListCompanyFilters
+    filters?: IListCompanyFilters,
   ): Promise<IPublicCompanyListResponse>;
 
   listNormalCompanies(
     page?: number,
     limit?: number,
-    filters?: IListCompanyFilters
+    filters?: IListCompanyFilters,
   ): Promise<IPublicCompanyListResponse>;
 
   listAllCompanies(
     page?: number,
     limit?: number,
-    filters?: IListCompanyFilters
+    filters?: IListCompanyFilters,
   ): Promise<IPublicCompanyListResponse>;
 
   // Outros métodos
@@ -130,7 +130,7 @@ interface IPublicCompanyContext {
 // ==================== PROVIDER ====================
 
 export const PublicCompanyContext = createContext<IPublicCompanyContext>(
-  {} as IPublicCompanyContext
+  {} as IPublicCompanyContext,
 );
 
 export const PublicCompanyProvider = ({
@@ -140,14 +140,14 @@ export const PublicCompanyProvider = ({
 }) => {
   // Estados
   const [companies, setCompanies] = useState<IPublicCompanyListResponse | null>(
-    null
+    null,
   );
   const [highlightedCompanies, setHighlightedCompanies] =
     useState<IPublicCompanyListResponse | null>(null);
   const [normalCompanies, setNormalCompanies] =
     useState<IPublicCompanyListResponse | null>(null);
   const [selectedCompany, setSelectedCompany] = useState<IPublicCompany | null>(
-    null
+    null,
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -158,7 +158,7 @@ export const PublicCompanyProvider = ({
       page: number,
       limit: number,
       filters: IListCompanyFilters,
-      highlight?: boolean
+      highlight?: boolean,
     ) => {
       return {
         page,
@@ -170,7 +170,7 @@ export const PublicCompanyProvider = ({
         portalReferer: window.location.hostname,
       };
     },
-    []
+    [],
   );
 
   // Função auxiliar para tratamento de erros
@@ -186,7 +186,7 @@ export const PublicCompanyProvider = ({
     async (
       page = 1,
       limit = 20,
-      filters: IListCompanyFilters = {}
+      filters: IListCompanyFilters = {},
     ): Promise<IPublicCompanyListResponse> => {
       setLoading(true);
       setError(null);
@@ -197,7 +197,6 @@ export const PublicCompanyProvider = ({
         const formattedResponse: IPublicCompanyListResponse = response.data;
 
         setHighlightedCompanies(formattedResponse);
-        console.log("formattedResponse", formattedResponse);
         return formattedResponse;
       } catch (err: any) {
         return handleApiError(err, "Erro ao carregar comércios em destaque");
@@ -205,7 +204,7 @@ export const PublicCompanyProvider = ({
         setLoading(false);
       }
     },
-    [buildParams, handleApiError]
+    [buildParams, handleApiError],
   );
 
   // Listar apenas empresas normais (highlight: false)
@@ -213,7 +212,7 @@ export const PublicCompanyProvider = ({
     async (
       page = 1,
       limit = 20,
-      filters: IListCompanyFilters = {}
+      filters: IListCompanyFilters = {},
     ): Promise<IPublicCompanyListResponse> => {
       setLoading(true);
       setError(null);
@@ -222,7 +221,6 @@ export const PublicCompanyProvider = ({
         const params = buildParams(page, limit, filters, false);
         const response = await api.get("/company/site", { params });
         const formattedResponse: IPublicCompanyListResponse = response.data;
-        console.log("formattedResponse", formattedResponse);
 
         setNormalCompanies(formattedResponse);
         return formattedResponse;
@@ -232,7 +230,7 @@ export const PublicCompanyProvider = ({
         setLoading(false);
       }
     },
-    [buildParams, handleApiError]
+    [buildParams, handleApiError],
   );
 
   // Listar todas as empresas (sem filtro de highlight)
@@ -240,7 +238,7 @@ export const PublicCompanyProvider = ({
     async (
       page = 1,
       limit = 20,
-      filters: IListCompanyFilters = {}
+      filters: IListCompanyFilters = {},
     ): Promise<IPublicCompanyListResponse> => {
       setLoading(true);
       setError(null);
@@ -258,7 +256,7 @@ export const PublicCompanyProvider = ({
         setLoading(false);
       }
     },
-    [buildParams, handleApiError]
+    [buildParams, handleApiError],
   );
 
   // Buscar empresa por ID
@@ -284,7 +282,7 @@ export const PublicCompanyProvider = ({
         setLoading(false);
       }
     },
-    [handleApiError]
+    [handleApiError],
   );
 
   // Criar novo lead
@@ -315,7 +313,7 @@ export const PublicCompanyProvider = ({
         setLoading(false);
       }
     },
-    []
+    [],
   );
 
   // Funções auxiliares
@@ -360,7 +358,7 @@ export const PublicCompanyProvider = ({
       clearSelectedCompany,
       clearError,
       createNewLead,
-    ]
+    ],
   );
 
   return (
@@ -377,7 +375,7 @@ export const usePublicCompany = () => {
 
   if (!context) {
     throw new Error(
-      "usePublicCompany deve ser usado dentro de um PublicCompanyProvider"
+      "usePublicCompany deve ser usado dentro de um PublicCompanyProvider",
     );
   }
 
