@@ -221,7 +221,6 @@ export const PublicCompanyProvider = ({
         const params = buildParams(page, limit, filters, false);
         const response = await api.get("/company/site", { params });
         const formattedResponse: IPublicCompanyListResponse = response.data;
-        console.log("formattedResponse", formattedResponse);
 
         setNormalCompanies(formattedResponse);
         return formattedResponse;
