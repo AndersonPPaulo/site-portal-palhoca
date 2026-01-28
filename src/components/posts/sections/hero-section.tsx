@@ -10,7 +10,7 @@ import { formatDate } from "@/utils/formatDate";
 import { useParams } from "next/navigation";
 import normalizeTextToslug from "@/utils/normalize-text-to-slug";
 import default_image from "@/assets/no-img.png";
-import { useArticleViewTracking } from "@/hooks/useIntersectionObserverArticle";
+// import { useArticleViewTracking } from "@/hooks/useIntersectionObserverArticle";
 
 // Componente wrapper para side post com tracking de view
 function SidePostItem({
@@ -20,25 +20,25 @@ function SidePostItem({
   handleSidePostClick,
   TrackArticleView,
 }: any) {
-  const trackingData = {
-    page: pathname,
-    section: "hero-section",
-    position: "side-article",
-    categoryName: post.category.name,
-    articleTitle: post.title,
-    sidePostIndex: idx,
-    highlightPosition: 2,
-  };
+  // const trackingData = {
+  //   page: pathname,
+  //   section: "hero-section",
+  //   position: "side-article",
+  //   categoryName: post.category.name,
+  //   articleTitle: post.title,
+  //   sidePostIndex: idx,
+  //   highlightPosition: 2,
+  // };
 
-  const { ref: sidePostRef, registerInitialView } = useArticleViewTracking(
-    post.id,
-    trackingData,
-    TrackArticleView
-  );
+  // const { ref: sidePostRef, registerInitialView } = useArticleViewTracking(
+  //   post.id,
+  //   trackingData,
+  //   TrackArticleView,
+  // );
 
-  useEffect(() => {
-    registerInitialView();
-  }, [registerInitialView]);
+  // useEffect(() => {
+  //   registerInitialView();
+  // }, [registerInitialView]);
 
   return (
     <Link
@@ -46,7 +46,7 @@ function SidePostItem({
       href={`/noticia/${normalizeTextToslug(post.category.name)}/${post.slug}`}
       onClick={() => handleSidePostClick(post, idx)}
     >
-      <div ref={sidePostRef} className="flex gap-3 rounded-xl p-2 transition">
+      <div className="flex gap-3 rounded-xl p-2 transition">
         <div className="relative min-w-[151px] h-[110px] rounded-sm overflow-hidden">
           <Image
             src={
@@ -89,9 +89,7 @@ export default function HeroSection() {
     GetArticlesByPortalHighlightPositionTwo,
   } = useContext(ArticleContext);
 
-  const { TrackArticleClick, TrackArticleView } = useContext(
-    ArticleAnalyticsContext
-  );
+  const { TrackArticleClick } = useContext(ArticleAnalyticsContext);
 
   useEffect(() => {
     const fetchArticles = async () => {
@@ -115,30 +113,30 @@ export default function HeroSection() {
   const sidePosts = articlesByPortalHighlightPositionTwo?.data.slice(0, 3);
 
   // Hook para tracking de view do artigo principal
-  const mainPostTrackingData = mainPost
-    ? {
-        page: pathname,
-        section: "hero-section",
-        position: "main-article",
-        categoryName: mainPost.category.name,
-        articleTitle: mainPost.title,
-        highlightPosition: 1,
-      }
-    : {};
+  // const mainPostTrackingData = mainPost
+  //   ? {
+  //       page: pathname,
+  //       section: "hero-section",
+  //       position: "main-article",
+  //       categoryName: mainPost.category.name,
+  //       articleTitle: mainPost.title,
+  //       highlightPosition: 1,
+  //     }
+  //   : {};
 
-  const { ref: mainPostRef, registerInitialView: registerMainPostView } =
-    useArticleViewTracking(
-      mainPost?.id || "",
-      mainPostTrackingData,
-      TrackArticleView
-    );
+  // const { ref: mainPostRef, registerInitialView: registerMainPostView } =
+  //   useArticleViewTracking(
+  //     mainPost?.id || "",
+  //     mainPostTrackingData,
+  //     TrackArticleView,
+  //   );
 
-  // Registrar view inicial do artigo principal quando carregado
-  useEffect(() => {
-    if (mainPost) {
-      registerMainPostView();
-    }
-  }, [mainPost, registerMainPostView]);
+  // // Registrar view inicial do artigo principal quando carregado
+  // useEffect(() => {
+  //   if (mainPost) {
+  //     registerMainPostView();
+  //   }
+  // }, [mainPost, registerMainPostView]);
 
   // Analytics: Função para registrar clique no artigo principal
   const handleMainPostClick = () => {
@@ -194,10 +192,7 @@ export default function HeroSection() {
           }`}
           onClick={handleMainPostClick}
         >
-          <div
-            ref={mainPostRef}
-            className="flex flex-col lg:flex-row gap-6 rounded-xl"
-          >
+          <div className="flex flex-col lg:flex-row gap-6 rounded-xl">
             <div className="relative md:min-w-[490px] max-w-[490px] min-h-[406px] max-h-[406px] rounded-xl overflow-hidden">
               <Image
                 src={mainPost?.thumbnail?.url ?? default_image}
@@ -241,7 +236,6 @@ export default function HeroSection() {
               idx={idx}
               pathname={pathname}
               handleSidePostClick={handleSidePostClick}
-              TrackArticleView={TrackArticleView}
             />
           ))}
         </div>

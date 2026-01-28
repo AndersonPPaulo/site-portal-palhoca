@@ -52,7 +52,7 @@ interface IColumnistData {
   GetColumnistArticles: (
     columnistId: string,
     page?: number,
-    limit?: number
+    limit?: number,
   ) => Promise<void>;
   columnistArticles: ColumnistArticlesResponse | null;
   loading: boolean;
@@ -70,9 +70,8 @@ export const ColumnistProvider = ({ children }: { children: ReactNode }) => {
     setLoading(true);
     try {
       const response = await api.get(
-        `/columnists-with-articles?columnistLimit=${limit}&articlesPerColumnist=1`
+        `/columnists-with-articles?columnistLimit=${limit}&articlesPerColumnist=1`,
       );
-      console.log("Response completa do backend:", response.data);
       setColumnists(response.data.response || []);
     } catch (error) {
       console.error("Erro ao buscar colunistas:", error);
@@ -85,12 +84,12 @@ export const ColumnistProvider = ({ children }: { children: ReactNode }) => {
   const GetColumnistArticles = async (
     columnistId: string,
     page: number = 1,
-    limit: number = 20
+    limit: number = 20,
   ) => {
     setLoading(true);
     try {
       const response = await api.get(
-        `/article-author/${columnistId}?page=${page}&limit=${limit}&status=PUBLISHED`
+        `/article-author/${columnistId}?page=${page}&limit=${limit}&status=PUBLISHED`,
       );
       console.log("Response artigos do colunista:", response.data);
       setColumnistArticles(response.data);

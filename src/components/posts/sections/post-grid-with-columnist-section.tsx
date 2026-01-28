@@ -9,7 +9,7 @@ import { ArticleAnalyticsContext } from "@/provider/analytics/article";
 import { formatDate } from "@/utils/formatDate";
 import normalizeTextToslug from "@/utils/normalize-text-to-slug";
 import default_image from "@/assets/no-img.png";
-import { useArticleViewTracking } from "@/hooks/useIntersectionObserverArticle";
+// import { useArticleViewTracking } from "@/hooks/useIntersectionObserverArticle";
 import ColumnistCardWidget from "@/components/columnists/columnist-card-widget";
 
 // Componente wrapper para columnist post com tracking de view
@@ -22,28 +22,28 @@ function ColumnistPostItem({
   TrackArticleView,
   gridSize,
 }: any) {
-  const trackingData = {
-    page: pathname,
-    section: "post-grid-columnist",
-    position: "grid-item",
-    categoryName: post.category.name,
-    articleTitle: post.title,
-    gridIndex: index,
-    highlightPosition: 4,
-    gridSize: gridSize,
-    hasSlug: !noSlug,
-    layoutType: noSlug ? "with-columnist" : "category-focused",
-  };
+  // const trackingData = {
+  //   page: pathname,
+  //   section: "post-grid-columnist",
+  //   position: "grid-item",
+  //   categoryName: post.category.name,
+  //   articleTitle: post.title,
+  //   gridIndex: index,
+  //   highlightPosition: 4,
+  //   gridSize: gridSize,
+  //   hasSlug: !noSlug,
+  //   layoutType: noSlug ? "with-columnist" : "category-focused",
+  // };
 
-  const { ref: columnistPostRef, registerInitialView } = useArticleViewTracking(
-    post.id,
-    trackingData,
-    TrackArticleView
-  );
+  // const { ref: columnistPostRef, registerInitialView } = useArticleViewTracking(
+  //   post.id,
+  //   trackingData,
+  //   TrackArticleView,
+  // );
 
-  useEffect(() => {
-    registerInitialView();
-  }, [registerInitialView]);
+  // useEffect(() => {
+  //   registerInitialView();
+  // }, [registerInitialView]);
 
   return (
     <Link
@@ -52,7 +52,6 @@ function ColumnistPostItem({
       onClick={() => handleGridPostClick(post, index)}
     >
       <div
-        ref={columnistPostRef}
         className={`flex flex-col gap-3 rounded-xl p-2 transition hover:shadow-lg hover:transform hover:scale-105 ${
           !noSlug
             ? "max-w-[405px] min-w-[300px] md:w-[405px] min-h-[310px]"
@@ -113,9 +112,7 @@ export default function PostGridWwithColumnistSection() {
     articlesByPortalHighlightPositionFour,
   } = useContext(ArticleContext);
 
-  const { TrackArticleClick, TrackArticleView } = useContext(
-    ArticleAnalyticsContext
-  );
+  const { TrackArticleClick } = useContext(ArticleAnalyticsContext);
 
   useEffect(() => {
     const fetchArticles = async () => {
@@ -168,7 +165,6 @@ export default function PostGridWwithColumnistSection() {
             pathname={pathname}
             noSlug={noSlug}
             handleGridPostClick={handleGridPostClick}
-            TrackArticleView={TrackArticleView}
             gridSize={gridPosts.length}
           />
         ))}
