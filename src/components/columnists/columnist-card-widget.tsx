@@ -53,9 +53,9 @@ export default function ColumnistCardWidget({
                   className="flex items-center gap-3 mb-3 hover:opacity-80 transition"
                 >
                   <div className="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
-                    {columnist.user_image?.image_url ? (
+                    {columnist.user_image?.url ? (
                       <Image
-                        src={columnist.user_image.image_url}
+                        src={columnist.user_image.url}
                         alt={columnist.name}
                         fill
                         unoptimized
@@ -86,7 +86,7 @@ export default function ColumnistCardWidget({
                 {lastArticle && (
                   <Link
                     href={`/noticia/${normalizeTextToslug(
-                      lastArticle.category.name
+                      lastArticle.category.name,
                     )}/${lastArticle.slug}`}
                     className="flex items-center gap-3 pl-2 hover:opacity-80 transition"
                   >
