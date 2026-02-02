@@ -58,9 +58,9 @@ export default function ColumnistPage() {
             {columnist && (
               <div className="flex items-center gap-6 p-6 bg-gradient-to-br from-primary/10 to-secondary/20 rounded-xl border-2 border-primary/20 mb-6">
                 <div className="relative w-24 h-24 rounded-full overflow-hidden flex-shrink-0">
-                  {columnist?.user_image?.image_url ? (
+                  {columnist?.user_image?.url ? (
                     <Image
-                      src={columnist.user_image.image_url}
+                      src={columnist.user_image.url}
                       alt={columnist.name}
                       fill
                       unoptimized
@@ -103,7 +103,7 @@ export default function ColumnistPage() {
                       <Link
                         key={article.id}
                         href={`/noticia/${normalizeTextToslug(
-                          article.category.name
+                          article.category.name,
                         )}/${article.slug}`}
                         className="flex flex-col gap-3 rounded-xl p-2 transition hover:shadow-lg hover:transform hover:scale-105"
                       >
@@ -161,7 +161,7 @@ export default function ColumnistPage() {
                         <Link
                           key={article.id}
                           href={`/noticia/${normalizeTextToslug(
-                            article.category.name
+                            article.category.name,
                           )}/${article.slug}`}
                           className="flex flex-col gap-3 rounded-xl p-2 transition hover:shadow-lg hover:transform hover:scale-105"
                         >
@@ -222,7 +222,7 @@ export default function ColumnistPage() {
                       <button
                         onClick={() =>
                           setPage((p) =>
-                            Math.min(columnistArticles.meta.totalPages, p + 1)
+                            Math.min(columnistArticles.meta.totalPages, p + 1),
                           )
                         }
                         disabled={page === columnistArticles.meta.totalPages}
@@ -250,7 +250,7 @@ export default function ColumnistPage() {
                   <Link
                     key={article.id}
                     href={`/noticia/${normalizeTextToslug(
-                      article.category.name
+                      article.category.name,
                     )}/${article.slug}`}
                     className="flex gap-3 rounded-xl p-2 transition hover:bg-gray-50"
                   >

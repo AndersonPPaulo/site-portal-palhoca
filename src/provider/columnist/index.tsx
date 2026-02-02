@@ -30,7 +30,7 @@ export interface Columnist {
   topic: string;
   user_image?: {
     id: string;
-    image_url: string;
+    url: string;
   };
   articles: ColumnistArticle[];
 }
