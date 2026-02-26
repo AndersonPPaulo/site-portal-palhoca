@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { memo, useCallback, useMemo, useEffect, useRef, useState } from "react";
-import Image, { StaticImageData } from "next/image";
+import { memo, useCallback, useMemo } from "react";
+import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { MapPin, Phone } from "lucide-react";
@@ -127,7 +128,7 @@ export const CardCompany = memo(function CardCompany({
   onAnalyticsEvent,
 }: ICardCompanyProps) {
   const company_category_response = company.company_category?.map(
-    (cat) => cat.name
+    (cat) => cat.name,
   );
 
   const router = useRouter();
@@ -136,12 +137,12 @@ export const CardCompany = memo(function CardCompany({
   // Hook de analytics com fallback
   const analytics = useCompanyAnalytics();
   const TrackCompanyClick = analytics?.TrackCompanyClick;
-  const TrackCompanyView = analytics?.TrackCompanyView;
+  // const TrackCompanyView = analytics?.TrackCompanyView;
 
-  // Refs e states para Intersection Observer
-  const cardRef = useRef<HTMLElement>(null);
-  const [hasTrackedView, setHasTrackedView] = useState(false);
-  const hasLeftRef = useRef(false);
+  // Refs e states para Intersection Observer - TRACKING DE VIEW DESABILITADO
+  // const cardRef = useRef<HTMLElement>(null);
+  // const [hasTrackedView, setHasTrackedView] = useState(false);
+  // const hasLeftRef = useRef(false);
 
   // Dados processados e memoizados
   const processedData = useMemo(() => {
@@ -168,83 +169,84 @@ export const CardCompany = memo(function CardCompany({
     };
   }, [company]);
 
+  // TRACKING DE VISUALIZAÇÃO DESABILITADO - Card não envia mais eventos de view ao backend
   // Intersection Observer para tracking de views
-  useEffect(() => {
-    const element = cardRef.current;
-    if (!element || !TrackCompanyView || !processedData.companyId) return;
+  // useEffect(() => {
+  //   const element = cardRef.current;
+  //   if (!element || !TrackCompanyView || !processedData.companyId) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            // Registrar view inicial
-            if (!hasTrackedView) {
-              const viewData = {
-                page: pathname,
-                section,
-                position: "company-card",
-                companyName: company.name,
-                primaryCategory: processedData.primaryCategory,
-                allCategories: processedData.categories,
-                hasMultipleCategories: processedData.hasMultipleCategories,
-                gridIndex,
-                address: company.address,
-                viewType: "initial",
-                timestamp: new Date().toISOString(),
-                isHighlight: company.highlight,
-              };
+  //   const observer = new IntersectionObserver(
+  //     (entries) => {
+  //       entries.forEach((entry) => {
+  //         if (entry.isIntersecting) {
+  //           // Registrar view inicial
+  //           if (!hasTrackedView) {
+  //             const viewData = {
+  //               page: pathname,
+  //               section,
+  //               position: "company-card",
+  //               companyName: company.name,
+  //               primaryCategory: processedData.primaryCategory,
+  //               allCategories: processedData.categories,
+  //               hasMultipleCategories: processedData.hasMultipleCategories,
+  //               gridIndex,
+  //               address: company.address,
+  //               viewType: "initial",
+  //               timestamp: new Date().toISOString(),
+  //               isHighlight: company.highlight,
+  //             };
 
-              TrackCompanyView(processedData.companyId, viewData);
-              setHasTrackedView(true);
-            }
-            // Registrar reappear se já saiu antes
-            else if (hasLeftRef.current) {
-              const viewData = {
-                page: pathname,
-                section,
-                position: "company-card",
-                companyName: company.name,
-                primaryCategory: processedData.primaryCategory,
-                viewType: "reappear",
-                timestamp: new Date().toISOString(),
-              };
+  //             TrackCompanyView(processedData.companyId, viewData);
+  //             setHasTrackedView(true);
+  //           }
+  //           // Registrar reappear se já saiu antes
+  //           else if (hasLeftRef.current) {
+  //             const viewData = {
+  //               page: pathname,
+  //               section,
+  //               position: "company-card",
+  //               companyName: company.name,
+  //               primaryCategory: processedData.primaryCategory,
+  //               viewType: "reappear",
+  //               timestamp: new Date().toISOString(),
+  //             };
 
-              TrackCompanyView(processedData.companyId, viewData);
-              hasLeftRef.current = false;
-            }
-          } else {
-            // Marca que o card saiu da tela
-            if (hasTrackedView) {
-              hasLeftRef.current = true;
-            }
-          }
-        });
-      },
-      {
-        threshold: 0.5, // 50% do card visível
-        rootMargin: "0px",
-      }
-    );
+  //             TrackCompanyView(processedData.companyId, viewData);
+  //             hasLeftRef.current = false;
+  //           }
+  //         } else {
+  //           // Marca que o card saiu da tela
+  //           if (hasTrackedView) {
+  //             hasLeftRef.current = true;
+  //           }
+  //         }
+  //       });
+  //     },
+  //     {
+  //       threshold: 0.5, // 50% do card visível
+  //       rootMargin: "0px",
+  //     },
+  //   );
 
-    observer.observe(element);
+  //   observer.observe(element);
 
-    return () => {
-      observer.disconnect();
-    };
-  }, [
-    hasTrackedView,
-    TrackCompanyView,
-    processedData.companyId,
-    pathname,
-    section,
-    company.name,
-    processedData.primaryCategory,
-    processedData.categories,
-    processedData.hasMultipleCategories,
-    gridIndex,
-    company.address,
-    company.highlight,
-  ]);
+  //   return () => {
+  //     observer.disconnect();
+  //   };
+  // }, [
+  //   hasTrackedView,
+  //   TrackCompanyView,
+  //   processedData.companyId,
+  //   pathname,
+  //   section,
+  //   company.name,
+  //   processedData.primaryCategory,
+  //   processedData.categories,
+  //   processedData.hasMultipleCategories,
+  //   gridIndex,
+  //   company.address,
+  //   company.highlight,
+  // ]);
 
   // Função para registrar analytics
   const trackAnalytics = useCallback(
@@ -281,7 +283,7 @@ export const CardCompany = memo(function CardCompany({
       processedData,
       TrackCompanyClick,
       onAnalyticsEvent,
-    ]
+    ],
   );
 
   // Handler para navegação com analytics
@@ -294,13 +296,12 @@ export const CardCompany = memo(function CardCompany({
         router.push(processedData.targetUrl);
       }, 50);
     },
-    [router, processedData.targetUrl, trackAnalytics]
+    [router, processedData.targetUrl, trackAnalytics],
   );
 
   // Renderização de categorias
   const renderCategories = useMemo(() => {
-    const { categories, hasMultipleCategories, primaryCategory } =
-      processedData;
+    const { categories } = processedData;
     const maxVisible = variant === "detailed" ? 4 : 3;
     const visibleCategories = categories.slice(0, maxVisible);
     const remainingCount = categories.length - maxVisible;
@@ -346,7 +347,7 @@ export const CardCompany = memo(function CardCompany({
 
   return (
     <article
-      ref={cardRef}
+      // ref={cardRef} // REMOVIDO - Tracking de view desabilitado
       data-company-id={processedData.companyId}
       data-company-name={company.name}
       data-company-category={processedData.primaryCategory}
