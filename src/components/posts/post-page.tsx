@@ -376,7 +376,7 @@ export default function PostPage() {
                 })()}
 
               {/* Botão CTA com observer para view_end */}
-              <div ref={whatsappButtonRef}>
+              <div ref={whatsappButtonRef} className="mb-5">
                 <ButtonCTAWhatsAppButton />
               </div>
             </div>
