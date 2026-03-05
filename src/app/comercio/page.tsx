@@ -29,7 +29,6 @@ export async function generateMetadata({
   const categoriaNome = categoria
     ? capitalize(SlugToText(categoria))
     : "Comércios";
-  console.log("categoriaNome", categoriaNome);
 
   const title = `${categoriaNome} em Palhoça | Portal Palhoça`;
   const description = `Explore os melhores ${categoriaNome.toLowerCase()} em Palhoça. Descubra serviços locais, empresas e muito mais na sua região.`;

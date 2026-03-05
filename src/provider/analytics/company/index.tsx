@@ -23,6 +23,7 @@ export enum EventType {
   INSTAGRAM_CLICK = "instagram_click",
   PHONE_CLICK = "phone_click",
   SHARE = "share",
+  PRINT = "print",
 }
 
 // ==================== INTERFACES DE DADOS ====================
@@ -102,6 +103,7 @@ interface ICompanyAnalyticsContext {
   TrackCompanyInstagramClick(companyId: string, extraData?: Record<string, any>): Promise<void>;
   TrackCompanyPhoneClick(companyId: string, extraData?: Record<string, any>): Promise<void>;
   TrackCompanyShare(companyId: string, extraData?: Record<string, any>): Promise<void>;
+  TrackCompanyPrint(companyId: string, extraData?: Record<string, any>): Promise<void>;
 
   // Funções de dados
   GetEventsByCompany(companyId: string): Promise<void>;
@@ -393,6 +395,7 @@ export const CompanyAnalyticsProvider = ({ children }: { children: ReactNode }) 
   const TrackCompanyInstagramClick = useMemo(() => createTrackFunction(EventType.INSTAGRAM_CLICK), [createTrackFunction]);
   const TrackCompanyPhoneClick = useMemo(() => createTrackFunction(EventType.PHONE_CLICK), [createTrackFunction]);
   const TrackCompanyShare = useMemo(() => createTrackFunction(EventType.SHARE), [createTrackFunction]);
+  const TrackCompanyPrint = useMemo(() => createTrackFunction(EventType.PRINT), [createTrackFunction]);
 
   // Buscar eventos por empresa (com cache)
   const GetEventsByCompany = useCallback(async (companyId: string): Promise<void> => {
@@ -575,6 +578,7 @@ export const CompanyAnalyticsProvider = ({ children }: { children: ReactNode }) 
       TrackCompanyInstagramClick,
       TrackCompanyPhoneClick,
       TrackCompanyShare,
+      TrackCompanyPrint,
       
       // Funções de dados
       GetEventsByCompany,
@@ -609,6 +613,7 @@ export const CompanyAnalyticsProvider = ({ children }: { children: ReactNode }) 
       TrackCompanyInstagramClick,
       TrackCompanyPhoneClick,
       TrackCompanyShare,
+      TrackCompanyPrint,
       GetEventsByCompany,
       GetTotalEvents,
       UpdateVirtualEvent,
