@@ -384,7 +384,7 @@ export default function PostPage() {
         </div>
 
         {/* Side Posts */}
-        <div className="flex flex-col max-w-[356px]">
+        <div className="hidden lg:flex flex-col max-w-[356px]">
           <div className="shadow-md">
             {sidePosts &&
               sidePosts.map((post, idx) => (
