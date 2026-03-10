@@ -181,14 +181,14 @@ export function CompanyGridSection() {
     >
       <div className="w-[106px] h-2 bg-red-500 rounded-full" />
 
-      <div className="flex flex-col md:flex-row items-start gap-3 md:items-center justify-between">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between">
         <h2 className="text-2xl font-semibold text-red-500 py-6">
           Comércios que são destaques em Palhoça!
         </h2>
 
         <Link
           href="/comercio"
-          className="flex items-center mb-3 font-semibold gap-2 text-zinc-900 hover:text-red-500 transition-colors group"
+          className="hidden md:flex items-center font-semibold gap-2 text-zinc-900 hover:text-red-500 transition-colors group"
         >
           Veja mais
           <ArrowRight
@@ -269,14 +269,14 @@ export function CompanyGridSectionWithSkeleton() {
     <section className="w-full mt-8 md:mt-16 py-12 max-w-[1272px] mx-auto px-4">
       <div className="w-[106px] h-2 bg-red-500 rounded-full" />
 
-      <div className="flex flex-col md:flex-row items-start gap-3 md:items-center justify-between">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between">
         <h2 className="text-2xl font-semibold text-red-500 py-6">
           Comércios que são destaques em Palhoça!
         </h2>
 
         <Link
           href="/comercio"
-          className="flex items-center font-semibold gap-2 text-zinc-900 hover:text-red-500 transition-colors group"
+          className="hidden md:flex items-center font-semibold gap-2 text-zinc-900 hover:text-red-500 transition-colors group"
         >
           Veja mais
           <ArrowRight
