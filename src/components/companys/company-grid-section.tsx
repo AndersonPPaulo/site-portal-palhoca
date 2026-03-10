@@ -188,7 +188,7 @@ export function CompanyGridSection() {
 
         <Link
           href="/comercio"
-          className="flex items-center font-semibold gap-2 text-zinc-900 hover:text-red-500 transition-colors group"
+          className="flex items-center mb-3 font-semibold gap-2 text-zinc-900 hover:text-red-500 transition-colors group"
         >
           Veja mais
           <ArrowRight
