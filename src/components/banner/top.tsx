@@ -6,12 +6,14 @@ import { useContext, useEffect, useState } from "react";
 import { BannerContext, BannerItem } from "@/provider/banner";
 import { BannerAnalyticsContext } from "@/provider/analytics/banner";
 import { useBannerViewTracking } from "@/hooks/useIntersectionObserverBanner";
+import { PortalContext } from "@/provider/portal";
 
 export const TopBanner = () => {
   const { ListBannersTop, bannersTop } = useContext(BannerContext);
   const { TrackBannerView, TrackBannerClick } = useContext(
     BannerAnalyticsContext
   );
+  const { SelfPortalByReferer, portal } = useContext(PortalContext);
 
   const [isVisible, setIsVisible] = useState(false);
   const [randomBanner, setRandomBanner] = useState<BannerItem | null>(null);
@@ -43,10 +45,16 @@ export const TopBanner = () => {
 
   // Requisição dos banners quando o componente carrega
   useEffect(() => {
-    if (shouldDisplayBanner) {
-      ListBannersTop({});
+    const host = window.location.host;
+    const referer = host.replace(":3000", "");
+    SelfPortalByReferer(referer);
+  }, []);
+
+  useEffect(() => {
+    if (shouldDisplayBanner && portal?.link_referer) {
+      ListBannersTop({ linkReferer: portal.link_referer });
     }
-  }, [shouldDisplayBanner, pathname]);
+  }, [shouldDisplayBanner, pathname, portal]);
 
   // Escolher o banner aleatório assim que os banners forem carregados
   useEffect(() => {

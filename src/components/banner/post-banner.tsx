@@ -9,12 +9,14 @@ import { BannerContext, BannerItem } from "@/provider/banner";
 import { BannerAnalyticsContext, EventType } from "@/provider/analytics/banner";
 import { useBannerViewTracking } from "@/hooks/useIntersectionObserverBanner"; // Hook corrigido
 import { PublicCompanyContext } from "@/provider/company";
+import { PortalContext } from "@/provider/portal";
 
 const PostBanner = () => {
   const { ListBannersNews, bannersNews } = useContext(BannerContext);
   const { TrackBannerView, TrackBannerClick } = useContext(
     BannerAnalyticsContext
   );
+  const { SelfPortalByReferer, portal } = useContext(PortalContext);
 
   const {highlightedCompanies} =useContext(PublicCompanyContext)
 
@@ -48,10 +50,16 @@ const PostBanner = () => {
 
   // Requisição dos banners quando o componente carrega
   useEffect(() => {
-    if (shouldDisplayBanner) {
-      ListBannersNews({});
+    const host = window.location.host;
+    const referer = host.replace(":3000", "");
+    SelfPortalByReferer(referer);
+  }, []);
+
+  useEffect(() => {
+    if (shouldDisplayBanner && portal?.link_referer) {
+      ListBannersNews({ linkReferer: portal.link_referer });
     }
-  }, [shouldDisplayBanner, pathname]);
+  }, [shouldDisplayBanner, pathname, portal]);
 
   // Escolher o banner aleatório assim que os banners forem carregados
   useEffect(() => {

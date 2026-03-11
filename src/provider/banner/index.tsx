@@ -1,7 +1,8 @@
 "use client";
 
 import { api } from "@/service/api";
-import { createContext, ReactNode, useState } from "react";
+import { createContext, ReactNode, useState, useContext, useEffect } from "react";
+import { PortalContext } from "../portal";
 
 interface Company {
   id: string;
@@ -36,6 +37,7 @@ interface IBannerMetadataProps {
   limit?: number;
   onlyActive?: boolean;
   bannerStyle?: string;
+  linkReferer?: string;
 }
 
 interface IBannerData {
@@ -82,12 +84,14 @@ interface ICihldrenReact {
 export const BannerContext = createContext<IBannerData>({} as IBannerData);
 
 export const BannerProvider = ({ children }: ICihldrenReact) => {
+  const { portal } = useContext(PortalContext);
   const [bannersWelcome, setBannersWelcome] = useState<IBanner>({} as IBanner);
   const ListBannersWelcome = async ({
     page,
     limit,
     onlyActive = true,
     bannerStyle = "destaque",
+    linkReferer,
   }: IBannerMetadataProps): Promise<void> => {
     const config = {
       headers: {
@@ -98,6 +102,7 @@ export const BannerProvider = ({ children }: ICihldrenReact) => {
         limit,
         onlyActive,
         bannerStyle,
+        linkReferer: linkReferer || portal?.link_referer,
       },
     };
     const response = await api
@@ -118,6 +123,7 @@ export const BannerProvider = ({ children }: ICihldrenReact) => {
     limit,
     onlyActive = true,
     bannerStyle = "topo",
+    linkReferer,
   }: IBannerMetadataProps): Promise<void> => {
     const config = {
       headers: {
@@ -128,6 +134,7 @@ export const BannerProvider = ({ children }: ICihldrenReact) => {
         limit,
         onlyActive,
         bannerStyle,
+        linkReferer: linkReferer || portal?.link_referer,
       },
     };
 
@@ -149,6 +156,7 @@ export const BannerProvider = ({ children }: ICihldrenReact) => {
     limit,
     onlyActive = true,
     bannerStyle = "noticia",
+    linkReferer,
   }: IBannerMetadataProps): Promise<void> => {
     const config = {
       headers: {
@@ -159,6 +167,7 @@ export const BannerProvider = ({ children }: ICihldrenReact) => {
         limit,
         onlyActive,
         bannerStyle,
+        linkReferer: linkReferer || portal?.link_referer,
       },
     };
 
@@ -180,6 +189,7 @@ export const BannerProvider = ({ children }: ICihldrenReact) => {
     limit,
     onlyActive = true,
     bannerStyle = "sidebar",
+    linkReferer,
   }: IBannerMetadataProps): Promise<void> => {
     const config = {
       headers: {
@@ -190,6 +200,7 @@ export const BannerProvider = ({ children }: ICihldrenReact) => {
         limit,
         onlyActive,
         bannerStyle,
+        linkReferer: linkReferer || portal?.link_referer,
       },
     };
 

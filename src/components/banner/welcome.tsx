@@ -6,12 +6,14 @@ import Image from "next/image";
 import { Button } from "../ui/button";
 import { BannerContext, BannerItem } from "@/provider/banner";
 import { BannerAnalyticsContext } from "@/provider/analytics/banner";
+import { PortalContext } from "@/provider/portal";
 
 export const Banner = () => {
   const { ListBannersWelcome, bannersWelcome } = useContext(BannerContext);
   const { TrackBannerView, TrackBannerClick } = useContext(
     BannerAnalyticsContext
   );
+  const { SelfPortalByReferer, portal } = useContext(PortalContext);
 
   const [isVisible, setIsVisible] = useState(false);
   const [randomBanner, setRandomBanner] = useState<BannerItem | null>(null);
@@ -21,10 +23,16 @@ export const Banner = () => {
 
   // Requisição dos banners quando o componente carrega
   useEffect(() => {
-    if (shouldDisplayBanner) {
-      ListBannersWelcome({});
+    const host = window.location.host;
+    const referer = host.replace(":3000", "");
+    SelfPortalByReferer(referer);
+  }, []);
+
+  useEffect(() => {
+    if (shouldDisplayBanner && portal?.link_referer) {
+      ListBannersWelcome({ linkReferer: portal.link_referer });
     }
-  }, [shouldDisplayBanner, pathname]);
+  }, [shouldDisplayBanner, pathname, portal]);
 
   // Escolher o banner aleatório assim que os banners forem carregados
   useEffect(() => {
