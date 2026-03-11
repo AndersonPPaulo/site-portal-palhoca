@@ -9,6 +9,15 @@ interface Company {
   name: string;
 }
 
+interface Portal {
+  id: string;
+  name: string;
+  link_referer: string;
+  status: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface BannerItem {
   id: string;
   url: string; // era url_image no seu tipo, mas a API retorna "url"
@@ -22,6 +31,7 @@ export interface BannerItem {
   created_at: string;
   updated_at: string;
   company: Company;
+  portal: Portal;
   banner?: File;
 }
 
@@ -108,7 +118,22 @@ export const BannerProvider = ({ children }: ICihldrenReact) => {
     const response = await api
       .get("/banner", config)
       .then((res) => {
-        setBannersWelcome(res.data.response);
+        const referer = linkReferer || portal?.link_referer;
+        const responseData = res.data.response;
+        
+        // Filtrar banners pelo link_referer do portal
+        if (referer && responseData?.data) {
+          const filteredData = responseData.data.filter(
+            (banner: BannerItem) => banner.portal?.link_referer === referer
+          );
+          setBannersWelcome({
+            ...responseData,
+            data: filteredData,
+            total: filteredData.length,
+          });
+        } else {
+          setBannersWelcome(responseData);
+        }
       })
       .catch((err) => {
         return err;
@@ -141,7 +166,22 @@ export const BannerProvider = ({ children }: ICihldrenReact) => {
     const response = await api
       .get("/banner", config)
       .then((res) => {
-        setBannersTop(res.data.response);
+        const referer = linkReferer || portal?.link_referer;
+        const responseData = res.data.response;
+        
+        // Filtrar banners pelo link_referer do portal
+        if (referer && responseData?.data) {
+          const filteredData = responseData.data.filter(
+            (banner: BannerItem) => banner.portal?.link_referer === referer
+          );
+          setBannersTop({
+            ...responseData,
+            data: filteredData,
+            total: filteredData.length,
+          });
+        } else {
+          setBannersTop(responseData);
+        }
       })
       .catch((err) => {
         return err;
@@ -174,7 +214,22 @@ export const BannerProvider = ({ children }: ICihldrenReact) => {
     const response = await api
       .get("/banner", config)
       .then((res) => {
-        setBannersNews(res.data.response);
+        const referer = linkReferer || portal?.link_referer;
+        const responseData = res.data.response;
+        
+        // Filtrar banners pelo link_referer do portal
+        if (referer && responseData?.data) {
+          const filteredData = responseData.data.filter(
+            (banner: BannerItem) => banner.portal?.link_referer === referer
+          );
+          setBannersNews({
+            ...responseData,
+            data: filteredData,
+            total: filteredData.length,
+          });
+        } else {
+          setBannersNews(responseData);
+        }
       })
       .catch((err) => {
         return err;
@@ -207,7 +262,22 @@ export const BannerProvider = ({ children }: ICihldrenReact) => {
     const response = await api
       .get("/banner", config)
       .then((res) => {
-        setBannersSidebar(res.data.response);
+        const referer = linkReferer || portal?.link_referer;
+        const responseData = res.data.response;
+        
+        // Filtrar banners pelo link_referer do portal
+        if (referer && responseData?.data) {
+          const filteredData = responseData.data.filter(
+            (banner: BannerItem) => banner.portal?.link_referer === referer
+          );
+          setBannersSidebar({
+            ...responseData,
+            data: filteredData,
+            total: filteredData.length,
+          });
+        } else {
+          setBannersSidebar(responseData);
+        }
       })
       .catch((err) => {
         return err;

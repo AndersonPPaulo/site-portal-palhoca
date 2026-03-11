@@ -11,20 +11,22 @@ import { ColumnistProvider } from "./columnist";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <ArticleProvider>
-      <ColumnistProvider>
-        <PublicCompanyProvider>
-          <CompanyAnalyticsProvider>
-            <BannerProvider>
-              <ArticleAnalyticsProvider>
-                <BannerAnalyticsProvider>
-                  <PortalProvider>{children}</PortalProvider>
-                </BannerAnalyticsProvider>
-              </ArticleAnalyticsProvider>
-            </BannerProvider>
-          </CompanyAnalyticsProvider>
-        </PublicCompanyProvider>
-      </ColumnistProvider>
-    </ArticleProvider>
+    <PortalProvider>
+      <ArticleProvider>
+        <ColumnistProvider>
+          <PublicCompanyProvider>
+            <CompanyAnalyticsProvider>
+              <BannerProvider>
+                <ArticleAnalyticsProvider>
+                  <BannerAnalyticsProvider>
+                    {children}
+                  </BannerAnalyticsProvider>
+                </ArticleAnalyticsProvider>
+              </BannerProvider>
+            </CompanyAnalyticsProvider>
+          </PublicCompanyProvider>
+        </ColumnistProvider>
+      </ArticleProvider>
+    </PortalProvider>
   );
 }
