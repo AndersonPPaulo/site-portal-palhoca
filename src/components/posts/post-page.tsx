@@ -39,7 +39,7 @@ export default function PostPage() {
     publishedArticles,
   } = useContext(ArticleContext);
 
-  const { TrackArticleViewEnd, TrackArticleView, TrackArticleClick } =
+  const { TrackArticleViewEnd, TrackArticleView, TrackArticleClick, TrackArticleWhatsappClick } =
     useContext(ArticleAnalyticsContext);
 
   const slug = useParams();
@@ -376,7 +376,15 @@ export default function PostPage() {
                 })()}
 
               {/* Botão CTA com observer para view_end */}
-              <div ref={whatsappButtonRef} className="mb-5">
+              <div 
+                ref={whatsappButtonRef} 
+                className="mb-5"
+                onClick={() => {
+                  if (articleBySlug?.id) {
+                    TrackArticleWhatsappClick(articleBySlug.id);
+                  }
+                }}
+              >
                 <ButtonCTAWhatsAppButton />
               </div>
             </div>
