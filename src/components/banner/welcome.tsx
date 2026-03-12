@@ -36,14 +36,14 @@ export const Banner = () => {
 
   // Escolher o banner aleatório assim que os banners forem carregados
   useEffect(() => {
-    if (bannersWelcome?.data?.length > 0 && shouldDisplayBanner) {
+    if (bannersWelcome?.data?.length > 0 && shouldDisplayBanner && !randomBanner) {
       const randomIndex = Math.floor(
         Math.random() * bannersWelcome.data.length
       );
       setRandomBanner(bannersWelcome.data[randomIndex]);
       setIsVisible(true);
     }
-  }, [bannersWelcome, shouldDisplayBanner, pathname]);
+  }, [bannersWelcome, shouldDisplayBanner]);
 
   // Analytics: Registrar VIEW inicial quando o banner modal for exibido
   useEffect(() => {

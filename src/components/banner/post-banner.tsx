@@ -63,12 +63,12 @@ const PostBanner = () => {
 
   // Escolher o banner aleatório assim que os banners forem carregados
   useEffect(() => {
-    if (bannersNews?.data?.length > 0 && shouldDisplayBanner) {
+    if (bannersNews?.data?.length > 0 && shouldDisplayBanner && !randomBanner) {
       const randomIndex = Math.floor(Math.random() * bannersNews.data.length);
       setRandomBanner(bannersNews.data[randomIndex]);
       setIsVisible(true);
     }
-  }, [bannersNews, shouldDisplayBanner, pathname]);
+  }, [bannersNews, shouldDisplayBanner]);
 
   // Registrar view inicial quando banner for exibido
   useEffect(() => {

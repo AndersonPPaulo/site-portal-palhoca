@@ -60,14 +60,14 @@ const SideBanner = () => {
 
   // Escolher o banner aleatório assim que os banners forem carregados
   useEffect(() => {
-    if (bannersSidebar?.data?.length > 0 && shouldDisplayBanner) {
+    if (bannersSidebar?.data?.length > 0 && shouldDisplayBanner && !randomBanner) {
       const randomIndex = Math.floor(
         Math.random() * bannersSidebar.data.length
       );
       setRandomBanner(bannersSidebar.data[randomIndex]);
       setIsVisible(true);
     }
-  }, [bannersSidebar, shouldDisplayBanner, pathname]);
+  }, [bannersSidebar, shouldDisplayBanner]);
 
   // Registrar view inicial quando banner for exibido
   useEffect(() => {
