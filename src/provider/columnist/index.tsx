@@ -66,13 +66,28 @@ export const ColumnistProvider = ({ children }: { children: ReactNode }) => {
     useState<ColumnistArticlesResponse | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const GetColumnists = async (limit: number = 3) => {
+  const GetColumnists = async (limit: number = 4) => {
     setLoading(true);
     try {
       const response = await api.get(
         `/columnists-with-articles?columnistLimit=${limit}&articlesPerColumnist=1`,
       );
-      setColumnists(response.data.response || []);
+      const columnistsData = response.data.response || [];
+
+      // Ordenar colunistas pela data do artigo mais recente (mais recente primeiro)
+      const sortedColumnists = columnistsData
+        .filter(
+          (columnist: Columnist) =>
+            columnist.articles && columnist.articles.length > 0,
+        )
+        .sort((a: Columnist, b: Columnist) => {
+          const dateA = new Date(a.articles[0].created_at).getTime();
+          const dateB = new Date(b.articles[0].created_at).getTime();
+          return dateB - dateA; // Ordem decrescente (mais recente primeiro)
+        })
+        .slice(0, limit); // Garantir que retorna apenas o limite especificado
+
+      setColumnists(sortedColumnists);
     } catch (error) {
       console.error("Erro ao buscar colunistas:", error);
       setColumnists(null);
