@@ -106,8 +106,14 @@ export const ColumnistProvider = ({ children }: { children: ReactNode }) => {
       const response = await api.get(
         `/article-author/${columnistId}?page=${page}&limit=${limit}&status=PUBLISHED`,
       );
-      console.log("Response artigos do colunista:", response.data);
-      setColumnistArticles(response.data);
+
+      // Verificar se a resposta tem a estrutura esperada
+      if (response.data && response.data.data) {
+        setColumnistArticles(response.data);
+      } else {
+        console.error("Estrutura de resposta inesperada:", response.data);
+        setColumnistArticles(null);
+      }
     } catch (error) {
       console.error("Erro ao buscar artigos do colunista:", error);
       setColumnistArticles(null);

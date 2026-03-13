@@ -33,6 +33,7 @@ export default function ColumnistPage() {
     if (id && typeof id === "string") {
       GetColumnistArticles(id, page, LIMIT);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, page]);
 
   useEffect(() => {
@@ -41,6 +42,7 @@ export default function ColumnistPage() {
     }
     // Buscar artigos mais lidos para o sidebar
     GetPublishedArticles({ page: 1, limit: 5, highlight: false });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const columnist = columnists?.find((c) => c.id === id);
@@ -96,7 +98,9 @@ export default function ColumnistPage() {
                 <div className="flex items-center justify-center py-20">
                   <p className="text-gray-500">Carregando artigos...</p>
                 </div>
-              ) : columnistArticles && columnistArticles.data.length > 0 ? (
+              ) : columnistArticles &&
+                columnistArticles.data &&
+                columnistArticles.data.length > 0 ? (
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {columnistArticles.data.slice(0, 6).map((article) => (
@@ -235,7 +239,9 @@ export default function ColumnistPage() {
                 </>
               ) : (
                 <div className="flex items-center justify-center py-20">
-                  <p className="text-gray-500">Nenhum artigo encontrado</p>
+                  <p className="text-gray-500">
+                    Nenhum artigo publicado encontrado
+                  </p>
                 </div>
               )}
             </div>
