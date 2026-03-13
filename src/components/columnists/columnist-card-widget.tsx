@@ -17,7 +17,7 @@ export default function ColumnistCardWidget({
   const { GetColumnists, columnists, loading } = useContext(ColumnistContext);
 
   useEffect(() => {
-    GetColumnists(3);
+    GetColumnists(4);
   }, []);
 
   return (
@@ -28,7 +28,7 @@ export default function ColumnistCardWidget({
           : "min-w-[300px] md:w-[264px] md:min-w-[260px]"
       }`}
     >
-      <h3 className="text-2xl font-bold text-primary mb-4">Colunistas</h3>
+      <h3 className="text-2xl font-bold text-primary mb-1">Colunistas</h3>
 
       <div className="flex flex-col">
         {loading ? (
@@ -50,7 +50,7 @@ export default function ColumnistCardWidget({
                 {/* Link do Colunista */}
                 <Link
                   href={`/colunista/autor/${columnist.id}`}
-                  className="flex items-center gap-3 mb-3 hover:opacity-80 transition"
+                  className="flex items-center gap-3 hover:opacity-80 transition"
                 >
                   <div className="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
                     {columnist.user_image?.url ? (
@@ -72,47 +72,15 @@ export default function ColumnistCardWidget({
                   </div>
                   <div className="flex-1 min-w-0">
                     <h4 className="text-sm font-semibold text-gray-800 truncate">
-                      {columnist.name}
+                      {columnist.topic}
                     </h4>
                     {columnist.topic && (
                       <p className="text-xs text-gray-600 truncate">
-                        {columnist.topic}
+                        {columnist.name}
                       </p>
                     )}
                   </div>
                 </Link>
-
-                {/* Última Notícia do Colunista */}
-                {lastArticle && (
-                  <Link
-                    href={`/noticia/${normalizeTextToslug(
-                      lastArticle.category.name,
-                    )}/${lastArticle.slug}`}
-                    className="flex items-center gap-3 pl-2 hover:opacity-80 transition"
-                  >
-                    <div className="relative w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
-                      {lastArticle.thumbnail?.url ? (
-                        <Image
-                          src={lastArticle.thumbnail.url}
-                          alt={lastArticle.title}
-                          fill
-                          unoptimized
-                          className="object-cover"
-                        />
-                      ) : (
-                        <Image
-                          src={default_image}
-                          alt={lastArticle.title}
-                          fill
-                          className="object-cover"
-                        />
-                      )}
-                    </div>
-                    <p className="flex-1 text-xs text-gray-700 line-clamp-2 leading-tight">
-                      {lastArticle.title}
-                    </p>
-                  </Link>
-                )}
               </div>
             );
           })

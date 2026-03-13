@@ -74,7 +74,7 @@ function ColumnistPostItem({
             alt={
               post && post.title && post.title
                 ? post.title
-                : "Imagem do portal palhoça"
+                : "Imagem do portal Palhoça"
             }
             fill
             unoptimized
@@ -151,7 +151,7 @@ export default function PostGridWwithColumnistSection() {
   };
 
   return (
-    <section className="w-full sm:py-0 sm:px-6 lg:px-10 mx-auto max-w-7xl">
+    <section className="w-full sm:py-0 sm:px-6 lg:px-10 mx-auto max-w-7xl  md:mb-40">
       <div
         className={`flex flex-col ${
           noSlug ? "lg:flex-row" : "lg:flex-row"
