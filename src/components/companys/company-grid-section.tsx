@@ -73,16 +73,12 @@ const useCompanyData = () => {
   useEffect(() => {
     if (isComercioPage) return;
 
-    if (!hasLoaded || !highlightedCompanies) {
+    if (!hasLoaded) {
       listHighlightedCompanies(1, 4);
       setHasLoaded(true);
     }
-  }, [
-    isComercioPage,
-    hasLoaded,
-    highlightedCompanies,
-    listHighlightedCompanies,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isComercioPage, hasLoaded]);
 
   // Reset quando sair da página de comércios
   useEffect(() => {
@@ -128,10 +124,11 @@ export function CompanyGridSection() {
 
   const { TrackCompanyPrint } = useCompanyAnalytics();
   const pathname = usePathname();
+  const [hasTracked, setHasTracked] = useState(false);
 
   // Rastrear quando os comércios aparecem na tela
   useEffect(() => {
-    if (!loading && displayCompanies.length > 0 && TrackCompanyPrint) {
+    if (!loading && displayCompanies.length > 0 && TrackCompanyPrint && !hasTracked) {
       displayCompanies.forEach((company, index) => {
         TrackCompanyPrint(company.id, {
           page: pathname,
@@ -143,8 +140,9 @@ export function CompanyGridSection() {
           isHighlighted: company.highlight,
         });
       });
+      setHasTracked(true);
     }
-  }, [displayCompanies, loading, pathname, TrackCompanyPrint]);
+  }, [displayCompanies, loading, pathname, TrackCompanyPrint, hasTracked]);
 
   // Estados de carregamento e erro
   if (loading && !highlightedCompanies) {

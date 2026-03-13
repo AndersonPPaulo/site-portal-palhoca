@@ -41,7 +41,8 @@ export default function FilteredCommerceListHighlight() {
     } catch (error) {
       console.error("Erro ao buscar empresas destacadas:", error);
     }
-  }, [activeCategory, selectedDistrict, searchTerm, listHighlightedCompanies]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeCategory, selectedDistrict, searchTerm]);
 
   // Buscar dados quando filtros mudarem
   useEffect(() => {

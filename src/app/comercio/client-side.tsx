@@ -1,15 +1,35 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useContext, useMemo } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import DefaultPage from "@/components/default-page";
 import Header from "@/components/header";
 import { usePublicCompany } from "@/provider/company";
-import { useCompanyAnalytics } from "@/provider/analytics/company";
+import { CompanyAnalyticsContext } from "@/provider/analytics/company";
 import SlugToText from "@/utils/slugToText";
 import dynamic from "next/dynamic";
 import { AlertCircle, Loader2 } from "lucide-react";
 import CompanySkeleton from "@/components/companys/companySkeleton";
+
+type TrackCompanyViewParams = {
+  page: string;
+  section: string;
+  position: string;
+  companyName: string;
+  categories: string[];
+  activeCategory: string;
+  selectedDistrict: string;
+  showMapMode: boolean;
+  gridIndex: number;
+  globalIndex: number;
+  currentPage: number;
+  totalPages: number;
+  itemsPerPage: number;
+  totalCompanies: number;
+  pageCompaniesCount: number;
+  viewType: string;
+  timestamp: string;
+};
 
 // Definir tipos para window global
 declare global {
@@ -45,13 +65,13 @@ export default function ClientListArticlesByCategory() {
     clearSelectedCompany,
   } = usePublicCompany();
 
-  const { TrackCompanyPrint } = useCompanyAnalytics();
+  const { TrackCompanyView } = useContext(CompanyAnalyticsContext);
 
   const [showMap, setShowMap] = useState(false);
   const [selectedDistrict, setSelectedDistrict] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
 
-  //  Verificar se não há empresas em NENHUM dos conjuntos
+  // ✅ Verificar se não há empresas em NENHUM dos conjuntos
   const hasNoCompanies = useMemo(() => {
     const hasNormalCompanies =
       normalCompanies?.data && normalCompanies.data.length > 0;
@@ -77,24 +97,70 @@ export default function ClientListArticlesByCategory() {
     if (categoryQuery) {
       window.dispatchEvent(new CustomEvent("districtSelected", { detail: "" }));
       window.dispatchEvent(
-        new CustomEvent("companyNameSearch", { detail: "" }),
+        new CustomEvent("companyNameSearch", { detail: "" })
       );
       setSelectedDistrict("");
     }
-  }, [categoryQuery, pathname, listAllCompanies, clearSelectedCompany]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [categoryQuery, pathname]);
 
   // Disparar evento de categoria
   useEffect(() => {
     window.dispatchEvent(
       new CustomEvent("categorySelected", {
         detail: categoryQuery || "Todos",
-      }),
+      })
     );
   }, [categoryQuery]);
+
+  const trackCompanyViews = (
+    companies: any[],
+    viewType: string,
+    page: number = 1,
+    itemsPerPage: number = 9
+  ) => {
+    if (!TrackCompanyView || !companies?.length) return;
+
+    const startIndex = (page - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const pageCompanies = companies.slice(startIndex, endIndex);
+
+    pageCompanies.forEach((company, index) => {
+      if (company.id) {
+        TrackCompanyView(
+          company.id as string,
+          {
+            page: pathname,
+            section: "commerce-page",
+            position: "company-list",
+            companyName: company.name as string,
+            categories: (company.company_category?.map(
+              (cat: { name: string }) => cat.name
+            ) || []) as string[],
+            activeCategory: categoryQuery ? categoryQuery : "Todos",
+            selectedDistrict: selectedDistrict as string,
+            showMapMode: showMap as boolean,
+            gridIndex: index as number,
+            globalIndex: (startIndex + index) as number,
+            currentPage: page as number,
+            totalPages: Math.ceil(companies.length / itemsPerPage) as number,
+            itemsPerPage: itemsPerPage as number,
+            totalCompanies: companies.length as number,
+            pageCompaniesCount: pageCompanies.length as number,
+            viewType: viewType as string,
+            timestamp: new Date().toISOString(),
+          } as TrackCompanyViewParams
+        );
+      }
+    });
+  };
 
   // Handler para mudança de página
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
+    if (companies?.data) {
+      trackCompanyViews(companies.data, "pagination", newPage, 9);
+    }
   };
 
   const capitalize = (text: string) => {
@@ -139,39 +205,12 @@ export default function ClientListArticlesByCategory() {
     }
   }, [showMap]);
 
-  // Rastrear quando os comércios aparecem na página
+  // Analytics inicial
   useEffect(() => {
-    if (!loading && companies?.data && companies.data.length > 0 && TrackCompanyPrint) {
-      // Calcular empresas da página atual (mesma lógica de paginação)
-      const itemsPerPage = 9;
-      const startIndex = (currentPage - 1) * itemsPerPage;
-      const endIndex = startIndex + itemsPerPage;
-      const pageCompanies = companies.data.slice(startIndex, endIndex);
-      const totalCompanies = companies.data.length;
-
-      pageCompanies.forEach((company, index) => {
-        if (company.id && company.status === "active") {
-          TrackCompanyPrint(company.id, {
-            page: pathname,
-            section: "commerce-page",
-            position: "company-list",
-            companyName: company.name,
-            categories: company.company_category?.map((cat: { name: string }) => cat.name) || [],
-            activeCategory: categoryQuery ? categoryQuery : "Todos",
-            selectedDistrict: selectedDistrict,
-            showMapMode: showMap,
-            gridIndex: index,
-            globalIndex: startIndex + index,
-            currentPage: currentPage,
-            totalPages: Math.ceil(totalCompanies / itemsPerPage),
-            itemsPerPage: itemsPerPage,
-            totalCompanies: totalCompanies,
-            pageCompaniesCount: pageCompanies.length,
-          });
-        }
-      });
+    if (!loading && companies?.data?.length && currentPage === 1) {
+      trackCompanyViews(companies.data, "initial", 1, 9);
     }
-  }, [companies?.data?.length, loading, currentPage, pathname, categoryQuery, selectedDistrict, showMap, TrackCompanyPrint]);
+  }, [companies?.data?.length, loading]);
 
   // Listener para mudanças de distrito
   useEffect(() => {
@@ -179,33 +218,48 @@ export default function ClientListArticlesByCategory() {
       const customEvent = event as CustomEvent;
       setSelectedDistrict(customEvent.detail);
       setCurrentPage(1);
+
+      // Track mudança de filtro
+      if (companies?.data) {
+        trackCompanyViews(companies.data, "filter_change", 1, 9);
+      }
     };
 
     window.addEventListener("districtSelected", handleDistrictChange);
     return () =>
       window.removeEventListener("districtSelected", handleDistrictChange);
-  }, []);
+  }, [companies?.data]);
 
-  //  Combinar apenas empresas da página atual com status ACTIVE
+  // ✅ NOVO: Combinar apenas empresas da página atual com status ACTIVE
   const currentPageCompaniesForMap = useMemo(() => {
     const companies: any[] = [];
 
-    //  Sempre incluir as destacadas (aparecem na primeira página) - APENAS ACTIVE
+    // ✅ Sempre incluir as destacadas (aparecem na primeira página) - APENAS ACTIVE
     if (currentPage === 1 && highlightedCompanies?.data) {
       const activeHighlighted = highlightedCompanies.data.filter(
-        (company) => company.status === "active",
+        (company) => company.status === "active"
       );
       companies.push(...activeHighlighted);
+      console.log(
+        `Destacadas ACTIVE: ${activeHighlighted.length} de ${highlightedCompanies.data.length}`
+      );
     }
 
-    //  Incluir as empresas normais da página atual - APENAS ACTIVE
+    // ✅ Incluir as empresas normais da página atual - APENAS ACTIVE
     if (normalCompanies?.data) {
       const activeNormal = normalCompanies.data.filter(
-        (company) => company.status === "active",
+        (company) => company.status === "active"
       );
       companies.push(...activeNormal);
+      console.log(
+        `Normais ACTIVE: ${activeNormal.length} de ${normalCompanies.data.length}`
+      );
     }
 
+    console.log(
+      `Total empresas ACTIVE no mapa (Página ${currentPage}):`,
+      companies.length
+    );
     return companies;
   }, [highlightedCompanies?.data, normalCompanies?.data, currentPage]);
 
@@ -226,7 +280,7 @@ export default function ClientListArticlesByCategory() {
             />
           </div>
 
-          {/*  Mapa lateral - mostra apenas empresas da página atual */}
+          {/* ✅ Mapa lateral - mostra apenas empresas da página atual */}
           {showMap && !loading && (
             <CommercialMap
               companies={currentPageCompaniesForMap}

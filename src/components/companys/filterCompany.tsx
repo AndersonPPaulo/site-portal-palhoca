@@ -74,6 +74,7 @@ export default function FilteredCommerceList({
     } catch (error) {
       console.error("Erro ao buscar empresas:", error);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     activeCategory,
     selectedDistrict,
@@ -81,7 +82,6 @@ export default function FilteredCommerceList({
     currentPage,
     itemsPerPage,
     showHighlightedOnly,
-    listNormalCompanies,
   ]);
 
   // Buscar dados quando filtros mudarem
