@@ -22,7 +22,7 @@ export default function PostTopGridSection({
   const { TrackArticleClick } = useContext(ArticleAnalyticsContext);
 
   useEffect(() => {
-    GetPublishedArticles({});
+    GetPublishedArticles({ limit: 20 });
   }, []);
 
   // Filtra para remover o post atual e notícias de colunistas (por role do creator)
@@ -43,7 +43,7 @@ export default function PostTopGridSection({
 
       return dateB.getTime() - dateA.getTime(); // Mais recentes primeiro
     })
-    .slice(0, 9);
+    .slice(0, 6);
 
   const topPosts = sortedPosts || [];
 
