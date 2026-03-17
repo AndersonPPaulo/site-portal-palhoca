@@ -102,7 +102,7 @@ export default function ColumnistPage() {
                 columnistArticles.data &&
                 columnistArticles.data.length > 0 ? (
                 <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {columnistArticles.data.slice(0, 6).map((article) => (
                       <Link
                         key={article.id}
@@ -160,7 +160,7 @@ export default function ColumnistPage() {
 
                   {/* Restante dos artigos */}
                   {columnistArticles.data.length > 6 && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
                       {columnistArticles.data.slice(6).map((article) => (
                         <Link
                           key={article.id}
@@ -246,59 +246,6 @@ export default function ColumnistPage() {
               )}
             </div>
           </div>
-
-          {/* Sidebar - Notícias Mais Lidas */}
-          <aside className="w-full lg:w-[356px]">
-            <div className="sticky top-4">
-              <h3 className="text-2xl font-bold mb-4">Mais Lidas</h3>
-              <div className="shadow-md rounded-xl overflow-hidden">
-                {sidebarArticles.map((article, idx) => (
-                  <Link
-                    key={article.id}
-                    href={`/noticia/${normalizeTextToslug(
-                      article.category.name,
-                    )}/${article.slug}`}
-                    className="flex gap-3 rounded-xl p-2 transition hover:bg-gray-50"
-                  >
-                    <div className="relative min-w-[151px] h-[110px] rounded-sm overflow-hidden">
-                      {article?.thumbnail?.url ? (
-                        <Image
-                          src={article.thumbnail.url}
-                          alt={
-                            article.thumbnail.description || "Imagem do artigo"
-                          }
-                          fill
-                          unoptimized
-                          className="object-cover"
-                        />
-                      ) : (
-                        <Image
-                          unoptimized
-                          src={default_image}
-                          alt={"Sem imagem cadastrada na noticia"}
-                          fill
-                          className="object-cover"
-                        />
-                      )}
-                    </div>
-                    <div className="flex flex-col justify-between">
-                      <h3 className="text-xl font-semibold leading-tight line-clamp-3">
-                        {article.title}
-                      </h3>
-                      <div className="flex w-full justify-between">
-                        <span className="w-min text-xs bg-secondary text-primary px-3 py-1 rounded-2xl">
-                          {article.category.name}
-                        </span>
-                        <p className="text-xs text-gray-500">
-                          {formatDate(article.updated_at)}
-                        </p>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </aside>
         </section>
       </main>
       <footer>
